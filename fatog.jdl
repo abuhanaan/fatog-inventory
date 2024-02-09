@@ -1,0 +1,110 @@
+entity Customer {
+	name String
+    phoneNumber Integer
+    shippingAddress String
+    gender Gender
+}
+
+
+entity Sales {
+	orderId Integer
+    amountPayable Integer
+    amountPaid Long
+    paymentStatus PaymentStatus
+    outStandingPayment Long
+    note String
+}
+
+entity OrderList {
+	orderId Integer
+	productId Integer
+    noOfBags Integer
+    pricePerBag Long
+    totalWeight Long
+    totalPrice Long
+}
+
+entity Order {
+	totalAmount Long
+    totalWeight Long
+    totalNoOfBags Integer
+    customerId Integer
+    phoneNumber Integer
+    shippingAddress String
+    paymentStatus PaymentStatus
+    deliveryStatus DeliveryStatus
+    amountPaid Long
+    outStandingPayment Long
+    note String
+}
+
+entity StockList {
+	stockId Integer required
+    productId Integer
+    noOfBags Integer
+    pricePerBag Long
+    totalWeight Long
+    totalAmount Long
+}
+
+entity Stock {
+	productId Integer
+	totalAmount Long
+    totalWeight Long
+    totalNoOfBags Integer
+    invoice Image
+}
+
+entity Product {
+	name String
+	type Feedtype
+	weight Integer
+	size Long
+	manufacturer String
+}
+
+entity Manufacturer {
+	brandName String
+	repName String
+	repPhoneNumber Integer
+}
+
+entity User {
+	email String
+	role Role
+	language Language
+}
+
+enum Role {
+	ADMIN, CEO, MANAGER, DEALER, CUSTOMER
+}
+
+
+enum Feedtype {
+	SINKING, FLOATING
+}
+
+enum PaymentStatus {
+	FullyPaid, PartlyPaid, NoPayment
+}
+
+enum DeliveryStatus {
+	Delivered, Pending
+}
+
+enum Gender {
+	MALE, FEMALE
+}
+
+relationship OneToOne {
+	Product{manufacturer} to Manufacturer
+    Sales{orderId} to Order
+}
+
+relationship OneToMany {
+	Stock to StockList{stockId}
+    Customer to Order{orderId}
+    Order to OrderList{orderId}
+    Product to OrderList{productId}
+}
+
