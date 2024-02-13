@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id              Int      @id @default(autoincrement())
+  name            String
+  phoneNumber     Int
+  shippingAddress String
+  gender          String
+  userId          Int?     @unique
+  user            User?    @relation(fields: [userId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  orders Order[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String
+  role      String
+  language  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  logs     Log[]
+  Customer Customer?
+}
+
+model Sales {
+  id                 Int      @id @default(autoincrement())
+  orderId            Int      @unique
+  amountPayable      Int
+  amountPaid         Int
+  paymentStatus      String
+  outStandingPayment Int
+  note               String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+}
+
+model OrderList {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  productId   Int
+  noOfBags    Int
+  pricePerBag Int
+  totalWeight Int
+  totalPrice  Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id                 Int      @id @default(autoincrement())
+  totalAmount        Int
+  totalWeight        Int
+  totalNoOfBags      Int
+  customerId         Int
+  phoneNumber        Int
+  shippingAddress    String
+  paymentStatus      String
+  deliveryStatus     String
+  amountPaid         Int
+  outStandingPayment Int
+  note               String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  customer           Customer    @relation(fields: [customerId], references: [id])
+  orderLists         OrderList[]
+  invoice            Sales?
+}
+
+model StockList {
+  id          Int      @id @default(autoincrement())
+  stockId     Int
+  productId   Int
+  noOfBags    Int
+  pricePerBag Int
+  totalWeight Int
+  totalAmount Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  stock       Stock   @relation(fields: [stockId], references: [id])
+  product     Product @relation(fields: [productId], references: [id])
+}
+
+model Stock {
+  id            Int      @id @default(autoincrement())
+  totalAmount   Int
+  totalWeight   Int
+  totalNoOfBags Int
+  invoice       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  StockList     StockList[]
+}
+
+model Product {
+  id             Int      @id @default(autoincrement())
+  name           String
+  type           String
+  weight         Int
+  size           Int
+  manufacturerId Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  manufacturer Manufacturer @relation(fields: [manufacturerId], references: [id])
+  orderLists    OrderList[]
+  stockLists     StockList[]
+}
+
+model Manufacturer {
+  id             Int      @id @default(autoincrement())
+  brandName      String
+  repName        String
+  repPhoneNumber Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  products Product[]
+}
+
+model Log {
+  id           Int    @id @default(autoincrement())
+  requestBody  String
+  responseBody String
+  action       String
+  userId       Int?   @unique
+  user         User?  @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
