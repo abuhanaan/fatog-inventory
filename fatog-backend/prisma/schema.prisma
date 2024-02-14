@@ -24,16 +24,32 @@ model Customer {
   orders Order[]
 }
 
+model Staff {
+  id              Int      @id @default(autoincrement())
+  name            String
+  phoneNumber     Int
+  gender          String
+  userId          Int?     @unique
+  user            User?    @relation(fields: [userId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sales Sales[]
+}
+
 model User {
   id        Int      @id @default(autoincrement())
-  email     String
+  email     String   @unique
+  category  String
   role      String
-  language  String
+  password  String
+  active    Boolean
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   logs     Log[]
-  Customer Customer?
+  customer Customer?
+  staff    Staff?
 }
 
 model Sales {
@@ -44,10 +60,12 @@ model Sales {
   paymentStatus      String
   outStandingPayment Int
   note               String?
+  cashierId          Int         
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
   order Order @relation(fields: [orderId], references: [id])
+  staff Staff @relation(fields: [cashierId], references: [id])
 }
 
 model OrderList {
@@ -81,7 +99,7 @@ model Order {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  customer           Customer    @relation(fields: [customerId], references: [id])
+  customer           Customer?    @relation(fields: [customerId], references: [id])
   orderLists         OrderList[]
   invoice            Sales?
 }
