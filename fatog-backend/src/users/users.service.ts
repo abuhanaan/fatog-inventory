@@ -43,6 +43,14 @@ export class UsersService {
       createUserDto.password = hashedPassword;
       const newUser = await this.prisma.user.create({ data: createUserDto });
 
+      if (newUser.category === 'customer') {
+        // #TODO: Create a new customer profile
+      }
+
+      if (newUser.category === 'staff') {
+        // #TODO: Create a new staff profile
+      }
+
       return newUser;
     } catch (error) {
       console.log(error);
