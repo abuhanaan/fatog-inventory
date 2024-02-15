@@ -12,7 +12,7 @@ import {
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthenticatedRequest } from 'src/utils/interfaces/authRequest.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { CustomerEntity } from './entities/customer.entity';
@@ -23,8 +23,10 @@ export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
   @Post()
-  create(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customerService.create(createCustomerDto);
+  @ApiCreatedResponse({ type: CustomerEntity })
+  async create(@Body() createCustomerDto: CreateCustomerDto) {
+    const newCustomer = await this.customerService.create(createCustomerDto);
+    return new CustomerEntity(newCustomer);
   }
 
   @Get('dashboard')
@@ -34,16 +36,21 @@ export class CustomerController {
   orders() {}
 
   @Get()
-  findAll() {
-    return this.customerService.findAll();
+  @ApiOkResponse({ type: CustomerEntity, isArray: true })
+  async findAll() {
+    const customers = await this.customerService.findAll();
+    return customers.map((customer) => new CustomerEntity(customer));
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.customerService.findOne(id);
+  @ApiOkResponse({ type: CustomerEntity })
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    const customer = await this.customerService.findOne(id);
+    return new CustomerEntity(customer);
   }
 
   @Patch(':id')
+  @ApiOkResponse({ type: CustomerEntity })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Req() request: AuthenticatedRequest,
@@ -59,7 +66,9 @@ export class CustomerController {
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.customerService.remove(id);
+  @ApiOkResponse({ type: CustomerEntity })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const customer = await this.customerService.remove(id);
+    return new CustomerEntity(customer);
   }
 }
