@@ -10,6 +10,8 @@ import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { UserEntity } from './entities/user.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { CustomerService } from 'src/customer/customer.service';
+import { StaffsService } from 'src/staffs/staffs.service';
 
 export const roundsOfHashing = 10;
 
@@ -23,7 +25,11 @@ export class UsersService {
       });
     }
   }
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private customerService: CustomerService,
+    private staffService: StaffsService,
+  ) {}
   async create(createUserDto: CreateUserDto) {
     try {
       const existingUser = await this.prisma.user.findUnique({
@@ -44,11 +50,11 @@ export class UsersService {
       const newUser = await this.prisma.user.create({ data: createUserDto });
 
       if (newUser.category === 'customer') {
-        // #TODO: Create a new customer profile
+        await this.customerService.create({ customerId: newUser.id });
       }
 
       if (newUser.category === 'staff') {
-        // #TODO: Create a new staff profile
+        await this.staffService.create({ staffId: newUser.id });
       }
 
       return newUser;
