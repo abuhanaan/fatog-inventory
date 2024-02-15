@@ -12,12 +12,13 @@ datasource db {
 
 model Customer {
   id              Int      @id @default(autoincrement())
-  name            String
-  phoneNumber     Int
+  firstName       String
+  lastName        String
+  phoneNumber     String
   shippingAddress String
   gender          String
-  userId          Int?     @unique
-  user            User?    @relation(fields: [userId], references: [id])
+  customerId      Int?     @unique
+  user            User?    @relation(fields: [customerId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -26,11 +27,12 @@ model Customer {
 
 model Staff {
   id              Int      @id @default(autoincrement())
-  name            String
-  phoneNumber     Int
+  firstName       String
+  lastName        String
+  phoneNumber     String
   gender          String
-  userId          Int?     @unique
-  user            User?    @relation(fields: [userId], references: [id])
+  staffId         Int?     @unique
+  user            User?    @relation(fields: [staffId], references: [id])
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
