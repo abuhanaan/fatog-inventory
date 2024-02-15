@@ -152,7 +152,7 @@ model Manufacturer {
   id             Int      @id @default(autoincrement())
   brandName      String
   repName        String
-  repPhoneNumber Int
+  repPhoneNumber String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
