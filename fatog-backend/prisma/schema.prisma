@@ -135,7 +135,7 @@ model Stock {
 
 model Product {
   id             Int      @id @default(autoincrement())
-  name           String
+  name           String   @unique
   type           String
   weight         Int
   size           Int
@@ -150,7 +150,7 @@ model Product {
 
 model Manufacturer {
   id             Int      @id @default(autoincrement())
-  brandName      String
+  brandName      String   @unique
   repName        String
   repPhoneNumber String
   createdAt      DateTime @default(now())

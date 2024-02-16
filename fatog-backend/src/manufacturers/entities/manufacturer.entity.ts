@@ -14,11 +14,20 @@ export class ManufacturerEntity implements Manufacturer {
   @ApiProperty()
   repPhoneNumber: string;
 
-  //   TODO: make maufatorer render Products
+  //   TODO: make maufatorer return associated Products
 
   @ApiProperty()
   createdAt: Date;
 
   @ApiProperty({ required: false, nullable: true })
   updatedAt: Date;
+
+  constructor(manufacturer: Manufacturer) {
+    this.id = manufacturer.id;
+    this.brandName = manufacturer.brandName;
+    this.repName = manufacturer.repName;
+    this.repPhoneNumber = manufacturer.repPhoneNumber;
+    this.createdAt = manufacturer.createdAt;
+    this.updatedAt = manufacturer.updatedAt;
+  }
 }
