@@ -36,7 +36,8 @@ model Staff {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  sales Sales[]
+  sales  Sales[]
+  stocks Stock[]
 }
 
 model User {
@@ -126,11 +127,13 @@ model Stock {
   totalAmount   Int
   totalWeight   Int
   totalNoOfBags Int
+  staffId       Int
   invoice       String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  StockList     StockList[]
+  staff          Staff?    @relation(fields: [staffId], references: [staffId])
+  stockLists     StockList[]
 }
 
 model Product {
