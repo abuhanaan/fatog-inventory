@@ -18,6 +18,10 @@ export class CreateProductDto {
   weight: number;
 
   @IsNumber()
+  @ApiProperty()
+  pricePerBag?: number;
+
+  @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
   size: number;
