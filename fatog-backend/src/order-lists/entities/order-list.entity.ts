@@ -25,7 +25,7 @@ export class OrderListEntity implements OrderList {
   @ApiProperty()
   totalPrice: number;
 
-  @ApiProperty({ required: false, type: OrderEntity })
+  @ApiProperty({ required: false, type: () => OrderEntity })
   order?: OrderEntity;
 
   @ApiProperty({ required: false, type: ProductEntity })
