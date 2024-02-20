@@ -22,7 +22,7 @@ export class ProductsController {
   @ApiCreatedResponse({ type: ProductEntity })
   async create(@Body() createProductDto: CreateProductDto) {
     const product = await this.productsService.create(createProductDto);
-    return new ProductEntity(product);
+    // return new ProductEntity(product);
   }
 
   @Get()
