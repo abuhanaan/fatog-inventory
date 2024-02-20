@@ -10,9 +10,11 @@ import { ManufacturersModule } from './manufacturers/manufacturers.module';
 import { ProductsModule } from './products/products.module';
 import { StocksModule } from './stocks/stocks.module';
 import { StockListsModule } from './stock-lists/stock-lists.module';
+import { OrdersModule } from './orders/orders.module';
+import { OrderListsModule } from './order-lists/order-lists.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, CustomerModule, StaffsModule, ManufacturersModule, ProductsModule, StocksModule, StockListsModule],
+  imports: [PrismaModule, UsersModule, AuthModule, CustomerModule, StaffsModule, ManufacturersModule, ProductsModule, StocksModule, StockListsModule, OrdersModule, OrderListsModule],
   controllers: [AppController],
   providers: [AppService],
 })

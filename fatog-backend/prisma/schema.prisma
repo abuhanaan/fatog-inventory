@@ -36,6 +36,7 @@ model Staff {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
+  orders Order[]
   sales  Sales[]
   stocks Stock[]
 }
@@ -91,18 +92,20 @@ model Order {
   totalAmount        Int
   totalWeight        Int
   totalNoOfBags      Int
-  customerId         Int
-  phoneNumber        Int
-  shippingAddress    String
-  paymentStatus      String
-  deliveryStatus     String
-  amountPaid         Int
-  outStandingPayment Int
+  customerId         Int?
+  staffId            Int?     
+  phoneNumber        String
+  shippingAddress    String?
+  paymentStatus      String?
+  deliveryStatus     String?
+  amountPaid         Int?
+  outStandingPayment Int?
   note               String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  customer           Customer?    @relation(fields: [customerId], references: [id])
+  customer           Customer?    @relation(fields: [customerId], references: [customerId])
+  staff              Staff?    @relation(fields: [staffId], references: [staffId])
   orderLists         OrderList[]
   invoice            Sales?
 }
@@ -140,6 +143,7 @@ model Product {
   id             Int      @id @default(autoincrement())
   name           String   @unique
   type           String
+  pricePerBag    Int
   weight         Int
   size           Int
   manufacturerId Int

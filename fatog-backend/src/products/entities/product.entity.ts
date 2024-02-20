@@ -16,6 +16,9 @@ export class ProductEntity implements Product {
   weight: number;
 
   @ApiProperty()
+  pricePerBag: number;
+
+  @ApiProperty()
   size: number;
 
   @ApiProperty()

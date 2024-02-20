@@ -13,13 +13,13 @@ import { StockListsService } from './stock-lists.service';
 import { CreateStockListDto } from './dto/create-stock-list.dto';
 import { UpdateStockListDto } from './dto/update-stock-list.dto';
 import { CreateStockListArrayDto } from './dto/create-stock-list-array.dto';
-import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { StockListEntity } from './entities/stock-list.entity';
 import { AuthenticatedRequest } from 'src/utils/interfaces/authRequest.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { NewStockListEntity } from 'src/utils/newStockListEntity';
 
 @Controller('stock-lists')
+@ApiTags('stock-lists')
 export class StockListsController {
   constructor(private readonly stockListsService: StockListsService) {}
 

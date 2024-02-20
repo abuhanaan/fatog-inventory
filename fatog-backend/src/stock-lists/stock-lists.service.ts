@@ -48,7 +48,8 @@ export class StockListsService {
       memberStock.stockId = stock.id;
     });
     const createdStockLists = await this.prisma.stockList.createMany({
-      data: createStockListArrayDto.data,
+      // data: createStockListArrayDto.data,
+      data: stockListData,
     });
     // Fetch the newly created stock lists with their related entities
     const stockLists = await this.prisma.stockList.findMany({
