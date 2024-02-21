@@ -44,7 +44,7 @@ export class OrderEntity implements Order {
   @ApiProperty()
   note: string;
 
-  @ApiProperty({ required: false, type: CustomerEntity })
+  @ApiProperty({ required: false, type: () => CustomerEntity })
   customer?: CustomerEntity;
 
   @ApiProperty({ required: false, type: StaffEntity })

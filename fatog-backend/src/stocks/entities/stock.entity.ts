@@ -22,7 +22,7 @@ export class StockEntity implements Stock {
   @ApiProperty()
   invoice: string;
 
-  @ApiProperty({ required: false, type: StaffEntity })
+  @ApiProperty({ required: false, type: () => StaffEntity })
   staff?: StaffEntity;
 
   @ApiProperty({ required: false, type: () => StockListEntity, isArray: true })

@@ -37,13 +37,16 @@ export class StaffsService {
 
   async findAll() {
     const staffs = await this.prisma.staff.findMany({
-      include: { sales: true },
+      include: { sales: true, user: true, orders: true, stocks: true },
     });
     return staffs;
   }
 
   async findOne(id: number) {
-    const staff = await this.prisma.staff.findUnique({ where: { id } });
+    const staff = await this.prisma.staff.findUnique({
+      where: { id },
+      include: { sales: true, user: true, orders: true, stocks: true },
+    });
     this.checkIfStaffExists(staff, id);
     return staff;
   }
