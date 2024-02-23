@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -45,7 +46,16 @@ export class ManufacturersService {
   }
 
   async create(createManufacturerDto: CreateManufacturerDto) {
-    await this.checkIfManufacturerExists(createManufacturerDto.brandName);
+    const existingManufacturer =
+      await this.prismaService.manufacturer.findFirst({
+        where: { brandName: createManufacturerDto.brandName },
+      });
+    if (existingManufacturer) {
+      throw new ConflictException({
+        message: `Manufacturer with brand ${createManufacturerDto.brandName} already exists`,
+        error: 'Conflict Operation',
+      });
+    }
     return this.prismaService.manufacturer.create({
       data: createManufacturerDto,
     });
