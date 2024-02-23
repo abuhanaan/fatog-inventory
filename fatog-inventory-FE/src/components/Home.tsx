@@ -1,4 +1,5 @@
 import { Box, Heading, Button, Flex, FormControl, FormLabel, InputGroup, InputLeftAddon, Input, Icon, Stack, Link } from "@chakra-ui/react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { Form } from "react-router-dom";
 import bgImage from '../assets/fish-hero3.png';
 import bgImage2 from '../assets/inventoryImg.webp';
@@ -6,7 +7,20 @@ import { TbPasswordUser, TbUser } from "react-icons/tb";
 
 import Logo from "./Logo";
 
+export interface ILoginFormInput {
+    username: string;
+    password: string;
+};
+
 const Home = () => {
+    const {
+        handleSubmit,
+        register,
+        formState,
+    } = useForm<ILoginFormInput>();
+
+    const onSubmit = handleSubmit(data => console.log(data));
+
     return (
         <Flex
             fontSize='3xl'
@@ -36,12 +50,12 @@ const Home = () => {
                     <Form>
                         <Stack spacing='6'>
                             <FormControl>
-                                <FormLabel>Username</FormLabel>
+                                <FormLabel>Username/Email</FormLabel>
                                 <InputGroup>
                                     <InputLeftAddon>
                                         <Icon as={TbUser} />
                                     </InputLeftAddon>
-                                    <Input type="text" placeholder="Username" />
+                                    <Input type="text" placeholder="Username/Email" {...register('username')} />
                                 </InputGroup>
                             </FormControl>
 
