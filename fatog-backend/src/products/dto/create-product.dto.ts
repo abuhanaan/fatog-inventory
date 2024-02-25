@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Product } from '@prisma/client';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateProductDto {
-  id: number;
   @IsString()
   @IsNotEmpty()
   @ApiProperty()

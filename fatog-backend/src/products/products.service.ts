@@ -6,7 +6,7 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Product } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 import { ProductEntity } from './entities/product.entity';
 
 @Injectable()
@@ -32,7 +32,17 @@ export class ProductsService {
         error: 'Conflict Operation',
       });
     }
-    // return this.prisma.product.create({ data: createProductDto });
+    const newProduct = await this.prisma.product.create({
+      data: {
+        name: createProductDto.name,
+        type: createProductDto.type,
+        weight: createProductDto.weight,
+        pricePerBag: createProductDto.pricePerBag,
+        size: createProductDto.size,
+        manufacturerId: createProductDto.manufacturerId,
+      },
+    });
+    return newProduct;
   }
 
   async findAll() {
