@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateManufacturerDto } from './dto/create-manufacturer.dto';
 import { UpdateManufacturerDto } from './dto/update-manufacturer.dto';
@@ -89,6 +91,19 @@ export class ManufacturersService {
 
   async remove(id: number) {
     await this.checkIfManufacturerExists(undefined, id);
+
+    const relatedProducts = await this.prismaService.product.findMany({
+      where: { manufacturerId: id },
+    });
+
+    if (relatedProducts.length > 0) {
+      // TODO: Allow only admin to delete after performing a check on the user's role, O/W throw the exception below
+      throw new ForbiddenException({
+        message:
+          'There are records in other table referencing the specified record, deleting it will automatically delete those records. Please refer to the admin if you want to proceed with the deletions',
+        error: 'forbidden Operation',
+      });
+    }
     return this.prismaService.manufacturer.delete({ where: { id } });
   }
 }
