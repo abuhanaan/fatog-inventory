@@ -1,11 +1,12 @@
 import { useRef } from 'react';
 import { useNavigate, Link, useLoaderData } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, Box, useDisclosure, IconButton, Button, Heading, Text } from '@chakra-ui/react';
+import { Stack, HStack, Box, useDisclosure, IconButton, Button, Heading, Text} from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import Modal from '../../components/Modal';
 import Breadcrumb from '../../components/Breadcrumb';
+import { EmptySearch } from '../../components/EmptySearch';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -18,15 +19,15 @@ const columns = [
 ];
 
 const products = [
-    { id: 1, name: 'Product 1', type: 'Type 1', weight: 10, size: 100, manufacturer: 'Vita Feed' },
-    { id: 2, name: 'Product 2', type: 'Type 2', weight: 10, size: 100, manufacturer: 'Vita Feed' },
-    { id: 3, name: 'Product 3', type: 'Type 3', weight: 10, size: 100, manufacturer: 'Vita Feed' },
+    // { id: 1, name: 'Product 1', type: 'Type 1', weight: 10, size: 100, manufacturer: 'Vita Feed' },
+    // { id: 2, name: 'Product 2', type: 'Type 2', weight: 10, size: 100, manufacturer: 'Vita Feed' },
+    // { id: 3, name: 'Product 3', type: 'Type 3', weight: 10, size: 100, manufacturer: 'Vita Feed' },
 ];
 
 const Products = () => {
     const breadcrumbData = [
-        {name: 'Home', ref: '/dashboard'},
-        {name: 'Products', ref: '/products'},
+        { name: 'Home', ref: '/dashboard' },
+        { name: 'Products', ref: '/products' },
     ];
 
     return (
@@ -36,9 +37,13 @@ const Products = () => {
             </Box>
             <Heading fontSize='3xl' color='blue.700'>Products</Heading>
             <Box>
-                <ListingsTable data={products} columns={columns} fileName='products-data.csv' addLink='create' render={(product) => (
-                    <ActionButtons product={product} />
-                )} />
+                {
+                    products?.length === 0 ?
+                        <EmptySearch headers={['S/N', 'NAME', 'TYPE', 'WEIGHT', 'SIZE', 'MANUFACTURER']} type='product' /> :
+                        <ListingsTable data={products} columns={columns} fileName='products-data.csv' addLink='create' render={(product) => (
+                            <ActionButtons product={product} />
+                        )} />
+                }
             </Box>
         </Stack>
     )
@@ -86,7 +91,7 @@ const ActionButtons = ({ product }) => {
         // setTimeout(() => {
         //     return redirect('/admin/users');
         // }, 3000);
-        
+
         closeModalRef.current.click();
     }
 
