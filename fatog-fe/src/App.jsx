@@ -8,6 +8,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import RequireAuth from "./components/RequireAuth";
 import InventoryLayout from "./components/layouts/InventoryLayout";
+import Products from "./pages/products/Products";
+import Manufacturers from "./pages/manufacturers/Manufacturers";
+import Page404 from './components/Page404';
 
 const router = createBrowserRouter(createRoutesFromChildren(
     <Route path='/' element={<Layout />}>
@@ -16,9 +19,12 @@ const router = createBrowserRouter(createRoutesFromChildren(
         <Route element={<RequireAuth />}>
             <Route element={<InventoryLayout />}>
                 <Route path='dashboard' element={<Dashboard />} />
+                <Route path='products' element={<Products />} />
+                <Route path='manufacturers' element={<Manufacturers />} />
             </Route>
         </Route>
 
+        <Route path="*" element={<Page404 />} />
     </Route>
 ));
 

@@ -15,12 +15,12 @@ const InventoryLayout = () => {
     return (
         <Box minHeight="100vh">
             <Flex>
-                <Box w="250px" bg='white' borderRightWidth='1px' borderColor='gray.200' display={{ 'base': 'none', 'md': 'block' }}>
+                <Flex direction='column' w="250px" bg='white' borderRightWidth='1px' borderColor='gray.200' display={{ 'base': 'none', 'md': 'flex' }}>
                     {/* Side Navigation */}
                     <Logo />
                     <SideNavLinks />
                     <SideDrawer isOpen={isOpen} onClose={onClose} btnRef={drawerBtnRef} />
-                </Box>
+                </Flex>
                 <Flex direction='column' flex="1" minHeight='100vh'>
                     {/* Main Content */}
                     <Flex p={4} alignItems="center" bg='white' borderBottomWidth='1px' borderColor='gray.200'>
@@ -36,7 +36,7 @@ const InventoryLayout = () => {
                             </MenuList>
                         </Menu>
                     </Flex>
-                    <Box flex='1' p={4} bg='gray.50'>
+                    <Box flex='1' p={6} bg='gray.50'>
                         <Outlet />
                     </Box>
                 </Flex>

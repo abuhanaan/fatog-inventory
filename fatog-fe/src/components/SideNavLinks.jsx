@@ -1,18 +1,15 @@
 import React from 'react';
-import { Box, Stack, Flex, HStack, Text, Icon, Link } from '@chakra-ui/react';
+import { Box, Stack, Flex, HStack, Text, Icon, Link, Spacer } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
 import { links } from '../constants';
+import { RiLogoutCircleRLine } from "react-icons/ri";
+import LogoutBtn from './LogoutBtn';
 
 const SideNavLinks = () => {
     return (
-        <Stack pt='4' borderTopWidth='1px' borderColor='gray.200'>
+        <Stack flex='1' pt='4' borderTopWidth='1px' borderColor='gray.200'>
             {
                 links.map(link => (
-                    // <Box
-                    //     paddingLeft='6'
-                    //     paddingY='4'
-                    //     _hover={{ bg: 'blue.100', borderLeftWidth: '4px', borderColor: '#1570EF', color: '#1570EF' }}
-                    // >
                     <Link
                         key={link.title}
                         as={NavLink}
@@ -44,9 +41,13 @@ const SideNavLinks = () => {
 
                         </HStack>
                     </Link>
-                    // </Box>
                 ))
             }
+
+            <Spacer />
+            
+            {/* Logout */}
+            <LogoutBtn display={{ base: 'none', md: 'block' }} />
         </Stack>
     )
 }
