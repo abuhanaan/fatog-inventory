@@ -20,7 +20,7 @@ const SearchInput = ({ value: initValue, onChange, debounce = 500 }) => {
 
     return (
         <Box w='xs'>
-            <InputGroup>
+            <InputGroup size='sm'>
                 <InputLeftAddon>
                     <Icon as={IoSearch} />
                 </InputLeftAddon>

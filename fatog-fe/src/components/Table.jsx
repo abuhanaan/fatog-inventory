@@ -77,10 +77,7 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, addLink, rend
                     onChange={(value) => setGlobalFilter(String(value))}
                 />
                 <Spacer />
-                <HStack spacing='2'>
-                    <AddButton navigateTo={addLink} />
-                    <DownloadBtn data={tableData} fileName={fileName} />
-                </HStack>
+                <DownloadBtn data={tableData} fileName={fileName}>Download</DownloadBtn>
             </Flex>
             <TableContainer>
                 <Table variant="simple" size='sm' colorScheme='blue'>
@@ -126,7 +123,7 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, addLink, rend
             </TableContainer>
 
             {/* Pagination */}
-            <HStack mt={4}spacing='5'>
+            <HStack mt={4} spacing='5'>
                 Page{' '}
                 <em>
                     {

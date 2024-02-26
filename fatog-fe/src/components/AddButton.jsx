@@ -1,16 +1,18 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { IconButton } from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
 import { HiOutlinePlus } from "react-icons/hi";
 
-const AddButton = ({ navigateTo }) => {
+const AddButton = ({ children, navigateTo }) => {
     return (
-        <IconButton
+        <Button
             as={RouterLink}
             to={navigateTo}
-            icon={<HiOutlinePlus />}
+            leftIcon={<HiOutlinePlus />}
             colorScheme="blue"
-        />
+        >
+            {children}
+        </Button>
     )
 }
 
