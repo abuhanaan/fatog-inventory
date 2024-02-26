@@ -1,13 +1,17 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import {Link, HStack, Icon, Text} from '@chakra-ui/react';
+import { Link, HStack, Icon, Text } from '@chakra-ui/react';
 import { RiLogoutCircleRLine } from 'react-icons/ri';
+import useAuth from '../hooks/useAuth';
 
-const LogoutBtn = ({...rest}) => {
+const LogoutBtn = ({ ...rest }) => {
+    const { logout } = useAuth();
+
     return (
         <Link
             as={NavLink}
             to=''
+            onClick={() => logout()}
             _hover={{
                 bg: '#E53E3E', borderLeftWidth: '5px', borderColor: '#FC8181', color: '#FFF5F5', fontWeight: 'medium'
             }}

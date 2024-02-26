@@ -6,9 +6,10 @@ import SideNavLinks from '../SideNavLinks';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import SideDrawer from '../SideDrawer';
 import Logo from '../Logo';
+import useAuth from '../../hooks/useAuth';
 
 const InventoryLayout = () => {
-    const { colorMode } = useColorMode();
+    const { logout } = useAuth();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const drawerBtnRef = React.useRef();
 
@@ -31,8 +32,8 @@ const InventoryLayout = () => {
                                 <Avatar size="sm" />
                             </MenuButton>
                             <MenuList>
-                                <MenuItem>Settings</MenuItem>
-                                <MenuItem>Logout</MenuItem>
+                                <MenuItem>Profile</MenuItem>
+                                <MenuItem onClick={() => {logout()}}>Logout</MenuItem>
                             </MenuList>
                         </Menu>
                     </Flex>
