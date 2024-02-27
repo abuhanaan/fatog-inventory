@@ -1,6 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
 
-const BASE_URL = 'https://fatog-inventory.onrender.com';
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 const headers = {
     'Content-Type': 'application/json'
 };
