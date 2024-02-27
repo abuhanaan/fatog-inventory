@@ -21,22 +21,23 @@ const SideDrawer = ({ isOpen, onClose, btnRef }) => {
             onClose={onClose}
             finalFocusRef={btnRef}
             isFullHeight={true}
+            size='sm'
         >
             <DrawerOverlay />
-                <DrawerContent paddingX='0'>
-                    <DrawerCloseButton />
-                    <DrawerHeader paddingX='2'>
-                        <Logo />
-                    </DrawerHeader>
+            <DrawerContent paddingX='0'>
+                <DrawerCloseButton />
+                <DrawerHeader paddingX='2'>
+                    <Logo />
+                </DrawerHeader>
 
-                    <DrawerBody padding='0' flex='1'>
-                        <Flex direction='column'>
-                            <SideNavLinks />
-                            <Spacer />
-                            <LogoutBtn display={{ base: 'block', md: 'none' }} />
-                        </Flex>
-                    </DrawerBody>
-                </DrawerContent>
+                <DrawerBody padding='0' flex='1'>
+                    <Flex direction='column'>
+                        <SideNavLinks />
+                        <Spacer />
+                        <LogoutBtn display={{ base: 'block', md: 'none' }} />
+                    </Flex>
+                </DrawerBody>
+            </DrawerContent>
         </Drawer>
     )
 }

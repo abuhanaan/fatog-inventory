@@ -11,6 +11,8 @@ import InventoryLayout from "./components/layouts/InventoryLayout";
 import Products from "./pages/products/Products";
 import Manufacturers from "./pages/manufacturers/Manufacturers";
 import Page404 from './components/Page404';
+import ProductForm from "./pages/products/ProductForm";
+import ProductView from "./pages/products/ProductView";
 
 const router = createBrowserRouter(createRoutesFromChildren(
     <Route path='/' element={<Layout />}>
@@ -19,7 +21,11 @@ const router = createBrowserRouter(createRoutesFromChildren(
         <Route element={<RequireAuth />}>
             <Route element={<InventoryLayout />}>
                 <Route path='dashboard' element={<Dashboard />} />
+
                 <Route path='products' element={<Products />} />
+                <Route path='products/create' element={<ProductForm />} />
+                <Route path='products/:id' element={<ProductView />} />
+
                 <Route path='manufacturers' element={<Manufacturers />} />
             </Route>
         </Route>

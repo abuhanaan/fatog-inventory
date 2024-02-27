@@ -7,7 +7,7 @@ import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
 import AddButton from './AddButton';
 
-const ListingsTable = ({ data: tableData, columns: cols, fileName, addLink, render }) => {
+const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => {
     const columnHelper = createColumnHelper();
 
     const columns = cols.map(col => {
@@ -28,6 +28,20 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, addLink, rend
                     cell: props => (
                         render(props.row.original)
                     ),
+                    header: col.header
+                })
+            )
+        }
+
+        if (col.id === 'manufacturer') {
+            return (
+                columnHelper.accessor(col.id, {
+                    id: col.id,
+                    cell: info => <span>
+                        {
+                            info.getValue() ? info.getValue().brandName : 'N/A'
+                        }
+                    </span>,
                     header: col.header
                 })
             )

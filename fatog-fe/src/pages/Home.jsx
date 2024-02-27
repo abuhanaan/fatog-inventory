@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import bgImage from '../assets/fish-hero3.png';
 import bgImage2 from '../assets/inventoryImg.webp';
 import { BiError } from "react-icons/bi";
-import TextInput from "../components/form/TextInput";
+import LoginInput from "../components/form/LoginInput";
 import PasswordInput from "../components/form/PasswordInput";
 import Logo from "../components/Logo";
 import { authenticate } from "../api/user";
@@ -77,7 +77,7 @@ const Home = () => {
 
                     <form onSubmit={handleSubmit(submit)}>
                         <Stack spacing='6'>
-                            <TextInput
+                            <LoginInput
                                 name='email'
                                 control={control}
                                 label='Email/Username'
