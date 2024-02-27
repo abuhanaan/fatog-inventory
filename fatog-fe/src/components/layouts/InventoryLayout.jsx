@@ -24,7 +24,7 @@ const InventoryLayout = () => {
                 </Flex>
                 <Flex direction='column' flex="1" minHeight='100vh'>
                     {/* Main Content */}
-                    <Flex p={4} alignItems="center" bg='white' borderBottomWidth='1px' borderColor='gray.200'>
+                    <Flex p={4} alignItems="center" bg='white' borderBottomWidth='1px' borderColor='gray.200' h='65px'>
                         <Icon as={HamburgerIcon} fontSize='24px' color='gray.800' display={['block', 'block', 'none']} onClick={onOpen} ref={drawerBtnRef} />
                         <Spacer />
                         <Menu>
