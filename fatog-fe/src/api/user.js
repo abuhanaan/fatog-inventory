@@ -29,4 +29,15 @@ export const authenticate = async (data) => {
         user
     }
 
+    // if (data.email === 'admin@gmail.com' && data.password === 'password') {
+    //     return {
+    //         accessToken: 'admin'
+    //     }
+    // }
+
+    // return {
+    //     error: 'User not found',
+    //     message: 'Invalid login details',
+    //     statusCode: '400'
+    // }
 };

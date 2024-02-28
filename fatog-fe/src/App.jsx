@@ -13,6 +13,8 @@ import Manufacturers from "./pages/manufacturers/Manufacturers";
 import Page404 from './components/Page404';
 import ProductForm from "./pages/products/ProductForm";
 import ProductView from "./pages/products/ProductView";
+import ManufacturerForm from "./pages/manufacturers/ManufacturerForm";
+import ManufacturerView from "./pages/manufacturers/ManufacturerView";
 
 const router = createBrowserRouter(createRoutesFromChildren(
     <Route path='/' element={<Layout />}>
@@ -27,6 +29,8 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='products/:id' element={<ProductView />} />
 
                 <Route path='manufacturers' element={<Manufacturers />} />
+                <Route path='manufacturers/create' element={<ManufacturerForm />} />
+                <Route path='manufacturers/:id' element={<ManufacturerView />} />
             </Route>
         </Route>
 
