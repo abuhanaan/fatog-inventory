@@ -1,7 +1,7 @@
 // Layout.js
 import React, { useRef } from 'react';
-import { Box, Flex, Spacer, useColorMode, Button, Menu, MenuButton, MenuList, MenuItem, Avatar, IconButton, Icon, useDisclosure } from '@chakra-ui/react';
-import { Link, Outlet } from 'react-router-dom';
+import { Box, Flex, Stack, Spacer, useColorMode, Button, Menu, MenuButton, MenuList, MenuItem, Avatar, IconButton, Icon, Spinner, useDisclosure } from '@chakra-ui/react';
+import { Link, Outlet, useNavigation } from 'react-router-dom';
 import SideNavLinks from '../SideNavLinks';
 import { HamburgerIcon } from '@chakra-ui/icons';
 import SideDrawer from '../SideDrawer';
@@ -12,6 +12,7 @@ const InventoryLayout = () => {
     const { logout } = useAuth();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const drawerBtnRef = React.useRef();
+    const { state } = useNavigation();
 
     return (
         <Box minHeight="100vh">
@@ -33,13 +34,24 @@ const InventoryLayout = () => {
                             </MenuButton>
                             <MenuList>
                                 <MenuItem>Profile</MenuItem>
-                                <MenuItem onClick={() => {logout()}}>Logout</MenuItem>
+                                <MenuItem onClick={() => { logout() }}>Logout</MenuItem>
                             </MenuList>
                         </Menu>
                     </Flex>
-                    <Box flex='1' p={6} bg='gray.50'>
-                        <Outlet />
-                    </Box>
+                    <Stack flex='1' p={6} bg='gray.50'>
+                        {
+                            state === 'loading' ?
+                                <Spinner
+                                    thickness='4px'
+                                    speed='0.4s'
+                                    emptyColor='gray.200'
+                                    color='blue.300'
+                                    size='xl'
+                                    alignSelf='center'
+                                /> :
+                                <Outlet />
+                        }
+                    </Stack>
                 </Flex>
             </Flex>
         </Box>
