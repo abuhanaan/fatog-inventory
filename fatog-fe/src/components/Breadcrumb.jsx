@@ -13,7 +13,11 @@ const Breadcrumb = ({ linkList }) => {
             {
                 linkList.map((link, index) => (
                     <BreadcrumbItem key={index}>
-                        <BreadcrumbLink as={RouterLink} to={link.ref}>{link.name}</BreadcrumbLink>
+                        {
+                            index === linkList.length - 1 ?
+                                <BreadcrumbLink>{link.name}</BreadcrumbLink> :
+                                <BreadcrumbLink as={RouterLink} to={link.ref}>{link.name}</BreadcrumbLink>
+                        }
                     </BreadcrumbItem>
                 ))
             }
