@@ -32,6 +32,7 @@ const ProductForm = () => {
     const { state, pathname } = useLocation();
     const currentProduct = state && state.currentProduct;
     const manufacturerIdRef = useRef(null);
+    const submitBtnRef = useRef(null);
     const {
         handleSubmit,
         control,
@@ -39,17 +40,25 @@ const ProductForm = () => {
         setValue,
     } = useForm();
 
-    const addProduct = async (data) => {
+    const submitProduct = async (data) => {
         const productData = {
             ...data,
             weight: Number(data.weight),
             size: Number(data.size),
             pricePerBag: Number(data.pricePerBag),
         };
+        const buttonIntent = submitBtnRef.current.getAttribute('data-intent');
+        console.log(productData);
 
-        setTimeout(() => {
-            console.log(productData);
-        }, 3000);
+        if (buttonIntent === 'add') {
+            console.log(submitBtnRef.current.getAttribute('data-intent'));
+            // TODO: Consume product create API endpoint
+        }
+
+        if (buttonIntent === 'update') {
+            console.log(submitBtnRef.current.getAttribute('data-intent'));
+            // TODO: Consume product update API endpoint
+        }
     };
 
     const setManufacturerId = (selectedValue) => {
@@ -72,32 +81,34 @@ const ProductForm = () => {
                 <Breadcrumb linkList={breadcrumbData} />
             </Box>
             <HStack justifyContent='space-between'>
-                <Heading fontSize='3xl' color='blue.700'>Add Products</Heading>
+                <Heading fontSize='3xl' color='blue.700'>{currentProduct ? `Update ${currentProduct.name}` : 'Add Product'}</Heading>
             </HStack>
-            <form onSubmit={handleSubmit(addProduct)}>
+            <form onSubmit={handleSubmit(submitProduct)}>
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                     <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
-                        <TextInput name='name' label='Product Name' control={control} type='text' defaultVal={ currentProduct?.name } />
-                        <TextInput name='type' label='Type' control={control} type='text' defaultVal={ currentProduct?.type } />
+                        <TextInput name='name' label='Product Name' control={control} type='text' defaultVal={currentProduct?.name} />
+                        <TextInput name='type' label='Type' control={control} type='text' defaultVal={currentProduct?.type} />
                     </Flex>
                     <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
-                        <TextInput name='weight' label='Weight (kg)' control={control} type='number' defaultVal={ currentProduct?.weight } />
-                        <TextInput name='size' label='Size' control={control} type='number' defaultVal={ currentProduct?.size } />
+                        <TextInput name='weight' label='Weight (kg)' control={control} type='number' defaultVal={currentProduct?.weight} />
+                        <TextInput name='size' label='Size' control={control} type='number' defaultVal={currentProduct?.size} />
                     </Flex>
 
                     <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
-                        <TextInput name='pricePerBag' label='Price per bag (₦)' control={control} type='number' defaultVal={ currentProduct?.pricePerBag } />
+                        <TextInput name='pricePerBag' label='Price per bag (₦)' control={control} type='number' defaultVal={currentProduct?.pricePerBag} />
                         <SelectElement data={manufacturersOptions} label='Manufacturer' setManufacturerId={setManufacturerId} defaultVal={setManufacturerOption()} />
                     </Flex>
 
-                    <TextInput fieldRef={manufacturerIdRef} name='manufacturerId' control={control} label='Manufacturer ID' type='hidden' defaultVal={ currentProduct?.manufacturerId } />
+                    <TextInput fieldRef={manufacturerIdRef} name='manufacturerId' control={control} label='Manufacturer ID' type='hidden' defaultVal={currentProduct?.manufacturerId} />
 
                     <Button
                         type='submit'
+                        data-intent={currentProduct ? 'update' : 'add'}
                         colorScheme='blue'
                         isLoading={isSubmitting ? true : false}
                         loadingText='Submitting...'
                         spinnerPlacement='end'
+                        ref={submitBtnRef}
                         spinner={<Spinner
                             thickness='4px'
                             speed='0.5s'
@@ -115,7 +126,9 @@ const ProductForm = () => {
                                     color='blue.300'
                                     size='xl'
                                 /> :
-                                'Submit'
+                                currentProduct ?
+                                    'Update Product' :
+                                    'Add Product'
                         }
                     </Button>
                 </Stack>
