@@ -6,6 +6,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import Modal from '../../components/Modal';
+import Tabs from '../../components/Tabs';
 
 const product = {
     id: 1,
@@ -37,6 +38,8 @@ const ProductView = () => {
         { name: 'Products', ref: '/products' },
         { name: product.name, ref: `/products/${1}` },
     ];
+    const tabTitles = ['General Information', 'Manufacturer\'s Information'];
+    const tabPanels = [<GeneralInfo />, <ManufacturerInfo />];
 
     async function productDelete(e) {
         e.preventDefault();
@@ -58,11 +61,11 @@ const ProductView = () => {
                 <Breadcrumb linkList={breadcrumbData} />
             </Box>
             <HStack justifyContent='space-between'>
-                <Heading fontSize='3xl' color='blue.700'>{product.name}</Heading>
+                <Heading fontSize={{base: '2xl', md: '3xl'}} color='blue.700'>{product.name}</Heading>
                 <HStack spacing='2'>
-                    <IconButton as={RouterLink} to='/products/create' icon={<HiOutlinePlus />} colorScheme='blue' />
-                    <IconButton as={RouterLink} to='/products/create' state={{ currentProduct: product }} icon={<MdOutlineEdit />} colorScheme='orange' />
-                    <IconButton icon={<MdDeleteOutline />} data-product-id={product.id} onClick={onOpen} colorScheme='red' />
+                    <IconButton as={RouterLink} size={{base: 'sm', md: 'md'}} to='/products/create' icon={<HiOutlinePlus />} colorScheme='blue' />
+                    <IconButton as={RouterLink} size={{base: 'sm', md: 'md'}} to='/products/create' state={{ currentProduct: product }} icon={<MdOutlineEdit />} colorScheme='orange' />
+                    <IconButton icon={<MdDeleteOutline />} size={{base: 'sm', md: 'md'}} data-product-id={product.id} onClick={onOpen} colorScheme='red' />
                 </HStack>
 
                 <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Product'>
@@ -72,67 +75,68 @@ const ProductView = () => {
                 </Modal>
             </HStack>
             <Box marginTop='8'>
-                <Stack spacing='6' direction={{ base: 'column', lg: 'row' }}>
-                    <Box as='fieldset' boxSize={{ base: 'full', lg: '50%' }} bg='white' p='6' borderWidth='1px' borderColor='gray.300' borderRadius='md'>
-                        <Heading as='legend' fontSize='lg' fontWeight='medium'>General Information</Heading>
-
-                        <SimpleGrid columns={{base: 1, sm: 2}} spacing={5}>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>ID</Heading>
-                                <Text>{product.id}</Text>
-                            </Stack>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>Name</Heading>
-                                <Text>{product.name}</Text>
-                            </Stack>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>Type</Heading>
-                                <Text>{product.type}</Text>
-                            </Stack>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>Price per bag (₦)</Heading>
-                                <Text>{product.pricePerBag}</Text>
-                            </Stack>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>Weight (kg)</Heading>
-                                <Text>{product.weight}</Text>
-                            </Stack>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>Size</Heading>
-                                <Text>{product.size}</Text>
-                            </Stack>
-                        </SimpleGrid>
-                    </Box>
-
-                    <Box as='fieldset' bg='white' boxSize={{ base: 'full', lg: '50%' }} p='6' borderWidth='1px' borderColor='gray.300' borderRadius='md'>
-                        <Heading as='legend' fontSize='lg' fontWeight='medium'>Manufacturer Information</Heading>
-
-                        <SimpleGrid columns={{base: 1, sm: 2}} spacing={5}>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>ID</Heading>
-                                <Text>{product.manufacturerId}</Text>
-                            </Stack>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>Brand Name</Heading>
-                                <Text>{manufacturer.brandName}</Text>
-                            </Stack>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>Representative Name</Heading>
-                                <Text>{manufacturer.repName}</Text>
-                            </Stack>
-                            <Stack direction='column'>
-                                <Heading fontSize='sm' fontWeight='semibold'>Representative Phone</Heading>
-                                <Text>{manufacturer.repPhoneNumber}</Text>
-                            </Stack>
-                            <Stack direction='column' colSpan={2} mt='2'>
-                                <Button as={RouterLink} to={`/manufacturers/${1}`} leftIcon={<IoEyeOutline />} colorScheme='blue' size='md'>Preview Manufacturer</Button>
-                            </Stack>
-                        </SimpleGrid>
-                    </Box>
-                </Stack>
+                <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />
             </Box >
         </Stack >
     )
 }
 
-export default ProductView
+const GeneralInfo = () => {
+    return (
+        <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>ID</Heading>
+                <Text>{product.id}</Text>
+            </Stack>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>Name</Heading>
+                <Text>{product.name}</Text>
+            </Stack>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>Type</Heading>
+                <Text>{product.type}</Text>
+            </Stack>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>Price per bag (₦)</Heading>
+                <Text>{product.pricePerBag}</Text>
+            </Stack>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>Weight (kg)</Heading>
+                <Text>{product.weight}</Text>
+            </Stack>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>Size</Heading>
+                <Text>{product.size}</Text>
+            </Stack>
+        </SimpleGrid>
+    )
+};
+
+const ManufacturerInfo = () => {
+    return (
+        <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>ID</Heading>
+                <Text>{product.manufacturerId}</Text>
+            </Stack>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>Brand Name</Heading>
+                <Text>{manufacturer.brandName}</Text>
+            </Stack>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>Representative Name</Heading>
+                <Text>{manufacturer.repName}</Text>
+            </Stack>
+            <Stack direction='column'>
+                <Heading fontSize='sm' fontWeight='semibold'>Representative Phone</Heading>
+                <Text>{manufacturer.repPhoneNumber}</Text>
+            </Stack>
+            <Stack direction='column' colSpan={2} mt='2'>
+                <Button as={RouterLink} to={`/manufacturers/${1}`} leftIcon={<IoEyeOutline />} colorScheme='blue' size='md'>Preview Manufacturer</Button>
+            </Stack>
+        </SimpleGrid>
+    )
+};
+
+
+export default ProductView;
