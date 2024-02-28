@@ -1,10 +1,9 @@
 import { useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import TextInput from '../../components/form/TextInput';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Stack, HStack, Flex, Box, Spinner, Button, Heading } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
-import { products } from './Products';
 import SelectElement from '../../components/form/SelectElement';
 
 const formFields = [
@@ -137,4 +136,4 @@ const ProductForm = () => {
     )
 }
 
-export default ProductForm
+export default ProductForm;
