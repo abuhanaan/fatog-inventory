@@ -36,7 +36,7 @@ const ProductView = () => {
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
         { name: 'Products', ref: '/products' },
-        { name: product.name, ref: `/products/${1}` },
+        { name: product.name, ref: `/products/${product.id}` },
     ];
     const tabTitles = ['General Information', 'Manufacturer\'s Information'];
     const tabPanels = [<GeneralInfo />, <ManufacturerInfo />];
