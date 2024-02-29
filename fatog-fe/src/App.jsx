@@ -2,6 +2,7 @@
 // import viteLogo from '/vite.svg'
 import Layout from "./components/layouts/Layout";
 import Home from "./pages/Home";
+import { loader as HomeLoader } from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import { Route, createBrowserRouter, createRoutesFromChildren, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -10,27 +11,35 @@ import RequireAuth from "./components/RequireAuth";
 import InventoryLayout from "./components/layouts/InventoryLayout";
 import Products from "./pages/products/Products";
 import Manufacturers from "./pages/manufacturers/Manufacturers";
+import { loader as ManufacturersLoader } from "./pages/manufacturers/Manufacturers";
 import Page404 from './components/Page404';
 import ProductForm from "./pages/products/ProductForm";
 import ProductView from "./pages/products/ProductView";
 import ManufacturerForm from "./pages/manufacturers/ManufacturerForm";
 import ManufacturerView from "./pages/manufacturers/ManufacturerView";
+import { loader as ManufacturerViewLoader } from "./pages/manufacturers/ManufacturerView";
+import { requireAuth } from "./hooks/useAuth";
+
+async function loader({ request }) {
+    await requireAuth(request);
+    return null;
+}
 
 const router = createBrowserRouter(createRoutesFromChildren(
     <Route path='/' element={<Layout />}>
-        <Route index element={<Home />} />
+        <Route index loader={HomeLoader} element={<Home />} />
 
         <Route element={<RequireAuth />}>
             <Route element={<InventoryLayout />}>
                 <Route path='dashboard' element={<Dashboard />} />
 
                 <Route path='products' element={<Products />} />
-                <Route path='products/create' element={<ProductForm />} />
+                <Route path='products/create' loader={loader} element={<ProductForm />} />
                 <Route path='products/:id' element={<ProductView />} />
 
-                <Route path='manufacturers' element={<Manufacturers />} />
-                <Route path='manufacturers/create' element={<ManufacturerForm />} />
-                <Route path='manufacturers/:id' element={<ManufacturerView />} />
+                <Route path='manufacturers' loader={ManufacturersLoader} element={<Manufacturers />} />
+                <Route path='manufacturers/create' loader={loader} element={<ManufacturerForm />} />
+                <Route path='manufacturers/:id' loader={ManufacturerViewLoader} element={<ManufacturerView />} />
             </Route>
         </Route>
 
