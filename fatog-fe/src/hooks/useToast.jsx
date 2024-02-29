@@ -1,4 +1,4 @@
-import {useToast} from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 
 export const useToastHook = () => {
@@ -7,13 +7,13 @@ export const useToastHook = () => {
 
     useEffect(() => {
         if (toastState) {
-            const {title, description, status, icon} = toastState;
+            const { title, description, status, icon } = toastState;
 
             toast({
                 title: title,
                 description: description,
                 status: status,
-                duration: 9000,
+                duration: 5000,
                 isClosable: true,
                 position: 'top',
                 icon: icon
