@@ -56,6 +56,35 @@ model User {
   staff    Staff?
 }
 
+model InventoryHistory {
+  id              Int      @id @default(autoincrement())
+  inventoryId     Int
+  orderItemId     Int? @unique  // this comes from sales record, the effect only takes place when the corresponding sales record is approved
+  stockItemId     Int? @unique  // stockItem is also stockList and likewise orderItem is also orderList
+  remainderBefore Int
+  remainderAfter  Int
+  effectQuantity  Int
+  increment       Boolean
+  decrement       Boolean
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  inventory       Inventory   @relation(fields: [inventoryId], references: [id])
+  orderItem       OrderList?  @relation(fields: [orderItemId], references: [id])
+  stockItem       StockList?  @relation(fields: [stockItemId], references: [id])
+}
+
+model Inventory {
+  id            Int      @id @default(autoincrement())
+  productId     Int      @unique
+  remainingQty  Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  product       Product   @relation(fields: [productId], references: [id])
+  history       InventoryHistory[]
+}
+
 model Sales {
   id                 Int      @id @default(autoincrement())
   orderId            Int      @unique
@@ -83,8 +112,9 @@ model OrderList {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  order   Order?   @relation(fields: [orderId], references: [id])
-  product Product? @relation(fields: [productId], references: [id])
+  order     Order?   @relation(fields: [orderId], references: [id])
+  product   Product? @relation(fields: [productId], references: [id])
+  inventory InventoryHistory?
 }
 
 model Order {
@@ -123,6 +153,7 @@ model StockList {
 
   stock       Stock?   @relation(fields: [stockId], references: [id])
   product     Product? @relation(fields: [productId], references: [id])
+  inventory   InventoryHistory?
 }
 
 model Stock {
@@ -150,9 +181,10 @@ model Product {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  manufacturer Manufacturer? @relation(fields: [manufacturerId], references: [id])
+  manufacturer  Manufacturer? @relation(fields: [manufacturerId], references: [id])
   orderLists    OrderList[]
-  stockLists     StockList[]
+  stockLists    StockList[]
+  inventory     Inventory?
 }
 
 model Manufacturer {
