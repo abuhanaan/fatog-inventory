@@ -1,10 +1,13 @@
 import { useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useLoaderData } from 'react-router-dom';
 import TextInput from '../../components/form/TextInput';
 import { useForm } from 'react-hook-form';
-import { Stack, HStack, Flex, Box, Spinner, Button, Heading } from '@chakra-ui/react';
+import { Stack, HStack, Flex, Icon, Box, Spinner, Button, Heading } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
-import SelectElement from '../../components/form/SelectElement';
+import { createManufacturer, updateManufacturer } from '../../api/manufacturers';
+import { useToastHook } from '../../hooks/useToast';
+import { BiError } from "react-icons/bi";
+import { FaRegThumbsUp } from "react-icons/fa6";
 
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
@@ -14,8 +17,9 @@ const breadcrumbData = [
 
 const ManufacturerForm = () => {
     const { state, pathname } = useLocation();
+    const navigate = useNavigate();
+    const [toastState, setToastState] = useToastHook();
     const currentManufacturer = state && state.currentManufacturer;
-    const manufacturerIdRef = useRef(null);
     const submitBtnRef = useRef(null);
     const {
         handleSubmit,
@@ -28,16 +32,82 @@ const ManufacturerForm = () => {
             ...data
         };
         const buttonIntent = submitBtnRef.current.getAttribute('data-intent');
-        console.log(manufacturerData);
 
         if (buttonIntent === 'add') {
-            console.log(submitBtnRef.current.getAttribute('data-intent'));
             // TODO: Consume manufacturer create API endpoint
+            try {
+                const response = await createManufacturer(manufacturerData);
+
+                if (response.unAuthorize) {
+                    sessionStorage.removeItem('user');
+                    navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+                }
+
+                if (response.error || response.message) {
+                    setToastState({
+                        title: response.error,
+                        description: response.message,
+                        status: 'error',
+                        icon: <Icon as={BiError} />
+                    });
+
+                    return response.error;
+                }
+
+                setToastState({
+                    title: 'Success!',
+                    description: 'Manufacturer added successfully',
+                    status: 'success',
+                    icon: <Icon as={FaRegThumbsUp} />
+                });
+
+                setTimeout(() => {
+                    navigate(`/manufacturers`);
+                }, 6000);
+
+            } catch (error) {
+                return error;
+            }
         }
 
         if (buttonIntent === 'update') {
-            console.log(submitBtnRef.current.getAttribute('data-intent'));
+            const manufacturerId = currentManufacturer.id;
             // TODO: Consume product update API endpoint
+            try {
+                const response = await updateManufacturer(manufacturerId, manufacturerData);
+
+                console.log(response);
+
+                if (response.unAuthorize) {
+                    sessionStorage.removeItem('user');
+                    navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+                }
+
+                if (response.error || response.message) {
+                    setToastState({
+                        title: response.error,
+                        description: response.message,
+                        status: 'error',
+                        icon: <Icon as={BiError} />
+                    });
+
+                    return response.error;
+                }
+
+                setToastState({
+                    title: 'Success!',
+                    description: 'Manufacturer updated successfully',
+                    status: 'success',
+                    icon: <Icon as={FaRegThumbsUp} />
+                });
+
+                setTimeout(() => {
+                    navigate(`/manufacturers`);
+                }, 6000);
+
+            } catch (error) {
+                return error;
+            }
         }
     };
 
@@ -70,21 +140,13 @@ const ManufacturerForm = () => {
                             speed='0.5s'
                             emptyColor='gray.200'
                             color='blue.300'
-                            size='xl'
+                            size='md'
                         />}
                     >
                         {
-                            isSubmitting ?
-                                <Spinner
-                                    thickness='4px'
-                                    speed='0.5s'
-                                    emptyColor='gray.200'
-                                    color='blue.300'
-                                    size='xl'
-                                /> :
-                                currentManufacturer ?
-                                    'Update Manufacturer' :
-                                    'Add Manufacturer'
+                            currentManufacturer ?
+                                'Update Manufacturer' :
+                                'Add Manufacturer'
                         }
                     </Button>
                 </Stack>
