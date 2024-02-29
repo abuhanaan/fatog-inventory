@@ -1,5 +1,5 @@
-import { Box, Heading, Button, Flex, Stack, Link, Icon } from "@chakra-ui/react";
-import { useNavigate } from 'react-router-dom';
+import { Box, Heading, Text, Button, Flex, Stack, Link, Icon } from "@chakra-ui/react";
+import { useNavigate, useLoaderData } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import bgImage from '../assets/fish-hero3.png';
 import bgImage2 from '../assets/inventoryImg.webp';
@@ -11,6 +11,11 @@ import { authenticate } from "../api/user";
 import { useToastHook } from "../hooks/useToast";
 import useAuth from "../hooks/useAuth";
 
+export async function loader({ request }) {
+    const error = new URL(request.url).searchParams.get('message')
+    return error;
+}
+
 const Home = () => {
     const {
         handleSubmit,
@@ -20,6 +25,7 @@ const Home = () => {
     const [toastState, setToastState] = useToastHook();
     const { login } = useAuth();
     const navigate = useNavigate();
+    const unAuthorizeError = useLoaderData();
 
     const submit = async (userData) => {
         const formData = new FormData();
@@ -76,6 +82,7 @@ const Home = () => {
                     <Heading fontSize='2xl' >Login</Heading>
 
                     <form onSubmit={handleSubmit(submit)}>
+                        {unAuthorizeError && <Text>{unAuthorizeError}</Text>}
                         <Stack spacing='6'>
                             <LoginInput
                                 name='email'
