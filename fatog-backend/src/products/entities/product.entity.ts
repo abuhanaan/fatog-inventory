@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Product, Manufacturer } from '@prisma/client';
+import { InventoryEntity } from 'src/inventory/entities/inventory.entity';
 import { ManufacturerEntity } from 'src/manufacturers/entities/manufacturer.entity';
+import { OrderListEntity } from 'src/order-lists/entities/order-list.entity';
+import { StockListEntity } from 'src/stock-lists/entities/stock-list.entity';
 
 export class ProductEntity implements Product {
   @ApiProperty()
@@ -24,17 +27,45 @@ export class ProductEntity implements Product {
   @ApiProperty()
   manufacturerId: number;
 
-  @ApiProperty({ required: false, type: ManufacturerEntity })
+  @ApiProperty({ required: false, type: () => ManufacturerEntity })
   manufacturer?: ManufacturerEntity;
 
-  //   @ApiProperty({ required: false, type: OrderEntity })
-  //   orders?: OrderEntity;
+  @ApiProperty({ required: false, type: () => OrderListEntity, isArray: true })
+  orderItems?: OrderListEntity[];
 
-  constructor({ manufacturer, ...data }: Partial<ProductEntity>) {
+  @ApiProperty({ required: false, type: () => StockListEntity, isArray: true })
+  stockItems?: StockListEntity[];
+
+  @ApiProperty({ required: false, type: () => InventoryEntity })
+  invetory?: InventoryEntity;
+
+  constructor({
+    manufacturer,
+    orderItems,
+    stockItems,
+    invetory,
+    ...data
+  }: Partial<ProductEntity>) {
     Object.assign(this, data);
 
     if (manufacturer) {
       this.manufacturer = new ManufacturerEntity(manufacturer);
+    }
+
+    if (orderItems) {
+      this.orderItems = orderItems.map(
+        (orderItem) => new OrderListEntity(orderItem),
+      );
+    }
+
+    if (stockItems) {
+      this.stockItems = stockItems.map(
+        (stockItem) => new StockListEntity(stockItem),
+      );
+    }
+
+    if (invetory) {
+      this.invetory = new InventoryEntity(invetory);
     }
   }
 

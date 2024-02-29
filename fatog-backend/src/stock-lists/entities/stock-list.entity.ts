@@ -25,7 +25,7 @@ export class StockListEntity implements StockList {
   @ApiProperty()
   totalWeight: number;
 
-  @ApiProperty({ required: false, type: ProductEntity })
+  @ApiProperty({ required: false, type: () => ProductEntity })
   product?: ProductEntity;
 
   @ApiProperty({ required: false, type: () => StockEntity })

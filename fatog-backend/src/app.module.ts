@@ -12,9 +12,27 @@ import { StocksModule } from './stocks/stocks.module';
 import { StockListsModule } from './stock-lists/stock-lists.module';
 import { OrdersModule } from './orders/orders.module';
 import { OrderListsModule } from './order-lists/order-lists.module';
+import { SalesModule } from './sales/sales.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { InventoryHistoryModule } from './inventory-history/inventory-history.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, CustomerModule, StaffsModule, ManufacturersModule, ProductsModule, StocksModule, StockListsModule, OrdersModule, OrderListsModule],
+  imports: [
+    PrismaModule,
+    UsersModule,
+    AuthModule,
+    CustomerModule,
+    StaffsModule,
+    ManufacturersModule,
+    ProductsModule,
+    StocksModule,
+    StockListsModule,
+    OrdersModule,
+    OrderListsModule,
+    SalesModule,
+    InventoryModule,
+    InventoryHistoryModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
