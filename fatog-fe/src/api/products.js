@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const user = JSON.parse(sessionStorage.getItem('user'));
 const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${user.accessToken}`,
+    'Authorization': `Bearer ${user?.accessToken}`,
 };
 
 export async function createProduct(productData) {
@@ -16,8 +16,16 @@ export async function createProduct(productData) {
 
     const data = await res.json();
 
-    isUnauthorized(res);
-    isError(res);
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+
+    isError(res, data);
 
     return data;
 }
@@ -31,8 +39,16 @@ export async function updateProduct(productId, productData) {
 
     const data = await res.json();
 
-    isUnauthorized(res);
-    isError(res);
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+
+    isError(res, data);
 
     return data;
 }
@@ -45,13 +61,13 @@ export async function getProducts(request) {
 
     const data = await res.json();
 
-    isUnauthorized(res);
+    isUnauthorized(res, request);
     isError(res);
 
     return data;
 }
 
-export async function getProduct(productId, request) {
+export async function getProduct(request, productId) {
     const res = await fetch(`${BASE_URL}/products/${productId}`, {
         method: 'GET',
         headers,
@@ -59,34 +75,34 @@ export async function getProduct(productId, request) {
 
     const data = await res.json();
 
-    isUnauthorized(res);
+    isUnauthorized(res, request);
     isError(res);
 
     return data;
 }
 
-export async function deleteProduct(productId) {
-    const res = await fetch(`https://hospital-scan-arhive-sys.onrender.com/users/delete/${productId}`, {
+export async function deleteProduct(request, productId) {
+    const res = await fetch(`${BASE_URL}/products/${productId}`, {
         method: 'DELETE',
         headers,
     });
 
     const data = await res.json();
 
-    isUnauthorized(res);
+    isUnauthorized(res, request);
     isError(res);
 
     return data;
 }
 
-const isUnauthorized = (res) => {
+const isUnauthorized = (res, request) => {
     if (res.status === 401) {
         const pathname = new URL(request.url).pathname;
         throw redirect(`/?message=Please log in to continue&redirectTo=${pathname}`);
     }
 };
 
-const isError = (res) => {
+const isError = (res, data) => {
     if (!res.ok || data.error) {
         return {
             statusCode: data.statusCode,

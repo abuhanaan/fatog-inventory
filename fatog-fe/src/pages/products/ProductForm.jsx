@@ -1,43 +1,50 @@
 import { useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, useLoaderData } from 'react-router-dom';
 import TextInput from '../../components/form/TextInput';
 import { useForm } from 'react-hook-form';
-import { Stack, HStack, Flex, Box, Spinner, Button, Heading } from '@chakra-ui/react';
+import { Stack, HStack, Flex, Box, Icon, Spinner, Button, Heading } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import SelectElement from '../../components/form/SelectElement';
+import { createProduct, updateProduct } from '../../api/products';
+import { getManufacturers } from '../../api/manufacturers';
+import { requireAuth } from '../../hooks/useAuth';
+import { useToastHook } from '../../hooks/useToast';
+import { BiError } from "react-icons/bi";
+import { FaRegThumbsUp } from "react-icons/fa6";
 
-const formFields = [
-    { name: 'name', label: 'Product Name' },
-    { name: 'type', label: 'Feed Type' },
-    { name: 'weight', label: 'Weight' },
-    { name: 'size', label: 'Size' },
-    { name: 'pricePerBag', label: 'Price per bag (₦)' },
-    { name: 'manufacturer', label: 'Manufacturer' },
-];
+export const loader = async ({ request }) => {
+    await requireAuth(request);
+    const response = await getManufacturers(request);
+
+    return response;
+};
 
 const manufacturers = [
     { id: 1, brandName: 'Optimal' },
     { id: 2, brandName: 'Kasmag' },
     { id: 3, brandName: 'Vital' },
 ];
-const manufacturersOptions = manufacturers.map(manufacturer => manufacturer.brandName);
-const breadcrumbData = [
-    { name: 'Home', ref: '/dashboard' },
-    { name: 'Products', ref: '/products' },
-    { name: 'Product Form', ref: '/products/create' },
-];
 
 const ProductForm = () => {
+    const manufacturers = useLoaderData();
+    const navigate = useNavigate();
     const { state, pathname } = useLocation();
     const currentProduct = state && state.currentProduct;
     const manufacturerIdRef = useRef(null);
     const submitBtnRef = useRef(null);
+    const [toastState, setToastState] = useToastHook();
     const {
         handleSubmit,
         control,
         formState: { isSubmitting },
         setValue,
     } = useForm();
+    const breadcrumbData = [
+        { name: 'Home', ref: '/dashboard' },
+        { name: 'Products', ref: '/products' },
+        { name: 'Product Form', ref: '/products/create' },
+    ];
+    const manufacturersOptions = manufacturers.map(manufacturer => manufacturer.brandName);
 
     const submitProduct = async (data) => {
         const productData = {
@@ -51,7 +58,40 @@ const ProductForm = () => {
 
         if (buttonIntent === 'add') {
             console.log(submitBtnRef.current.getAttribute('data-intent'));
-            // TODO: Consume product create API endpoint
+            // TODO: Consume create product API endpoint
+            try {
+                const response = await createProduct(productData);
+
+                if (response.unAuthorize) {
+                    sessionStorage.removeItem('user');
+                    navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+                }
+
+                if (response.error || response.message) {
+                    setToastState({
+                        title: response.error,
+                        description: response.message,
+                        status: 'error',
+                        icon: <Icon as={BiError} />
+                    });
+
+                    return response.error;
+                }
+
+                setToastState({
+                    title: 'Success!',
+                    description: 'Product added successfully',
+                    status: 'success',
+                    icon: <Icon as={FaRegThumbsUp} />
+                });
+
+                setTimeout(() => {
+                    navigate(`/products`);
+                }, 6000);
+
+            } catch (error) {
+                return error;
+            }
         }
 
         if (buttonIntent === 'update') {
@@ -113,21 +153,13 @@ const ProductForm = () => {
                             speed='0.5s'
                             emptyColor='gray.200'
                             color='blue.300'
-                            size='xl'
+                            size='md'
                         />}
                     >
                         {
-                            isSubmitting ?
-                                <Spinner
-                                    thickness='4px'
-                                    speed='0.5s'
-                                    emptyColor='gray.200'
-                                    color='blue.300'
-                                    size='xl'
-                                /> :
-                                currentProduct ?
-                                    'Update Product' :
-                                    'Add Product'
+                            currentProduct ?
+                                'Update Product' :
+                                'Add Product'
                         }
                     </Button>
                 </Stack>

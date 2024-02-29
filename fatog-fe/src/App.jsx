@@ -14,6 +14,7 @@ import Manufacturers from "./pages/manufacturers/Manufacturers";
 import { loader as ManufacturersLoader } from "./pages/manufacturers/Manufacturers";
 import Page404 from './components/Page404';
 import ProductForm from "./pages/products/ProductForm";
+import { loader as ProductFormLoader } from "./pages/products/ProductForm";
 import ProductView from "./pages/products/ProductView";
 import ManufacturerForm from "./pages/manufacturers/ManufacturerForm";
 import ManufacturerView from "./pages/manufacturers/ManufacturerView";
@@ -34,7 +35,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='dashboard' element={<Dashboard />} />
 
                 <Route path='products' element={<Products />} />
-                <Route path='products/create' loader={loader} element={<ProductForm />} />
+                <Route path='products/create' loader={ProductFormLoader} element={<ProductForm />} />
                 <Route path='products/:id' element={<ProductView />} />
 
                 <Route path='manufacturers' loader={ManufacturersLoader} element={<Manufacturers />} />
