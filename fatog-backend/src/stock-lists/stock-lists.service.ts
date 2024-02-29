@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateStockListDto } from './dto/create-stock-list.dto';
 import { UpdateStockListDto } from './dto/update-stock-list.dto';
 import { CreateStockListArrayDto } from './dto/create-stock-list-array.dto';
@@ -8,6 +13,8 @@ import { CreateStockDto } from 'src/stocks/dto/create-stock.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { StockEntity } from 'src/stocks/entities/stock.entity';
 import { StockList } from '@prisma/client';
+import { StockListEntity } from './entities/stock-list.entity';
+import { ProductEntity } from 'src/products/entities/product.entity';
 
 @Injectable()
 export class StockListsService {
@@ -26,45 +33,124 @@ export class StockListsService {
   async create(
     createStockListArrayDto: CreateStockListArrayDto,
     user: UserEntity,
-  ) {
-    let totalAmount = 0;
-    let totalWeight = 0;
-    let totalNoOfBags = 0;
-    const stockListData = createStockListArrayDto.data.map((memberStock) => {
-      totalAmount += memberStock.totalAmount;
-      totalWeight += memberStock.totalWeight;
-      totalNoOfBags += memberStock.noOfBags;
-      return { ...memberStock, stockId: undefined };
+  ): Promise<StockListEntity[]> {
+    try {
+      const staff = await this.prisma.staff.findFirst({
+        where: { staffId: user.id },
+      });
+
+      if (!staff) {
+        throw new UnauthorizedException({
+          message: 'You are not authorized to perform this operation',
+          error: 'Unauthorized Operation',
+        });
+      }
+      const { data: stockListData } = createStockListArrayDto;
+
+      // Calculate total amount, weight, and number of bags
+      let totalAmount = 0;
+      let totalWeight = 0;
+      let totalNoOfBags = 0;
+      for (const memberStock of stockListData) {
+        totalAmount += memberStock.totalAmount;
+        totalWeight += memberStock.totalWeight;
+        totalNoOfBags += memberStock.noOfBags;
+      }
+
+      // Create the stock record
+      const stockDTO: CreateStockDto = {
+        totalAmount,
+        totalWeight,
+        totalNoOfBags,
+        staffId: user.id,
+      };
+
+      // Initialize an array to store promises for transaction operations
+      const transactionOperations = [];
+
+      const stock = await this.stockService.create(stockDTO, user);
+
+      // Push stock creation into transactionOperations array
+      transactionOperations.push(stock);
+
+      // Update inventory and inventory history for each stock item
+      for (const memberStock of stockListData) {
+        const inventory = await this.updateInventory(
+          memberStock.productId,
+          memberStock.noOfBags,
+        );
+        transactionOperations.push(inventory);
+      }
+
+      // Create stock lists
+      const createdStockItems = await this.prisma.stockList.createMany({
+        data: stockListData.map((stockItem) => ({
+          ...stockItem,
+          stockId: stock.id,
+        })),
+      });
+      transactionOperations.push(createdStockItems);
+
+      // Start the transaction with the array of promises
+      await this.prisma.$transaction(transactionOperations);
+
+      // Return formatted stock items
+      const formattedStockItems = await this.getFormattedStockItems(stock.id);
+      return formattedStockItems;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException({
+        message: 'Failed to create stock and update inventory',
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  private async updateInventory(productId: number, quantity: number) {
+    const inventory = await this.prisma.inventory.findFirst({
+      where: { productId },
     });
-    const stockDTO: CreateStockDto = {
-      totalAmount,
-      totalWeight,
-      totalNoOfBags,
-      staffId: user.id,
-    };
-    const stock = await this.prisma.stock.create({ data: stockDTO });
-    stockListData.forEach((memberStock) => {
-      // TODO: work around affecting inventory with stock
-      memberStock.stockId = stock.id;
-    });
-    const createdStockLists = await this.prisma.stockList.createMany({
-      // data: createStockListArrayDto.data,
-      data: stockListData,
-    });
-    // Fetch the newly created stock lists with their related entities
-    const stockLists = await this.prisma.stockList.findMany({
-      where: { stockId: stock.id },
+    if (!inventory) {
+      throw new NotFoundException({
+        message: `Inventory not found for product ID ${productId}`,
+        error: 'Not Found',
+      });
+    }
+
+    return this.prisma.$transaction([
+      this.prisma.inventory.update({
+        where: { id: inventory.id },
+        data: { remainingQty: { increment: quantity } },
+      }),
+      this.prisma.inventoryHistory.create({
+        data: {
+          inventoryId: inventory.id,
+          remainderBefore: inventory.remainingQty,
+          remainderAfter: inventory.remainingQty + quantity,
+          effectQuantity: quantity,
+          increment: true,
+          decrement: false,
+        },
+      }),
+    ]);
+  }
+
+  private async getFormattedStockItems(
+    stockId: number,
+  ): Promise<StockListEntity[]> {
+    const stockItems = await this.prisma.stockList.findMany({
+      where: { stockId },
       include: { stock: true, product: true },
     });
-    // Convert the retrieved stock lists to the desired format
-    const formattedStockLists = stockLists.map(async (stocklist) => {
-      return {
-        ...stocklist,
-        stock: await new StockEntity(stocklist.stock),
-      };
-    });
-
-    return Promise.all(formattedStockLists);
+    return Promise.all(
+      stockItems.map(async (stockItem) => {
+        return {
+          ...stockItem,
+          stock: await new StockEntity(stockItem.stock),
+          // product: await new ProductEntity(stockItem.product),
+        };
+      }),
+    );
   }
 
   async findAll() {

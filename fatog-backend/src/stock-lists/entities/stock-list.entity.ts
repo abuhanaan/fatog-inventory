@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { StockList } from '@prisma/client';
+import { InventoryHistoryEntity } from 'src/inventory-history/entities/inventory-history.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
 import { StockEntity } from 'src/stocks/entities/stock.entity';
 
@@ -31,7 +32,15 @@ export class StockListEntity implements StockList {
   @ApiProperty({ required: false, type: () => StockEntity })
   stock?: StockEntity;
 
-  constructor({ product, stock, ...data }: Partial<StockListEntity>) {
+  @ApiProperty({ required: false, type: () => InventoryHistoryEntity })
+  inventory?: InventoryHistoryEntity;
+
+  constructor({
+    product,
+    stock,
+    inventory,
+    ...data
+  }: Partial<StockListEntity>) {
     Object.assign(this, data);
 
     if (product) {
@@ -39,7 +48,11 @@ export class StockListEntity implements StockList {
     }
 
     if (stock) {
-      this.stock = stock;
+      this.stock = new StockEntity(stock);
+    }
+
+    if (inventory) {
+      this.inventory = new InventoryHistoryEntity(inventory);
     }
   }
 

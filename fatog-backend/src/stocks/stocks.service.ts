@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
@@ -18,7 +22,17 @@ export class StocksService {
     }
   }
   async create(createStockDto: CreateStockDto, user: UserEntity) {
-    createStockDto.staffId = user.id;
+    const staff = await this.prisma.staff.findFirst({
+      where: { staffId: user.id },
+    });
+
+    if (!staff) {
+      throw new UnauthorizedException({
+        message: 'You are not authorised to perform this operation',
+        error: 'Unauthorised Request',
+      });
+    }
+    createStockDto.staffId = staff.staffId;
     const stock = await this.prisma.stock.create({ data: createStockDto });
     return stock;
   }
