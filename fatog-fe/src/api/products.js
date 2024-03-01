@@ -62,7 +62,7 @@ export async function getProducts(request) {
     const data = await res.json();
 
     isUnauthorized(res, request);
-    isError(res);
+    isError(res, data);
 
     return data;
 }
@@ -76,7 +76,7 @@ export async function getProduct(request, productId) {
     const data = await res.json();
 
     isUnauthorized(res, request);
-    isError(res);
+    isError(res, data);
 
     return data;
 }
@@ -90,7 +90,7 @@ export async function deleteProduct(request, productId) {
     const data = await res.json();
 
     isUnauthorized(res, request);
-    isError(res);
+    isError(res, data);
 
     return data;
 }
