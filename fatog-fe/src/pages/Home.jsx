@@ -79,10 +79,15 @@ const Home = () => {
                 >
                     <Logo />
 
+                    {
+                        unAuthorizeError &&
+                        <Text fontSize='md' fontWeight='medium' px='3' py='2' bg='red.100' color='red.600'>{unAuthorizeError}</Text>
+                    }
+
                     <Heading fontSize='2xl' >Login</Heading>
 
                     <form onSubmit={handleSubmit(submit)}>
-                        {unAuthorizeError && <Text>{unAuthorizeError}</Text>}
+
                         <Stack spacing='6'>
                             <LoginInput
                                 name='email'
