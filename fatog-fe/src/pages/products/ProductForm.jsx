@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useLocation, useNavigate, useLoaderData } from 'react-router-dom';
 import TextInput from '../../components/form/TextInput';
+import { SizeInput } from '../../components/form/TextInput';
 import { useForm } from 'react-hook-form';
-import { Stack, HStack, Flex, Box, Icon, Spinner, Button, Heading } from '@chakra-ui/react';
+import { Stack, HStack, Flex, Box, Icon, Spinner, Button, Heading, FormLabel, Text } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import SelectElement from '../../components/form/SelectElement';
 import { createProduct, updateProduct } from '../../api/products';
@@ -19,12 +20,6 @@ export const loader = async ({ request }) => {
     return response;
 };
 
-// const manufacturers = [
-//     { id: 1, brandName: 'Optimal' },
-//     { id: 2, brandName: 'Kasmag' },
-//     { id: 3, brandName: 'Vital' },
-// ];
-
 const ProductForm = () => {
     const manufacturers = useLoaderData();
     const navigate = useNavigate();
@@ -32,6 +27,8 @@ const ProductForm = () => {
     const currentProduct = state && state.currentProduct;
     const manufacturerIdRef = useRef(null);
     const submitBtnRef = useRef(null);
+    const [brandName, setBrandName] = useState('');
+    const [feedSize, setFeedSize] = useState('');
     const [toastState, setToastState] = useToastHook();
     const {
         handleSubmit,
@@ -50,9 +47,11 @@ const ProductForm = () => {
         const productData = {
             ...data,
             weight: Number(data.weight),
-            size: Number(data.size),
+            size: Number(feedSize[0]),
             pricePerBag: Number(data.pricePerBag),
+            name: getProductName(),
         };
+        
         const buttonIntent = submitBtnRef.current.getAttribute('data-intent');
 
         if (buttonIntent === 'add') {
@@ -131,10 +130,19 @@ const ProductForm = () => {
         }
     };
 
+    const getFeedSize = (size) => {
+        setFeedSize(`${size}mm`.toUpperCase());
+    }
+
+    const getProductName = () => {
+        return `${brandName}-${feedSize}`;
+    }
+
     const setManufacturerId = (selectedValue) => {
         const fieldName = manufacturerIdRef.current.name;
         const selectedManufacturer = manufacturers.filter(manufacturer => manufacturer.brandName === selectedValue);
-        setValue(fieldName, selectedManufacturer[0].id);
+        setValue(fieldName, selectedManufacturer[0]?.id);
+        setBrandName(selectedValue.replace(/\s+/g, '').toUpperCase());
     }
 
     const setManufacturerOption = () => {
@@ -156,17 +164,20 @@ const ProductForm = () => {
             <form onSubmit={handleSubmit(submitProduct)}>
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                     <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
-                        <TextInput name='name' label='Product Name' control={control} type='text' defaultVal={currentProduct?.name} />
-                        <TextInput name='type' label='Type' control={control} type='text' defaultVal={currentProduct?.type} />
+                        <SelectElement data={manufacturersOptions} label='Manufacturer' setManufacturerId={setManufacturerId} defaultVal={setManufacturerOption()} />
+                        <SizeInput name='size' label='Size' control={control} type='number' getFeedSize={getFeedSize} defaultVal={currentProduct?.size} />
                     </Flex>
                     <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
                         <TextInput name='weight' label='Weight (kg)' control={control} type='number' defaultVal={currentProduct?.weight} />
-                        <TextInput name='size' label='Size' control={control} type='number' defaultVal={currentProduct?.size} />
+                        <TextInput name='type' label='Type' control={control} type='text' defaultVal={currentProduct?.type} />
                     </Flex>
 
                     <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
                         <TextInput name='pricePerBag' label='Price per bag (₦)' control={control} type='number' defaultVal={currentProduct?.pricePerBag} />
-                        <SelectElement data={manufacturersOptions} label='Manufacturer' setManufacturerId={setManufacturerId} defaultVal={setManufacturerOption()} />
+                        <Stack w='full' spacing='0'>
+                            <FormLabel>Product Name</FormLabel>
+                            <Text borderWidth='1px' p='2' borderRadius='md' bg='gray.100'>{currentProduct ? currentProduct.name : getProductName()}</Text>
+                        </Stack>
                     </Flex>
 
                     <TextInput fieldRef={manufacturerIdRef} name='manufacturerId' control={control} label='Manufacturer ID' type='hidden' defaultVal={currentProduct?.manufacturerId} />

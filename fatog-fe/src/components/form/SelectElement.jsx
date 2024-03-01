@@ -14,10 +14,8 @@ const SelectElement = ({ data, setManufacturerId, label, defaultVal }) => {
         <FormControl>
             <FormLabel htmlFor={label}>{label}</FormLabel>
             <Select
-                // value={defaultVal ?? 'Select Manufacturer'}
                 value={selectedOption ? selectedOption : defaultVal}
                 placeholder='Select Manufacturer'
-                // onChange={(e) => setManufacturerId(e.target.value)}
                 onChange={handleChange}
             >
                 {
