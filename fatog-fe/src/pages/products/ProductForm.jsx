@@ -19,11 +19,11 @@ export const loader = async ({ request }) => {
     return response;
 };
 
-const manufacturers = [
-    { id: 1, brandName: 'Optimal' },
-    { id: 2, brandName: 'Kasmag' },
-    { id: 3, brandName: 'Vital' },
-];
+// const manufacturers = [
+//     { id: 1, brandName: 'Optimal' },
+//     { id: 2, brandName: 'Kasmag' },
+//     { id: 3, brandName: 'Vital' },
+// ];
 
 const ProductForm = () => {
     const manufacturers = useLoaderData();
@@ -54,10 +54,8 @@ const ProductForm = () => {
             pricePerBag: Number(data.pricePerBag),
         };
         const buttonIntent = submitBtnRef.current.getAttribute('data-intent');
-        console.log(productData);
 
         if (buttonIntent === 'add') {
-            console.log(submitBtnRef.current.getAttribute('data-intent'));
             // TODO: Consume create product API endpoint
             try {
                 const response = await createProduct(productData);
@@ -95,8 +93,41 @@ const ProductForm = () => {
         }
 
         if (buttonIntent === 'update') {
-            console.log(submitBtnRef.current.getAttribute('data-intent'));
+            const productId = currentProduct.id;
             // TODO: Consume product update API endpoint
+            try {
+                const response = await updateProduct(productId, productData);
+
+                if (response.unAuthorize) {
+                    sessionStorage.removeItem('user');
+                    navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+                }
+
+                if (response.error || response.message) {
+                    setToastState({
+                        title: response.error,
+                        description: response.message,
+                        status: 'error',
+                        icon: <Icon as={BiError} />
+                    });
+
+                    return response.error;
+                }
+
+                setToastState({
+                    title: 'Success!',
+                    description: 'Product updated successfully',
+                    status: 'success',
+                    icon: <Icon as={FaRegThumbsUp} />
+                });
+
+                setTimeout(() => {
+                    navigate(`/products`);
+                }, 6000);
+
+            } catch (error) {
+                return error;
+            }
         }
     };
 
