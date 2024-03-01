@@ -76,8 +76,6 @@ const ManufacturerForm = () => {
             try {
                 const response = await updateManufacturer(manufacturerId, manufacturerData);
 
-                console.log(response);
-
                 if (response.unAuthorize) {
                     sessionStorage.removeItem('user');
                     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);

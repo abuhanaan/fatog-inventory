@@ -52,8 +52,8 @@ const Manufacturers = () => {
             });
 
             setError({
-                error: manufacturer.error,
-                message: manufacturer.message
+                error: manufacturers.error,
+                message: manufacturers.message
             });
         }
     }, []);
@@ -88,8 +88,8 @@ const Manufacturers = () => {
 const ActionButtons = ({ manufacturer }) => {
     const navigate = useNavigate();
     const { state } = useNavigation();
-    const { pathname } = useLocation();
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { pathname } = useLocation();
     const closeModalRef = useRef(null);
     const [toastState, setToastState] = useToastHook();
     const [isDeleting, setIsDeleting] = useState(false);
@@ -122,6 +122,8 @@ const ActionButtons = ({ manufacturer }) => {
                 icon: <Icon as={BiError} />
             });
 
+            setIsDeleting(false);
+            closeModalRef.current.click();
             return response.error;
         }
 

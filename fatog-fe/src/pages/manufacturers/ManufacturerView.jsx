@@ -26,21 +26,12 @@ export async function loader({ params, request }) {
     return response;
 }
 
-// const manufacturer = {
-//     id: 1,
-//     brandName: "Vital Feeds",
-//     repName: "Yewande Smith",
-//     repPhoneNumber: "08098654789",
-//     createdAt: "2024-02-28T16:23:01.079Z",
-//     updatedAt: "2024-02-28T16:23:01.079Z"
-// };
-
 const ManufacturerView = () => {
     const navigate = useNavigate();
     const manufacturer = useLoaderData();
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [toastState, setToastState] = useToastHook();
     const closeModalRef = useRef(null);
+    const [toastState, setToastState] = useToastHook();
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState({
         error: '',
@@ -92,6 +83,9 @@ const ManufacturerView = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setIsDeleting(false);
+            closeModalRef.current.click();
 
             return response.error;
         }
