@@ -10,12 +10,14 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import RequireAuth from "./components/RequireAuth";
 import InventoryLayout from "./components/layouts/InventoryLayout";
 import Products from "./pages/products/Products";
+import { loader as ProductsLoader } from "./pages/products/Products";
 import Manufacturers from "./pages/manufacturers/Manufacturers";
 import { loader as ManufacturersLoader } from "./pages/manufacturers/Manufacturers";
 import Page404 from './components/Page404';
 import ProductForm from "./pages/products/ProductForm";
 import { loader as ProductFormLoader } from "./pages/products/ProductForm";
 import ProductView from "./pages/products/ProductView";
+import { loader as ProductViewLoader } from "./pages/products/ProductView";
 import ManufacturerForm from "./pages/manufacturers/ManufacturerForm";
 import ManufacturerView from "./pages/manufacturers/ManufacturerView";
 import { loader as ManufacturerViewLoader } from "./pages/manufacturers/ManufacturerView";
@@ -34,9 +36,9 @@ const router = createBrowserRouter(createRoutesFromChildren(
             <Route element={<InventoryLayout />}>
                 <Route path='dashboard' element={<Dashboard />} />
 
-                <Route path='products' element={<Products />} />
+                <Route path='products' loader={ProductsLoader} element={<Products />} />
                 <Route path='products/create' loader={ProductFormLoader} element={<ProductForm />} />
-                <Route path='products/:id' element={<ProductView />} />
+                <Route path='products/:id' loader={ProductViewLoader} element={<ProductView />} />
 
                 <Route path='manufacturers' loader={ManufacturersLoader} element={<Manufacturers />} />
                 <Route path='manufacturers/create' loader={loader} element={<ManufacturerForm />} />
