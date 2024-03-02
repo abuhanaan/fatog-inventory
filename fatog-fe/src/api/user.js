@@ -110,7 +110,7 @@ export async function getUser(request, userId) {
     return data;
 }
 
-export async function deleteUser(request, userId) {
+export async function deleteUser(userId) {
     const res = await fetch(`${BASE_URL}/users/${userId}`, {
         method: 'DELETE',
         headers,
@@ -118,7 +118,15 @@ export async function deleteUser(request, userId) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+    
     isError(res, data);
 
     return data;

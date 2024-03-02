@@ -10,7 +10,7 @@ import Modal from '../../components/Modal';
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
 import AddButton from '../../components/AddButton';
-import { getUsers, deleteUser } from '../../api/user';
+import { deleteUser, getUsers } from '../../api/user';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
 
@@ -123,6 +123,7 @@ const ActionButtons = ({ user }) => {
         e.preventDefault();
 
         setIsDeleting(true);
+        console.log(user.id)
 
         // TODO: Consume DELETE user endpoint
         const response = await deleteUser(user.id);
