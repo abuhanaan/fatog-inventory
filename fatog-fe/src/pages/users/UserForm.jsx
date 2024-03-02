@@ -42,6 +42,29 @@ const UserForm = () => {
     } = useForm();
 
     const submitUser = async (data) => {
+        if (!password) {
+            setToastState({
+                title: 'Password Required',
+                description: 'Click generate password button to create this user',
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
+
+            return;
+        }
+        
+        if (!categoryRef.current.value) {
+            setToastState({
+                title: 'Category Required',
+                description: 'Select a category to create this user',
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
+
+            return;
+        }
+
+
         const userData = {
             ...data,
             email: data.email,
@@ -132,7 +155,7 @@ const UserForm = () => {
     const generatePassword = (e) => {
         e.preventDefault();
 
-        if (!emailRef.current.value && !roleRef.current.value) {
+        if (!emailRef.current.value || !roleRef.current.value) {
             setToastState({
                 title: 'Error!',
                 description: 'Email and role fields are required to generate password.',
@@ -147,10 +170,6 @@ const UserForm = () => {
 
         setPassword(`${emailFirst6Char}_${role}`);
     };
-
-    const setVal = (val) => {
-        roleRef.current.value = val;
-    }
 
     return (
         <Stack spacing='6'>
