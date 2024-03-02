@@ -164,7 +164,7 @@ const ProductForm = () => {
             <form onSubmit={handleSubmit(submitProduct)}>
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                     <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
-                        <SelectElement data={manufacturersOptions} label='Manufacturer' setManufacturerId={setManufacturerId} defaultVal={setManufacturerOption()} />
+                        <SelectElement data={manufacturersOptions} label='Manufacturer' setManufacturerId={setManufacturerId} defaultVal={setManufacturerOption()} placeholder='Select Manufacturer' />
                         <SizeInput name='size' label='Size' control={control} type='number' getFeedSize={getFeedSize} defaultVal={currentProduct?.size} />
                     </Flex>
                     <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
