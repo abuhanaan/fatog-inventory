@@ -1,13 +1,15 @@
 // ProductsListing.js
 import React, { useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { createColumnHelper, getCoreRowModel, useReactTable, flexRender, getPaginationRowModel, getFilteredRowModel } from '@tanstack/react-table';
-import { TableContainer, Table, Tbody, Td, Th, Thead, Tr, Button, Flex, HStack, Input, Box, Select, Icon, Spacer } from '@chakra-ui/react';
+import { TableContainer, Table, Tbody, Td, Th, Thead, Tr, Button, Flex, HStack, Input, Box, Select, Icon, Spacer, Badge } from '@chakra-ui/react';
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
-import AddButton from './AddButton';
+import UsersFilter from './UsersFilter';
 
 const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => {
+    const { pathname } = useLocation();
     const columnHelper = createColumnHelper();
 
     const columns = cols.map(col => {
@@ -16,6 +18,20 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => 
                 columnHelper.accessor('', {
                     id: col.id,
                     cell: info => <span>{info.row.index + 1}</span>,
+                    header: col.header
+                })
+            )
+        }
+
+        if (col.id === 'active') {
+            return (
+                columnHelper.accessor(col.id, {
+                    id: col.id,
+                    cell: info => (
+                        <Badge colorScheme={info.getValue() === true ? 'green' : 'red'} variant='subtle'>
+                            {info.getValue() === true ? 'Active' : 'Inactive'}
+                        </Badge>
+                    ),
                     header: col.header
                 })
             )
@@ -90,6 +106,8 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => 
                     value={globalFilter ?? ''}
                     onChange={(value) => setGlobalFilter(String(value))}
                 />
+                <Spacer />
+                {pathname === '/users' && <UsersFilter />}
                 <Spacer />
                 <DownloadBtn data={tableData} fileName={fileName}>Download</DownloadBtn>
             </Flex>
