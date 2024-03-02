@@ -20,6 +20,7 @@ import ProductView from "./pages/products/ProductView";
 import { loader as ProductViewLoader } from "./pages/products/ProductView";
 import ManufacturerForm from "./pages/manufacturers/ManufacturerForm";
 import ManufacturerView from "./pages/manufacturers/ManufacturerView";
+import UserForm from "./pages/users/UserForm";
 import { loader as ManufacturerViewLoader } from "./pages/manufacturers/ManufacturerView";
 import { requireAuth } from "./hooks/useAuth";
 
@@ -35,6 +36,8 @@ const router = createBrowserRouter(createRoutesFromChildren(
         <Route element={<RequireAuth />}>
             <Route element={<InventoryLayout />}>
                 <Route path='dashboard' element={<Dashboard />} />
+
+                <Route path='users/create' element={<UserForm />} />
 
                 <Route path='products' loader={ProductsLoader} element={<Products />} />
                 <Route path='products/create' loader={ProductFormLoader} element={<ProductForm />} />
