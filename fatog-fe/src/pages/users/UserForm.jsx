@@ -45,8 +45,8 @@ const UserForm = () => {
         const userData = {
             ...data,
             email: data.email,
-            role: roleRef.current.value,
-            category: categoryRef.current.value,
+            role: roleRef.current.value.toLowerCase(),
+            category: categoryRef.current.value.toLowerCase(),
             active: true,
             password: password
         };
