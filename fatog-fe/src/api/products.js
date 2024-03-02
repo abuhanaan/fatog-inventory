@@ -81,7 +81,7 @@ export async function getProduct(request, productId) {
     return data;
 }
 
-export async function deleteProduct(request, productId) {
+export async function deleteProduct(productId) {
     const res = await fetch(`${BASE_URL}/products/${productId}`, {
         method: 'DELETE',
         headers,
@@ -89,7 +89,15 @@ export async function deleteProduct(request, productId) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+
     isError(res, data);
 
     return data;

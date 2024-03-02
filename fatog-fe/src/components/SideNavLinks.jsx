@@ -7,7 +7,7 @@ import LogoutBtn from './LogoutBtn';
 
 const SideNavLinks = () => {
     return (
-        <Stack flex='1' pt='4' borderTopWidth='1px' borderColor='gray.200'>
+        <Stack flex='1' spacing='1' pt='4' borderTopWidth='1px' borderColor='gray.200'>
             {
                 links.map(link => (
                     <Link
