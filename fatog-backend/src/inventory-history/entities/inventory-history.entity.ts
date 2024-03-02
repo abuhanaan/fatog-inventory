@@ -32,6 +32,9 @@ export class InventoryHistoryEntity implements InventoryHistory {
   @ApiProperty()
   decrement: boolean;
 
+  @ApiProperty()
+  note: string;
+
   @ApiProperty({ required: false, type: () => InventoryEntity })
   inventory: InventoryEntity;
 

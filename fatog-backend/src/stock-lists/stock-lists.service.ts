@@ -182,11 +182,67 @@ export class StockListsService {
   }
 
   async remove(id: number) {
-    const stockList = await this.prisma.stockList.findUnique({
-      where: { id },
-      include: { product: true, stock: true },
+    try {
+      // Fetch the StockItem to be deleted along with its related Stock and Product
+      const stockItem = await this.prisma.stockList.findUnique({
+        where: { id },
+        include: { product: true, stock: true },
+      });
+
+      // Check if the StockItem exists
+      this.checkIfStockListExist(stockItem, id);
+
+      // Update inventory by decrementing remainingQty for the corresponding product
+      const inventory = await this.updateInventoryByStockRemoval(
+        stockItem.productId,
+        -stockItem.noOfBags,
+      );
+
+      // Delete the StockItem
+      await this.prisma.stockList.delete({ where: { id } });
+
+      return `StockItem with id ${id} has been deleted, and inventory has been updated.`;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException({
+        message: `Failed to delete StockItem with ID ${id}`,
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  private async updateInventoryByStockRemoval(
+    productId: number,
+    quantity: number,
+  ) {
+    const inventory = await this.prisma.inventory.findFirst({
+      where: { productId },
     });
-    await this.checkIfStockListExist(stockList, id);
-    return this.prisma.stockList.delete({ where: { id } });
+    if (!inventory) {
+      throw new NotFoundException({
+        message: `Inventory not found for product ID ${productId}`,
+        error: 'Not Found',
+      });
+    }
+
+    // Decrement remainingQty for the corresponding product
+    return this.prisma.$transaction([
+      this.prisma.inventory.update({
+        where: { id: inventory.id },
+        data: { remainingQty: { decrement: quantity } },
+      }),
+      this.prisma.inventoryHistory.create({
+        data: {
+          stockItemId: null,
+          inventoryId: inventory.id,
+          remainderBefore: inventory.remainingQty,
+          remainderAfter: inventory.remainingQty - quantity,
+          effectQuantity: quantity,
+          increment: false,
+          decrement: true,
+          note: `Rollback operation from deleted StockItem with ID`,
+        },
+      }),
+    ]);
   }
 }

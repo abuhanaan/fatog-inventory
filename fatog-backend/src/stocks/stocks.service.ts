@@ -1,5 +1,6 @@
 import {
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -65,10 +66,76 @@ export class StocksService {
   }
 
   async remove(id: number) {
-    const stock = await this.prisma.stock.findUnique({
-      where: { id },
+    try {
+      // Find the stock record
+      const stock = await this.prisma.stock.findUnique({
+        where: { id },
+        include: { stockLists: true }, // Include related stock items
+      });
+      await this.checkIfStockExists(stock, id);
+
+      // Initialize transaction operations array
+      const transactionOperations = [];
+
+      // Update inventory and inventory history for each stock item to undo effects
+      for (const stockItem of stock.stockLists) {
+        const inventory = await this.updateInventory(
+          stockItem.productId,
+          stockItem.noOfBags,
+        );
+        transactionOperations.push(inventory);
+      }
+
+      // Delete all related stock items
+      transactionOperations.push(
+        this.prisma.stockList.deleteMany({ where: { id } }),
+      );
+
+      // Delete the stock record
+      transactionOperations.push(this.prisma.stock.delete({ where: { id } }));
+
+      // Start the transaction with the array of promises
+      await this.prisma.$transaction(transactionOperations);
+
+      // return `Stock with ID ${id} and its related items have been deleted, and inventory has been updated.`;
+      return stock;
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException({
+        message: `Failed to delete stock with ID ${id}`,
+        error: 'Internal Server Error',
+      });
+    }
+  }
+
+  private async updateInventory(productId: number, quantity: number) {
+    const inventory = await this.prisma.inventory.findFirst({
+      where: { productId },
     });
-    await this.checkIfStockExists(stock, id);
-    return this.prisma.stock.delete({ where: { id } });
+    if (!inventory) {
+      throw new NotFoundException({
+        message: `Inventory not found for product ID ${productId}`,
+        error: 'Not Found',
+      });
+    }
+
+    return this.prisma.$transaction([
+      this.prisma.inventory.update({
+        where: { id: inventory.id },
+        data: { remainingQty: { decrement: quantity } },
+      }),
+      this.prisma.inventoryHistory.create({
+        data: {
+          stockItemId: null,
+          inventoryId: inventory.id,
+          remainderBefore: inventory.remainingQty,
+          remainderAfter: inventory.remainingQty - quantity,
+          effectQuantity: quantity,
+          increment: false,
+          decrement: true,
+          note: 'Rollback operation from a deleted stock entry',
+        },
+      }),
+    ]);
   }
 }

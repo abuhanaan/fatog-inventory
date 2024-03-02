@@ -66,6 +66,7 @@ model InventoryHistory {
   effectQuantity  Int
   increment       Boolean
   decrement       Boolean
+  note            String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
