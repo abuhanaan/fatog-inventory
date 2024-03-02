@@ -1,13 +1,17 @@
 import { Select, FormControl, FormLabel } from '@chakra-ui/react';
 import { useState } from 'react';
 
-const SelectElement = ({ data, setManufacturerId, label, defaultVal }) => {
+const SelectElement = ({ data, setManufacturerId, label, defaultVal, placeholder, fieldRef }) => {
     const [selectedOption, setSelectedOption] = useState('');
 
     const handleChange = (e) => {
         const value = e.target.value;
         setSelectedOption(value);
-        setManufacturerId(value);
+        label === 'Manufacturer' && setManufacturerId(value);
+
+        if (fieldRef) {
+            fieldRef.current.value = value;
+        }
     }
 
     return (
@@ -15,8 +19,9 @@ const SelectElement = ({ data, setManufacturerId, label, defaultVal }) => {
             <FormLabel htmlFor={label}>{label}</FormLabel>
             <Select
                 value={selectedOption ? selectedOption : defaultVal}
-                placeholder='Select Manufacturer'
+                placeholder={placeholder}
                 onChange={handleChange}
+                ref={fieldRef}
             >
                 {
                     data.map((option, index) => (
