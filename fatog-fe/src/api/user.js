@@ -126,7 +126,51 @@ export async function deleteUser(userId) {
             error: data.error ?? 'Unauthorized',
         }
     }
-    
+
+    isError(res, data);
+
+    return data;
+}
+
+export async function activateUser(userId) {
+    const res = await fetch(`${BASE_URL}/users/activate/${userId}`, {
+        method: 'PATCH',
+        headers,
+    });
+
+    const data = await res.json();
+
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+
+    isError(res, data);
+
+    return data;
+}
+
+export async function deactivateUser(userId) {
+    const res = await fetch(`${BASE_URL}/users/deactivate/${userId}`, {
+        method: 'PATCH',
+        headers,
+    });
+
+    const data = await res.json();
+
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+
     isError(res, data);
 
     return data;

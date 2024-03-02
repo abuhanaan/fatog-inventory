@@ -27,7 +27,7 @@ const UserForm = () => {
     const manufacturers = useLoaderData();
     const navigate = useNavigate();
     const { state, pathname } = useLocation();
-    const currentUser = state && state.currentProduct;
+    const currentUser = state && state.currentUser;
     const submitBtnRef = useRef(null);
     const emailRef = useRef(null);
     const roleRef = useRef(null);
@@ -183,7 +183,7 @@ const UserForm = () => {
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                     <TextInput name='email' label='Email' control={control} type='text' fieldRef={emailRef} defaultVal={currentUser ? currentUser.email : ''} />
 
-                    <SelectElement data={userRoleOptions} label='Role' fieldRef={roleRef} defaultVal={currentUser ? currentUser.role : ''} placeholder='Select Role' />
+                    <SelectElement data={userRoleOptions} label='Role' fieldRef={roleRef} defaultVal={currentUser ? currentUser.role.toUpperCase() : ''} placeholder='Select Role' />
 
                     <SelectElement data={userCategoryOptions} label='Category' fieldRef={categoryRef} defaultVal={currentUser ? currentUser.category : ''} placeholder='Select Category' />
 

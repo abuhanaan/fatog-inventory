@@ -20,10 +20,12 @@ import ProductView from "./pages/products/ProductView";
 import { loader as ProductViewLoader } from "./pages/products/ProductView";
 import ManufacturerForm from "./pages/manufacturers/ManufacturerForm";
 import ManufacturerView from "./pages/manufacturers/ManufacturerView";
+import { loader as ManufacturerViewLoader } from "./pages/manufacturers/ManufacturerView";
 import UserForm from "./pages/users/UserForm";
 import Users from "./pages/users/Users";
 import { loader as UsersLoader } from "./pages/users/Users";
-import { loader as ManufacturerViewLoader } from "./pages/manufacturers/ManufacturerView";
+import UserView from "./pages/users/UserView";
+import { loader as UserViewLoader } from "./pages/users/UserView";
 import { requireAuth } from "./hooks/useAuth";
 
 async function loader({ request }) {
@@ -41,6 +43,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
 
                 <Route path='users' loader={UsersLoader} element={<Users />} />
                 <Route path='users/create' element={<UserForm />} />
+                <Route path='users/:id' loader={UserViewLoader} element={<UserView />} />
 
                 <Route path='products' loader={ProductsLoader} element={<Products />} />
                 <Route path='products/create' loader={ProductFormLoader} element={<ProductForm />} />
