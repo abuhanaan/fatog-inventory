@@ -14,7 +14,7 @@ export class InventoryEntity implements Inventory {
   remainingQty: number;
 
   @ApiProperty({ required: false, type: () => ProductEntity })
-  product: ProductEntity;
+  product?: ProductEntity;
 
   @ApiProperty({
     required: false,

@@ -65,9 +65,9 @@ export class StockListsController {
   }
 
   @Delete(':id')
-  @ApiOkResponse({ type: StockListEntity })
+  @ApiOkResponse({ type: String })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const stockList = await this.stockListsService.remove(+id);
-    return new StockListEntity(stockList);
+    return stockList;
   }
 }

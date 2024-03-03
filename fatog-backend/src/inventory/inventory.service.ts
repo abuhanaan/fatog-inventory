@@ -1,26 +1,77 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { NotFound } from '@aws-sdk/client-s3';
+import { InventoryEntity } from './entities/inventory.entity';
+import { Inventory } from '@prisma/client';
 
 @Injectable()
 export class InventoryService {
-  create(createInventoryDto: CreateInventoryDto) {
-    return 'This action adds a new inventory';
+  constructor(private prisma: PrismaService) {}
+
+  private async checkIfInventoryExists(inventory: Inventory, id: number) {
+    if (!inventory) {
+      throw new NotFoundException({
+        message: `Inventory with id ${id} does not exist`,
+        error: 'Not Found',
+      });
+    }
   }
 
-  findAll() {
-    return `This action returns all inventory`;
+  async create(createInventoryDto: CreateInventoryDto) {
+    const existingInventory = await this.prisma.inventory.findFirst({
+      where: { productId: createInventoryDto.productId },
+    });
+    if (existingInventory) {
+      throw new ConflictException({
+        message: `Inventory already exist for product with id: ${createInventoryDto.productId}`,
+        error: 'Conflict Operation',
+      });
+    }
+    createInventoryDto.remainingQty = 0;
+    return this.prisma.inventory.create({ data: createInventoryDto });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} inventory`;
+  async findAll() {
+    const inventories = await this.prisma.inventory.findMany({
+      include: { product: true },
+    });
+
+    return inventories;
   }
 
-  update(id: number, updateInventoryDto: UpdateInventoryDto) {
-    return `This action updates a #${id} inventory`;
+  async findOne(id: number) {
+    const inventory = await this.prisma.inventory.findUnique({
+      where: { id },
+      include: { product: true, history: true },
+    });
+    await this.checkIfInventoryExists(inventory, id);
+    return inventory;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} inventory`;
+  async update(id: number, updateInventoryDto: UpdateInventoryDto) {
+    const inventory = await this.prisma.inventory.findUnique({
+      where: { id },
+      include: { product: true },
+    });
+    await this.checkIfInventoryExists(inventory, id);
+    return this.prisma.inventory.update({
+      where: { id },
+      data: updateInventoryDto,
+    });
+  }
+
+  async remove(id: number) {
+    const inventory = await this.prisma.inventory.findUnique({
+      where: { id },
+      include: { product: true },
+    });
+    await this.checkIfInventoryExists(inventory, id);
+    return this.prisma.inventory.delete({ where: { id } });
   }
 }
