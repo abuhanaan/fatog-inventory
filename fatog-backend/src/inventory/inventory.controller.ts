@@ -13,6 +13,7 @@ import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { InventoryEntity } from './entities/inventory.entity';
+import { InventoryHistoryEntity } from 'src/inventory-history/entities/inventory-history.entity';
 
 @Controller('inventory')
 @ApiTags('inventory')
@@ -39,6 +40,13 @@ export class InventoryController {
     const inventory = await this.inventoryService.findOne(id);
     // return new InventoryEntity(inventory);
     return inventory;
+  }
+
+  @Get('/history/:id')
+  @ApiOkResponse({ type: InventoryHistoryEntity, isArray: true })
+  async history(@Param('stockId', ParseIntPipe) id: number) {
+    const histories = await this.inventoryService.history(id);
+    return histories.map((history) => new InventoryHistoryEntity(history));
   }
 
   @Patch(':id')

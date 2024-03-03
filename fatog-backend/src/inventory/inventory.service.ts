@@ -54,6 +54,18 @@ export class InventoryService {
     return inventory;
   }
 
+  async history(id: number) {
+    const inventory = await this.prisma.inventory.findUnique({
+      where: { id },
+      include: { product: true, history: true },
+    });
+    await this.checkIfInventoryExists(inventory, id);
+    const histories = await this.prisma.inventoryHistory.findMany({
+      where: { inventoryId: inventory.id },
+    });
+    return histories;
+  }
+
   async update(id: number, updateInventoryDto: UpdateInventoryDto) {
     const inventory = await this.prisma.inventory.findUnique({
       where: { id },
