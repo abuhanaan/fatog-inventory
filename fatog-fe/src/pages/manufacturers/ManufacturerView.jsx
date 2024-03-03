@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, useDisclosure } from '@chakra-ui/react';
+import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, useDisclosure } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
 import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
@@ -139,9 +139,17 @@ const ManufacturerView = () => {
                 <HStack justifyContent='space-between'>
                     <Heading fontSize={{ base: '2xl', md: '3xl' }} color='blue.700'>{manufacturer.brandName}</Heading>
                     <HStack spacing='2'>
-                        <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/manufacturers/create' icon={<HiOutlinePlus />} colorScheme='blue' />
-                        <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/manufacturers/create' state={{ currentManufacturer: manufacturer }} icon={<MdOutlineEdit />} colorScheme='orange' />
-                        <IconButton icon={<MdDeleteOutline />} size={{ base: 'sm', md: 'md' }} data-manufacturer-id={manufacturer.id} onClick={onOpen} colorScheme='red' />
+                        <Tooltip hasArrow label='Add new manufacturer' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/manufacturers/create' icon={<HiOutlinePlus />} colorScheme='blue' />
+                        </Tooltip>
+
+                        <Tooltip hasArrow label='Edit manufacturer' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/manufacturers/create' state={{ currentManufacturer: manufacturer }} icon={<MdOutlineEdit />} colorScheme='orange' />
+                        </Tooltip>
+
+                        <Tooltip hasArrow label='Delete manufacturer' placement='left' borderRadius='md'>
+                            <IconButton icon={<MdDeleteOutline />} size={{ base: 'sm', md: 'md' }} data-manufacturer-id={manufacturer.id} onClick={onOpen} colorScheme='red' />
+                        </Tooltip>
                     </HStack>
 
                     <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Manufacturer'>

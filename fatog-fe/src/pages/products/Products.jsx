@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useNavigation, Link, useLoaderData, useLocation } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
@@ -168,11 +168,17 @@ const ActionButtons = ({ product }) => {
     return (
         <>
             <HStack spacing='1'>
-                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-product-id={product.id} onClick={viewProduct} />
+                <Tooltip hasArrow label='Preview product' placement='bottom' borderRadius='md'>
+                    <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-product-id={product.id} onClick={viewProduct} />
+                </Tooltip>
 
-                <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentProduct: product }} />
+                <Tooltip hasArrow label='Edit product' placement='bottom' borderRadius='md'>
+                    <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentProduct: product }} />
+                </Tooltip>
 
-                <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-product-id={product.id} onClick={onOpen} />
+                <Tooltip hasArrow label='Delete product' placement='left' borderRadius='md'>
+                    <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-product-id={product.id} onClick={onOpen} />
+                </Tooltip>
             </HStack>
 
             <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Product'>

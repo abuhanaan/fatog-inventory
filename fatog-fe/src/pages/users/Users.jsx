@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, createContext } from 'react';
 import { useNavigate, useNavigation, useSearchParams, Link, useLoaderData, useLocation } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
@@ -268,48 +268,58 @@ const ActionButtons = ({ user }) => {
     return (
         <>
             <HStack spacing='1'>
-                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-user-id={user.id} onClick={viewUser} />
+                <Tooltip hasArrow label='Preview user' placement='bottom' borderRadius='md'>
+                    <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-user-id={user.id} onClick={viewUser} />
+                </Tooltip>
 
-                <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentUser: user }} />
+                <Tooltip hasArrow label='Edit user' placement='bottom' borderRadius='md'>
+                    <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentUser: user }} />
+                </Tooltip>
 
-                <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-user-id={user.id} onClick={onOpen} />
+                <Tooltip hasArrow label='Delete user' placement='bottom' borderRadius='md'>
+                    <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-user-id={user.id} onClick={onOpen} />
+                </Tooltip>
 
                 {
                     user.active ?
-                        <IconButton
-                            icon={<FaUserXmark />}
-                            size='sm'
-                            data-user-id={user.id}
-                            onClick={userDeactivate}
-                            colorScheme='red'
-                            aria-label='Deactivate user'
-                            isLoading={isActivating ? true : false}
-                            spinnerPlacement='end'
-                            spinner={<Spinner
-                                thickness='4px'
-                                speed='0.5s'
-                                emptyColor='gray.200'
-                                color='blue.300'
-                                size='md'
-                            />}
-                        /> :
-                        <IconButton
-                            icon={<FaUserCheck />}
-                            size='sm'
-                            data-user-id={user.id}
-                            onClick={userActivate}
-                            colorScheme='green'
-                            aria-label='Activate user'
-                            isLoading={isActivating ? true : false}
-                            spinnerPlacement='end'
-                            spinner={<Spinner
-                                thickness='4px'
-                                speed='0.5s'
-                                emptyColor='gray.200'
-                                color='blue.300'
-                                size='md'
-                            />}
-                        />
+                        <Tooltip hasArrow label='Deactivate user' placement='left'>
+                            <IconButton
+                                icon={<FaUserXmark />}
+                                size='sm'
+                                data-user-id={user.id}
+                                onClick={userDeactivate}
+                                colorScheme='red'
+                                aria-label='Deactivate user'
+                                isLoading={isActivating ? true : false}
+                                spinnerPlacement='end'
+                                spinner={<Spinner
+                                    thickness='4px'
+                                    speed='0.5s'
+                                    emptyColor='gray.200'
+                                    color='blue.300'
+                                    size='md'
+                                />}
+                            />
+                        </Tooltip> :
+                        <Tooltip hasArrow label='Activate user' placement='left' borderRadius='md'>
+                            <IconButton
+                                icon={<FaUserCheck />}
+                                size='sm'
+                                data-user-id={user.id}
+                                onClick={userActivate}
+                                colorScheme='green'
+                                aria-label='Activate user'
+                                isLoading={isActivating ? true : false}
+                                spinnerPlacement='end'
+                                spinner={<Spinner
+                                    thickness='4px'
+                                    speed='0.5s'
+                                    emptyColor='gray.200'
+                                    color='blue.300'
+                                    size='md'
+                                />}
+                            />
+                        </Tooltip>
                 }
             </HStack>
 

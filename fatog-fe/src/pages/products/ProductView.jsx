@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, useDisclosure } from '@chakra-ui/react';
+import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, useDisclosure } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
 import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
@@ -27,27 +27,6 @@ export async function loader({ params, request }) {
 
     return response;
 }
-
-// const product = {
-//     id: 1,
-//     name: "Product 1",
-//     type: "Type 1",
-//     weight: 12,
-//     pricePerBag: 7000,
-//     size: 12,
-//     manufacturerId: 1,
-//     manufacturer: {
-//         id: 1,
-//         brandName: "Optimal Feeds",
-//         repName: "Ibrahim Salis",
-//         repPhoneNumber: "08067565656",
-//         createdAt: "2024-02-27T21:29:08.330Z",
-//         updatedAt: "2024-02-27T21:29:08.330Z"
-//     },
-//     createdAt: "2024-02-27T21:29:08.334Z",
-//     updatedAt: "2024-02-27T21:29:08.334Z"
-// };
-
 
 const ProductView = () => {
     const navigate = useNavigate();
@@ -165,9 +144,17 @@ const ProductView = () => {
                 <HStack justifyContent='space-between'>
                     <Heading fontSize={{ base: '2xl', md: '3xl' }} color='blue.700'>{product.name}</Heading>
                     <HStack spacing='2'>
-                        <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/products/create' icon={<HiOutlinePlus />} colorScheme='blue' />
-                        <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/products/create' state={{ currentProduct: product }} icon={<MdOutlineEdit />} colorScheme='orange' />
-                        <IconButton icon={<MdDeleteOutline />} size={{ base: 'sm', md: 'md' }} data-product-id={product.id} onClick={onOpen} colorScheme='red' />
+                        <Tooltip hasArrow label='Add new product' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/products/create' icon={<HiOutlinePlus />} colorScheme='blue' />
+                        </Tooltip>
+
+                        <Tooltip hasArrow label='Edit product' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/products/create' state={{ currentProduct: product }} icon={<MdOutlineEdit />} colorScheme='orange' />
+                        </Tooltip>
+
+                        <Tooltip hasArrow label='Delete product' placement='left' borderRadius='md'>
+                            <IconButton icon={<MdDeleteOutline />} size={{ base: 'sm', md: 'md' }} data-product-id={product.id} onClick={onOpen} colorScheme='red' />
+                        </Tooltip>
                     </HStack>
 
                     <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Product'>
