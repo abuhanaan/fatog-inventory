@@ -5,12 +5,12 @@ import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, He
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
-import { FaRegThumbsUp } from "react-icons/fa6";
+import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
 import Modal from '../../components/Modal';
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
 import AddButton from '../../components/AddButton';
-import { deleteUser, getUsers } from '../../api/user';
+import { deleteUser, getUsers, activateUser, deactivateUser } from '../../api/user';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
 
@@ -111,6 +111,7 @@ const ActionButtons = ({ user }) => {
     const { pathname } = useLocation();
     const [toastState, setToastState] = useToastHook();
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isActivating, setIsActivating] = useState(false);
 
     function viewUser(e) {
         e.preventDefault();
@@ -123,7 +124,6 @@ const ActionButtons = ({ user }) => {
         e.preventDefault();
 
         setIsDeleting(true);
-        console.log(user.id)
 
         // TODO: Consume DELETE user endpoint
         const response = await deleteUser(user.id);
@@ -162,6 +162,88 @@ const ActionButtons = ({ user }) => {
 
     }
 
+    const userActivate = async (e) => {
+        e.preventDefault();
+
+        setIsActivating(true);
+
+        const userId = e.currentTarget.getAttribute('data-user-id');
+
+        const response = await activateUser(userId);
+
+        if (response.unAuthorize) {
+            sessionStorage.removeItem('user');
+            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+        }
+
+        if (response.error || response.message) {
+            setToastState({
+                title: response.error,
+                description: response.message,
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
+
+            setIsActivating(false);
+
+            return response.error;
+        }
+
+        setToastState({
+            title: 'Success!',
+            description: 'User activated successfully.',
+            status: 'success',
+            icon: <Icon as={FaRegThumbsUp} />
+        });
+
+        setIsActivating(false);
+
+        setTimeout(() => {
+            navigate(`/users`);
+        }, 6000);
+    }
+
+    const userDeactivate = async (e) => {
+        e.preventDefault();
+
+        setIsActivating(true);
+
+        const userId = e.currentTarget.getAttribute('data-user-id');
+
+        const response = await deactivateUser(userId);
+
+        if (response.unAuthorize) {
+            sessionStorage.removeItem('user');
+            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+        }
+
+        if (response.error || response.message) {
+            setToastState({
+                title: response.error,
+                description: response.message,
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
+
+            setIsActivating(false);
+
+            return response.error;
+        }
+
+        setToastState({
+            title: 'Success!',
+            description: 'User deactivated successfully.',
+            status: 'success',
+            icon: <Icon as={FaRegThumbsUp} />
+        });
+
+        setIsActivating(false);
+
+        setTimeout(() => {
+            navigate(`/users`);
+        }, 6000);
+    }
+
     const modalButtons =
         <HStack spacing='3'>
             <Button colorScheme='red' ref={closeModalRef} onClick={onClose}>Cancel</Button>
@@ -191,6 +273,44 @@ const ActionButtons = ({ user }) => {
                 <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentUser: user }} />
 
                 <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-user-id={user.id} onClick={onOpen} />
+
+                {
+                    user.active ?
+                        <IconButton
+                            icon={<FaUserXmark />}
+                            size='sm'
+                            data-user-id={user.id}
+                            onClick={userDeactivate}
+                            colorScheme='red'
+                            aria-label='Deactivate user'
+                            isLoading={isActivating ? true : false}
+                            spinnerPlacement='end'
+                            spinner={<Spinner
+                                thickness='4px'
+                                speed='0.5s'
+                                emptyColor='gray.200'
+                                color='blue.300'
+                                size='md'
+                            />}
+                        /> :
+                        <IconButton
+                            icon={<FaUserCheck />}
+                            size='sm'
+                            data-user-id={user.id}
+                            onClick={userActivate}
+                            colorScheme='green'
+                            aria-label='Activate user'
+                            isLoading={isActivating ? true : false}
+                            spinnerPlacement='end'
+                            spinner={<Spinner
+                                thickness='4px'
+                                speed='0.5s'
+                                emptyColor='gray.200'
+                                color='blue.300'
+                                size='md'
+                            />}
+                        />
+                }
             </HStack>
 
             <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete User'>
