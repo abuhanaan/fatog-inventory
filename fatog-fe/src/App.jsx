@@ -3,12 +3,13 @@
 import Layout from "./components/layouts/Layout";
 import Home from "./pages/Home";
 import { loader as HomeLoader } from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
 import { Route, createBrowserRouter, createRoutesFromChildren, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import RequireAuth from "./components/RequireAuth";
 import InventoryLayout from "./components/layouts/InventoryLayout";
+import Dashboard from "./pages/Dashboard";
+import { loader as DashboardLoader } from "./pages/Dashboard";
 import Products from "./pages/products/Products";
 import { loader as ProductsLoader } from "./pages/products/Products";
 import Manufacturers from "./pages/manufacturers/Manufacturers";
@@ -39,7 +40,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
 
         <Route element={<RequireAuth />}>
             <Route element={<InventoryLayout />}>
-                <Route path='dashboard' element={<Dashboard />} />
+                <Route path='dashboard' loader={DashboardLoader} element={<Dashboard />} />
 
                 <Route path='users' loader={UsersLoader} element={<Users />} />
                 <Route path='users/create' element={<UserForm />} />
