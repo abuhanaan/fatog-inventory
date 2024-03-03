@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useNavigation, Link, useLoaderData, useLocation } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
@@ -167,11 +167,17 @@ const ActionButtons = ({ manufacturer }) => {
     return (
         <>
             <HStack spacing='1'>
-                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-manufacturer-id={manufacturer.id} onClick={viewManufacturer} />
+                <Tooltip hasArrow label='Preview manufacturer' placement='bottom' borderRadius='md'>
+                    <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-manufacturer-id={manufacturer.id} onClick={viewManufacturer} />
+                </Tooltip>
 
-                <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentManufacturer: manufacturer }} />
+                <Tooltip hasArrow label='Edit manufacturer' placement='bottom' borderRadius='md'>
+                    <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentManufacturer: manufacturer }} />
+                </Tooltip>
 
-                <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-manufacturer-id={manufacturer.id} onClick={onOpen} />
+                <Tooltip hasArrow label='Delete manufacturer' placement='left' borderRadius='md'>
+                    <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-manufacturer-id={manufacturer.id} onClick={onOpen} />
+                </Tooltip>
             </HStack>
 
             <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Manufacturer'>
