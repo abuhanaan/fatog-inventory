@@ -33,7 +33,7 @@ const InventoryLayout = () => {
                                 <Avatar size="sm" />
                             </MenuButton>
                             <MenuList>
-                                <MenuItem>Profile</MenuItem>
+                                <MenuItem as={Link} to='/profile'>Profile</MenuItem>
                                 <MenuItem onClick={() => { logout() }}>Logout</MenuItem>
                             </MenuList>
                         </Menu>

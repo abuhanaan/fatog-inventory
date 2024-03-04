@@ -27,6 +27,10 @@ import Users from "./pages/users/Users";
 import { loader as UsersLoader } from "./pages/users/Users";
 import UserView from "./pages/users/UserView";
 import { loader as UserViewLoader } from "./pages/users/UserView";
+import ProfileView from "./pages/users/ProfileView";
+import { loader as ProfileViewLoader } from "./pages/users/ProfileView";
+import ProfileForm from "./pages/users/ProfileForm";
+import ChangePassword from "./pages/users/ChangePassword";
 import { requireAuth } from "./hooks/useAuth";
 import Error from "./components/Error";
 
@@ -46,6 +50,10 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='users' loader={UsersLoader} element={<Users />} />
                 <Route path='users/create' element={<UserForm />} />
                 <Route path='users/:id' loader={UserViewLoader} element={<UserView />} />
+
+                <Route path='profile' element={<ProfileView />} loader={ProfileViewLoader} />
+                <Route path='profile/update' element={<ProfileForm />} />
+                <Route path='profile/change-password' element={<ChangePassword />} />
 
                 <Route path='products' loader={ProductsLoader} element={<Products />} />
                 <Route path='products/create' loader={ProductFormLoader} element={<ProductForm />} />
