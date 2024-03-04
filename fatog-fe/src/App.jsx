@@ -28,6 +28,7 @@ import { loader as UsersLoader } from "./pages/users/Users";
 import UserView from "./pages/users/UserView";
 import { loader as UserViewLoader } from "./pages/users/UserView";
 import { requireAuth } from "./hooks/useAuth";
+import Error from "./components/Error";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -39,7 +40,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
         <Route index loader={HomeLoader} element={<Home />} />
 
         <Route element={<RequireAuth />}>
-            <Route element={<InventoryLayout />}>
+            <Route element={<InventoryLayout />} errorElement={<Error />}>
                 <Route path='dashboard' loader={DashboardLoader} element={<Dashboard />} />
 
                 <Route path='users' loader={UsersLoader} element={<Users />} />
