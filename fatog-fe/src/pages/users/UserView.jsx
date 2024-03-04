@@ -10,6 +10,7 @@ import Modal from '../../components/Modal';
 import { requireAuth } from '../../hooks/useAuth';
 import { getUser, deleteUser, activateUser, deactivateUser } from '../../api/users';
 import { useToastHook } from '../../hooks/useToast';
+import UserField from '../../components/UserField';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -310,15 +311,5 @@ const UserView = () => {
             </Stack >
     )
 }
-
-export const UserField = ({ field }) => {
-    return (
-        <Box as='fieldset' boxSize={{ base: 'full', lg: 'full' }} p='3' borderWidth='1px' borderColor='gray.300' borderRadius='md'>
-            <Heading as='legend' px='1' fontSize='sm' fontWeight='semibold' textTransform='capitalize'>{field.key}</Heading>
-            <Text>{field.value}</Text>
-        </Box>
-    )
-}
-
 
 export default UserView;

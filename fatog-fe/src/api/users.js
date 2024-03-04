@@ -82,6 +82,29 @@ export async function updateUser(userId, userData) {
     return data;
 }
 
+export async function changePassword(userId, userData) {
+    const res = await fetch(`${BASE_URL}/users/change-password`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(userData)
+    });
+
+    const data = await res.json();
+
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+
+    isError(res, data);
+
+    return data;
+}
+
 export async function getUsers(request) {
     const res = await fetch(`${BASE_URL}/users`, {
         method: 'GET',
