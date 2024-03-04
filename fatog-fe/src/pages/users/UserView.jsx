@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, useDisclosure } from '@chakra-ui/react';
+import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
 import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
@@ -8,7 +8,7 @@ import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
 import Modal from '../../components/Modal';
 import { requireAuth } from '../../hooks/useAuth';
-import { getUser, deleteUser, activateUser, deactivateUser } from '../../api/user';
+import { getUser, deleteUser, activateUser, deactivateUser } from '../../api/users';
 import { useToastHook } from '../../hooks/useToast';
 
 export async function loader({ params, request }) {
@@ -180,6 +180,23 @@ const UserView = () => {
         }, 6000);
     }
 
+    const getUserArray = (user) => {
+        const userArray = [];
+        for(const [key, value] of Object.entries(user)) {
+            if (key === 'createdAt' || key === 'updatedAt') {
+                continue;
+            }
+
+            if (key === 'active') {
+                userArray.push({key, value: value ? 'Active' : 'Inactive'});
+                continue;
+            }
+            userArray.push({key, value});
+        }
+
+        return userArray;
+    }
+
     const modalButtons =
         <HStack spacing='3'>
             <Button colorScheme='red' ref={closeModalRef} onClick={onClose}>Cancel</Button>
@@ -278,50 +295,30 @@ const UserView = () => {
                     </Modal>
                 </HStack>
                 <Box marginTop='8'>
-                    <Box as='fieldset' boxSize={{ base: 'full', lg: 'full' }} bg='white' p='6' borderWidth='1px' borderColor='gray.300' borderRadius='md'>
-                        <Heading as='legend' px='1' fontSize='lg' fontWeight='medium'>Basic Information</Heading>
-                        <UserInfo user={user} />
-                    </Box>
+                    <Card variant='elevated'>
+                        <CardBody>
+                            <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
+                                {
+                                    getUserArray(user).map((field, index) => (
+                                        <UserField key={index} field={field} />
+                                    ))
+                                }
+                            </SimpleGrid>
+                        </CardBody>
+                    </Card>
                 </Box >
             </Stack >
     )
 }
 
-const UserInfo = ({ user }) => {
+export const UserField = ({ field }) => {
     return (
-        <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>ID</Heading>
-                <Text>{user.id}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Email</Heading>
-                <Text>{user.email}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Role</Heading>
-                <Text>{user.role}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Category</Heading>
-                <Text>{user.category}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Status</Heading>
-                <Text>{user.active ? 'Active' : 'Inactive'}</Text>
-            </Stack>
-        </SimpleGrid>
-    )
-};
-
-const DeleteModal = () => {
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete User'>
-            <Box>
-                <Text>Proceed to delete user?</Text>
-            </Box>
-        </Modal>
+        <Box as='fieldset' boxSize={{ base: 'full', lg: 'full' }} p='3' borderWidth='1px' borderColor='gray.300' borderRadius='md'>
+            <Heading as='legend' px='1' fontSize='sm' fontWeight='semibold' textTransform='capitalize'>{field.key}</Heading>
+            <Text>{field.value}</Text>
+        </Box>
     )
 }
+
 
 export default UserView;

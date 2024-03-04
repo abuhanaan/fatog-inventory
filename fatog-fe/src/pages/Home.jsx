@@ -7,7 +7,7 @@ import { BiError } from "react-icons/bi";
 import LoginInput from "../components/form/LoginInput";
 import PasswordInput from "../components/form/PasswordInput";
 import Logo from "../components/Logo";
-import { authenticate } from "../api/user";
+import { authenticate } from "../api/users";
 import { useToastHook } from "../hooks/useToast";
 import useAuth from "../hooks/useAuth";
 
