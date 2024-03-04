@@ -10,7 +10,7 @@ import Modal from '../../components/Modal';
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
 import AddButton from '../../components/AddButton';
-import { deleteUser, getUsers, activateUser, deactivateUser } from '../../api/user';
+import { deleteUser, getUsers, activateUser, deactivateUser } from '../../api/users';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
 

@@ -8,7 +8,7 @@ import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
 import Modal from '../../components/Modal';
 import { requireAuth } from '../../hooks/useAuth';
-import { getUser, deleteUser, activateUser, deactivateUser } from '../../api/user';
+import { getUser, deleteUser, activateUser, deactivateUser } from '../../api/users';
 import { useToastHook } from '../../hooks/useToast';
 
 export async function loader({ params, request }) {
