@@ -24,6 +24,15 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
+    const existingProduct = await this.prisma.product.findFirst({
+      where: { name: createProductDto.name },
+    });
+    if (existingProduct) {
+      throw new ConflictException({
+        message: `Product with name ${createProductDto.name} already exist`,
+        error: 'Conflict Operation',
+      });
+    }
     const referenceId = generateReferenceId();
 
     try {
