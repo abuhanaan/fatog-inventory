@@ -29,7 +29,28 @@ export async function loader({ request }) {
     await requireAuth(request);
     const response = await getProducts(request);
 
-    return response;
+    console.log(response);
+
+    if (response.error || response.message) {
+        return {
+            error: response.error,
+            message: response.message
+        }
+    }
+
+    const data = response.map(product => {
+        return {
+            id: product.id,
+            name: product.name,
+            type: product.type,
+            weight: product.weight,
+            size: product.size,
+            pricePerBag: product.pricePerBag,
+            manufacturer: product.manufacturer.brandName
+        }
+    });
+
+    return data;
 }
 
 const Products = () => {

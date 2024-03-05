@@ -49,25 +49,12 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => 
             )
         }
 
-        if (col.id === 'manufacturer') {
-            return (
-                columnHelper.accessor(col.id, {
-                    id: col.id,
-                    cell: info => <span>
-                        {
-                            info.getValue() ? info.getValue().brandName : 'N/A'
-                        }
-                    </span>,
-                    header: col.header
-                })
-            )
-        }
-
         return (
             columnHelper.accessor(col.id, {
                 id: col.id,
                 cell: info => <span>
                     {
+                        typeof info.getValue() === 'number' ? info.getValue() : 
                         info.getValue() ? info.getValue() : 'N/A'
                     }
                 </span>,
