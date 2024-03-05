@@ -12,7 +12,7 @@ export class StockListEntity implements StockList {
   stockId: number;
 
   @ApiProperty()
-  productId: number;
+  productRefId: string;
 
   @ApiProperty()
   noOfBags: number;

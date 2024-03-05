@@ -1,13 +1,14 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma, Product } from '@prisma/client';
-import { ProductEntity } from './entities/product.entity';
+import { Product } from '@prisma/client';
+import { generateReferenceId } from 'src/utils/referenceIdGenerator';
 
 @Injectable()
 export class ProductsService {
@@ -22,27 +23,42 @@ export class ProductsService {
     }
   }
 
-  async create(createProductDto: CreateProductDto) {
-    const existingProduct = await this.prisma.product.findFirst({
-      where: { name: createProductDto.name },
-    });
-    if (existingProduct) {
-      throw new ConflictException({
-        message: `Product ${createProductDto.name} already exists`,
-        error: 'Conflict Operation',
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    const referenceId = generateReferenceId();
+
+    try {
+      // Start a Prisma transaction
+      const productAndInventory = await this.prisma.$transaction([
+        // Create the product with the generated reference ID
+        this.prisma.product.create({
+          data: {
+            refId: referenceId,
+            name: createProductDto.name,
+            type: createProductDto.type,
+            pricePerBag: createProductDto.pricePerBag,
+            weight: createProductDto.weight,
+            size: createProductDto.size,
+            manufacturerId: createProductDto.manufacturerId,
+          },
+        }),
+        // Create inventory using the same reference ID
+        this.prisma.inventory.create({
+          data: {
+            productRefId: referenceId,
+            remainingQty: 0,
+          },
+        }),
+      ]);
+
+      // Return the newly created product
+      return productAndInventory[0];
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException({
+        message: 'Failed to create product',
+        error: 'Internal Server Error',
       });
     }
-    const newProduct = await this.prisma.product.create({
-      data: {
-        name: createProductDto.name,
-        type: createProductDto.type,
-        weight: createProductDto.weight,
-        pricePerBag: createProductDto.pricePerBag,
-        size: createProductDto.size,
-        manufacturerId: createProductDto.manufacturerId,
-      },
-    });
-    return newProduct;
   }
 
   async findAll() {

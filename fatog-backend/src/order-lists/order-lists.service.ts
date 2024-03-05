@@ -34,8 +34,8 @@ export class OrderListsService {
 
     const orderListData = await Promise.all(
       createOrderListArrayDto.data.map(async (orderItem) => {
-        const product = await this.prisma.product.findUnique({
-          where: { id: orderItem.productId },
+        const product = await this.prisma.product.findFirst({
+          where: { refId: orderItem.productRefId },
         });
         orderItem.totalPrice = product.pricePerBag * orderItem.noOfBags;
         orderItem.totalWeight = product.weight * orderItem.noOfBags;

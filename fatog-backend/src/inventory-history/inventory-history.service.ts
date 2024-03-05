@@ -2,15 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateInventoryHistoryDto } from './dto/create-inventory-history.dto';
 import { UpdateInventoryHistoryDto } from './dto/update-inventory-history.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { StocksService } from 'src/stocks/stocks.service';
 import { InventoryHistory } from '@prisma/client';
 
 @Injectable()
 export class InventoryHistoryService {
-  constructor(
-    private prisma: PrismaService,
-    private stockService: StocksService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   private checkIfHistoryExists(history: InventoryHistory, id: number) {
     if (!history) {

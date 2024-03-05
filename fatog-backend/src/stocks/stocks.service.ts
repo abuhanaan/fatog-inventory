@@ -80,7 +80,7 @@ export class StocksService {
       // Update inventory and inventory history for each stock item to undo effects
       for (const stockItem of stock.stockLists) {
         const inventory = await this.updateInventory(
-          stockItem.productId,
+          stockItem.productRefId,
           stockItem.noOfBags,
         );
         transactionOperations.push(inventory);
@@ -108,13 +108,13 @@ export class StocksService {
     }
   }
 
-  private async updateInventory(productId: number, quantity: number) {
+  private async updateInventory(productRefId: string, quantity: number) {
     const inventory = await this.prisma.inventory.findFirst({
-      where: { productId },
+      where: { productRefId },
     });
     if (!inventory) {
       throw new NotFoundException({
-        message: `Inventory not found for product ID ${productId}`,
+        message: `Inventory not found for product ID ${productRefId}`,
         error: 'Not Found',
       });
     }

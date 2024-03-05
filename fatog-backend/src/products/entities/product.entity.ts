@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Product, Manufacturer } from '@prisma/client';
+import { Product } from '@prisma/client';
 import { InventoryEntity } from 'src/inventory/entities/inventory.entity';
 import { ManufacturerEntity } from 'src/manufacturers/entities/manufacturer.entity';
 import { OrderListEntity } from 'src/order-lists/entities/order-list.entity';
@@ -8,6 +8,9 @@ import { StockListEntity } from 'src/stock-lists/entities/stock-list.entity';
 export class ProductEntity implements Product {
   @ApiProperty()
   id: number;
+
+  @ApiProperty()
+  refId: string;
 
   @ApiProperty()
   name: string;

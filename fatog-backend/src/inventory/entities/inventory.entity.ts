@@ -8,7 +8,7 @@ export class InventoryEntity implements Inventory {
   id: number;
 
   @ApiProperty()
-  productId: number;
+  productRefId: string;
 
   @ApiProperty()
   remainingQty: number;

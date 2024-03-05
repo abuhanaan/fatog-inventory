@@ -63,12 +63,12 @@ export class SalesService {
       // Update inventory and record history for each order item
       for (const orderItem of orderItems) {
         const inventory = await this.prisma.inventory.findFirst({
-          where: { productId: orderItem.productId },
+          where: { productRefId: orderItem.productRefId },
         });
 
         if (!inventory) {
           throw new NotFoundException({
-            message: `Inventory not found for product ID ${orderItem.productId}`,
+            message: `Inventory not found for product ID ${orderItem.productRefId}`,
             error: 'Not Found',
           });
         }
@@ -168,11 +168,11 @@ export class SalesService {
       await Promise.all(
         sales.order.orderLists.map(async (orderItem) => {
           const inventory = await this.prisma.inventory.findFirst({
-            where: { productId: orderItem.productId },
+            where: { productRefId: orderItem.productRefId },
           });
           if (!inventory) {
             throw new NotFoundException({
-              message: `Inventory not found for product ID ${orderItem.productId}`,
+              message: `Inventory not found for product ID ${orderItem.productRefId}`,
               error: 'Not Found',
             });
           }

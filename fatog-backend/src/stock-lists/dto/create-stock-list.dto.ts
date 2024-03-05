@@ -10,7 +10,7 @@ export class CreateStockListDto {
   @IsNotEmpty()
   @IsNumber()
   @ApiProperty()
-  productId: number;
+  productRefId: string;
 
   @IsNotEmpty()
   @IsNumber()

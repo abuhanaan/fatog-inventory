@@ -5,7 +5,7 @@ export class CreateInventoryDto {
   @IsNotEmpty()
   @IsNumber()
   @ApiProperty()
-  productId: number;
+  productRefId: string;
 
   @IsNotEmpty()
   @IsNumber()

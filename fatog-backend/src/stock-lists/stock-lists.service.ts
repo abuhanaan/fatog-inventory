@@ -76,7 +76,7 @@ export class StockListsService {
       // Update inventory and inventory history for each stock item
       for (const memberStock of stockListData) {
         const inventory = await this.updateInventory(
-          memberStock.productId,
+          memberStock.productRefId,
           memberStock.noOfBags,
         );
         transactionOperations.push(inventory);
@@ -106,13 +106,13 @@ export class StockListsService {
     }
   }
 
-  private async updateInventory(productId: number, quantity: number) {
+  private async updateInventory(productRefId: string, quantity: number) {
     const inventory = await this.prisma.inventory.findFirst({
-      where: { productId },
+      where: { productRefId },
     });
     if (!inventory) {
       throw new NotFoundException({
-        message: `Inventory not found for product ID ${productId}`,
+        message: `Inventory not found for product ID ${productRefId}`,
         error: 'Not Found',
       });
     }
@@ -194,7 +194,7 @@ export class StockListsService {
 
       // Update inventory by decrementing remainingQty for the corresponding product
       const inventory = await this.updateInventoryByStockRemoval(
-        stockItem.productId,
+        stockItem.productRefId,
         -stockItem.noOfBags,
       );
 
@@ -212,15 +212,15 @@ export class StockListsService {
   }
 
   private async updateInventoryByStockRemoval(
-    productId: number,
+    productRefId: string,
     quantity: number,
   ) {
     const inventory = await this.prisma.inventory.findFirst({
-      where: { productId },
+      where: { productRefId },
     });
     if (!inventory) {
       throw new NotFoundException({
-        message: `Inventory not found for product ID ${productId}`,
+        message: `Inventory not found for product ID ${productRefId}`,
         error: 'Not Found',
       });
     }

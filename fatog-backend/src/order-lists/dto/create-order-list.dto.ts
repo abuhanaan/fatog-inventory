@@ -10,7 +10,7 @@ export class CreateOrderListDto {
   @IsNumber()
   @ApiProperty()
   @IsNotEmpty()
-  productId: number;
+  productRefId: string;
 
   @IsNumber()
   @ApiProperty()

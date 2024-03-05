@@ -11,7 +11,7 @@ export class OrderListEntity implements OrderList {
   orderId: number;
 
   @ApiProperty()
-  productId: number;
+  productRefId: string;
 
   @ApiProperty()
   noOfBags: number;

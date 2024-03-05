@@ -25,11 +25,11 @@ export class InventoryService {
 
   async create(createInventoryDto: CreateInventoryDto) {
     const existingInventory = await this.prisma.inventory.findFirst({
-      where: { productId: createInventoryDto.productId },
+      where: { productRefId: createInventoryDto.productRefId },
     });
     if (existingInventory) {
       throw new ConflictException({
-        message: `Inventory already exist for product with id: ${createInventoryDto.productId}`,
+        message: `Inventory already exist for product with id: ${createInventoryDto.productRefId}`,
         error: 'Conflict Operation',
       });
     }
