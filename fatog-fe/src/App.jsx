@@ -33,6 +33,8 @@ import ProfileForm from "./pages/users/ProfileForm";
 import ChangePassword from "./pages/users/ChangePassword";
 import { requireAuth } from "./hooks/useAuth";
 import Error from "./components/Error";
+import Inventories from "./pages/inventory/Inventories";
+import { loader as InventoriesLoader } from "./pages/inventory/Inventories";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -62,6 +64,8 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='manufacturers' loader={ManufacturersLoader} element={<Manufacturers />} />
                 <Route path='manufacturers/create' loader={loader} element={<ManufacturerForm />} />
                 <Route path='manufacturers/:id' loader={ManufacturerViewLoader} element={<ManufacturerView />} />
+
+                <Route path='inventories' loader={InventoriesLoader} element={<Inventories />} />
             </Route>
         </Route>
 
