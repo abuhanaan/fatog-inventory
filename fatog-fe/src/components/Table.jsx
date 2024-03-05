@@ -98,7 +98,7 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => 
                 <Spacer />
                 <DownloadBtn data={tableData} fileName={fileName}>Download</DownloadBtn>
             </Flex>
-            <TableContainer>
+            <TableContainer overflowX='auto'>
                 <Table variant="simple" size='sm' colorScheme='blue'>
                     <Thead>
                         {
