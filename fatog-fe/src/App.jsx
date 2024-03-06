@@ -39,6 +39,8 @@ import InventoryView from "./pages/inventory/InventoryView";
 import { loader as InventoryViewLoader } from "./pages/inventory/InventoryView";
 import Histories from "./pages/history/Histories";
 import { loader as HistoriesLoader } from "./pages/history/Histories";
+import Stocks from "./pages/stocks/Stocks";
+import { loader as StocksLoader } from "./pages/stocks/Stocks";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -73,6 +75,8 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='inventories/:id' loader={InventoryViewLoader} element={<InventoryView />} />
 
                 <Route path='history' loader={HistoriesLoader} element={<Histories />} />
+
+                <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
             </Route>
         </Route>
 
