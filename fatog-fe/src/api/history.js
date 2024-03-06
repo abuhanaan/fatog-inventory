@@ -2,7 +2,7 @@ import { redirect } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const user = JSON.parse(sessionStorage.getItem('user'));
-const endpoint = '/history';
+const endpoint = '/inventory-history';
 const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${user?.accessToken}`,
