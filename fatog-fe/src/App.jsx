@@ -35,6 +35,8 @@ import { requireAuth } from "./hooks/useAuth";
 import Error from "./components/Error";
 import Inventories from "./pages/inventory/Inventories";
 import { loader as InventoriesLoader } from "./pages/inventory/Inventories";
+import InventoryView from "./pages/inventory/InventoryView";
+import { loader as InventoryViewLoader } from "./pages/inventory/InventoryView";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -66,6 +68,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='manufacturers/:id' loader={ManufacturerViewLoader} element={<ManufacturerView />} />
 
                 <Route path='inventories' loader={InventoriesLoader} element={<Inventories />} />
+                <Route path='inventories/:id' loader={InventoryViewLoader} element={<InventoryView />} />
             </Route>
         </Route>
 

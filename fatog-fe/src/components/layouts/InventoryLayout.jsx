@@ -17,7 +17,7 @@ const InventoryLayout = () => {
     return (
         <Box minHeight="100vh">
             <Flex>
-                <Flex direction='column' w="250px" bg='white' borderRightWidth='1px' borderColor='gray.200' display={{ 'base': 'none', 'md': 'flex' }}>
+                <Flex direction='column' minW="250px" bg='white' borderRightWidth='1px' borderColor='gray.200' display={{ 'base': 'none', 'md': 'flex' }}>
                     {/* Side Navigation */}
                     <Logo />
                     <SideNavLinks />
