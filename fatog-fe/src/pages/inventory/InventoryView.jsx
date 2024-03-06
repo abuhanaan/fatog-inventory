@@ -139,6 +139,11 @@ const GeneralInfo = ({ inventory }) => {
 };
 
 const RecentHistory = ({ history }) => {
+    const columns = [
+        { id: 'S/N', header: 'S/N' },
+        // ...
+        { id: 'actions', header: '' },
+    ];
     return (
         <Box marginTop='8'>
             {
