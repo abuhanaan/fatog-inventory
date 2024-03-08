@@ -41,6 +41,8 @@ import Histories from "./pages/history/Histories";
 import { loader as HistoriesLoader } from "./pages/history/Histories";
 import Stocks from "./pages/stocks/Stocks";
 import { loader as StocksLoader } from "./pages/stocks/Stocks";
+import StockCreate from "./pages/stocks/StockCreate";
+import { loader as StockCreateLoader } from "./pages/stocks/StockCreate";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -77,6 +79,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='history' loader={HistoriesLoader} element={<Histories />} />
 
                 <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
+                <Route path='stocks/create' loader={StockCreateLoader} element={<StockCreate />} />
             </Route>
         </Route>
 

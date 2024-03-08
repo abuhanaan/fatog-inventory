@@ -89,7 +89,6 @@ const Stocks = () => {
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Stocks</Heading>
                     <Button as={RouterLink} to='create' colorScheme='blue' leftIcon={<MdOutlineCreateNewFolder />}>Create Stock</Button>
-                    {/* <AddButton navigateTo='create'>Create Stock</AddButton> */}
                 </HStack>
                 <Box marginTop='8'>
                     {
