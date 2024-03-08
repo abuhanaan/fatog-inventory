@@ -8,6 +8,29 @@ const headers = {
     'Authorization': `Bearer ${user?.accessToken}`,
 };
 
+export async function createStock(stockData) {
+    const res = await fetch(`${BASE_URL}/stock-lists`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(stockData)
+    });
+
+    const data = await res.json();
+
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+
+    isError(res, data);
+
+    return data;
+}
+
 export async function getStocks(request) {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
