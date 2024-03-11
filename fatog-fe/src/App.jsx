@@ -75,8 +75,8 @@ const router = createBrowserRouter(createRoutesFromChildren(
 
                 <Route path='inventories' loader={InventoriesLoader} element={<Inventories />} />
                 <Route path='inventories/:id' loader={InventoryViewLoader} element={<InventoryView />} />
+                <Route path='inventories/history' loader={HistoriesLoader} element={<Histories />} />
 
-                <Route path='history' loader={HistoriesLoader} element={<Histories />} />
 
                 <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
                 <Route path='stocks/create' loader={StockCreateLoader} element={<StockCreate />} />

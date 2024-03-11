@@ -24,19 +24,22 @@ const SideDrawer = ({ isOpen, onClose, btnRef }) => {
             size='sm'
         >
             <DrawerOverlay />
-            <DrawerContent paddingX='0'>
+            <DrawerContent px='0'>
                 <DrawerCloseButton />
-                <DrawerHeader paddingX='2'>
+                <DrawerHeader px='2'>
                     <Logo />
                 </DrawerHeader>
 
-                <DrawerBody padding='0' flex='1'>
+                <DrawerBody p='0' flex='1'>
                     <Flex direction='column'>
                         <SideNavLinks />
                         <Spacer />
-                        <LogoutBtn display={{ base: 'block', md: 'none' }} />
                     </Flex>
                 </DrawerBody>
+
+                <DrawerFooter borderTopWidth='1px' p='0' justifyContent='flex-start'>
+                    <LogoutBtn display={{ base: 'block', md: 'none' }} />
+                </DrawerFooter>
             </DrawerContent>
         </Drawer>
     )
