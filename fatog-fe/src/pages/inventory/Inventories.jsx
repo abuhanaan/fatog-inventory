@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLoaderData } from 'react-router-dom';
+import { useNavigate, useLoaderData, Link as RouterLink } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, IconButton, Icon, Heading, Tooltip } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Tooltip } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
+import { LuHistory } from "react-icons/lu";
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
 import { getManufacturers } from '../../api/manufacturers';
@@ -98,6 +99,7 @@ const Inventories = () => {
                 </Box>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Inventories</Heading>
+                    <Button as={RouterLink} to='history' leftIcon={<LuHistory />} colorScheme='blue'>History</Button>
                 </HStack>
                 <Box marginTop='8'>
                     {

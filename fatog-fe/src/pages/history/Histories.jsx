@@ -63,10 +63,13 @@ const Histories = () => {
         error: '',
         message: ''
     });
-    console.log(histories);
+    console.log(histories.error);
+    console.log(histories.message);
 
     useEffect(() => {
+        console.log('useEffect hit');
         if (histories.error || histories.message) {
+            console.log('UseEffect If condition');
             setToastState({
                 title: histories.error,
                 description: histories.message,
@@ -82,7 +85,7 @@ const Histories = () => {
     }, []);
 
     return (
-        error.error ?
+        error.error || error.message ?
             <VStack>
                 <Box>{error.error}</Box>
                 <Box>{error.message}</Box>
