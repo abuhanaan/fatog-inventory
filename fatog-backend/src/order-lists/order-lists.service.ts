@@ -38,6 +38,7 @@ export class OrderListsService {
     let orderTotalWeight = 0;
     let orderTotalNoOfBags = 0;
     console.log({ staffId: user.id, message: 'Now in the service' });
+    console.log({ user });
 
     const referenceId = generateReferenceId();
 
@@ -65,15 +66,19 @@ export class OrderListsService {
           orderRefId: referenceId,
           productRefId: orderItem.productRefId,
           noOfBags: orderItem.noOfBags,
-          pricePerBag: orderItem.pricePerBag,
+          pricePerBag: product.pricePerBag,
           totalWeight: orderItem.totalWeight,
           totalPrice: orderItem.totalPrice,
         };
       }),
     );
 
+    const userCategory = user.category;
+
     const orderDTO: CreateOrderDto = {
       refId: referenceId,
+      staffId: userCategory === 'staff' ? user.id : null,
+      customerId: userCategory === 'customer' ? user.id : null,
       totalAmount: orderTotalAmount,
       totalWeight: orderTotalWeight,
       totalNoOfBags: orderTotalNoOfBags,
@@ -122,6 +127,7 @@ export class OrderListsService {
       include: { product: true, order: true },
     });
     await this.checkIfOrderListExist(orderItem, id);
+    // TODO: Work around updating the related order object as well
     return this.prisma.orderList.update({
       where: { id },
       data: updateOrderListDto,
@@ -135,6 +141,8 @@ export class OrderListsService {
       include: { product: true, order: true },
     });
     await this.checkIfOrderListExist(orderItem, id);
+    // TODO: Work around updating the related order object as well
+
     return this.prisma.orderList.delete({ where: { id } });
   }
 }

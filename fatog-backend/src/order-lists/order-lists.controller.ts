@@ -8,15 +8,22 @@ import {
   Delete,
   Req,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { OrderListsService } from './order-lists.service';
 import { CreateOrderListDto } from './dto/create-order-list.dto';
 import { UpdateOrderListDto } from './dto/update-order-list.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { OrderListEntity } from './entities/order-list.entity';
 import { CreateOrderListArrayDto } from './dto/create-order-list-array.dto';
 import { AuthenticatedRequest } from 'src/utils/interfaces/authRequest.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('order-lists')
 @ApiTags('order-lists')
@@ -24,6 +31,8 @@ export class OrderListsController {
   constructor(private readonly orderListsService: OrderListsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: OrderListEntity, isArray: true })
   async create(
     @Body() createOrderListArrayDto: CreateOrderListArrayDto,
