@@ -81,6 +81,24 @@ export class OrderListsService {
       customerId: userCategory === 'customer' ? user.id : null,
       totalAmount: orderTotalAmount,
       totalWeight: orderTotalWeight,
+
+      amountPaid:
+        userCategory === 'staff' ? createOrderListArrayDto.amountPaid : null,
+      outStandingPayment:
+        userCategory === 'staff'
+          ? orderTotalAmount - createOrderListArrayDto.amountPaid
+          : null,
+
+      paymentStatus:
+        userCategory === 'staff'
+          ? createOrderListArrayDto.paymentStatus
+          : 'pending',
+
+      deliveryStatus:
+        userCategory === 'staff'
+          ? createOrderListArrayDto.deliveryStatus
+          : 'pending',
+
       totalNoOfBags: orderTotalNoOfBags,
       phoneNumber: createOrderListArrayDto.phoneNumber,
       shippingAddress: createOrderListArrayDto.shippingAddress
