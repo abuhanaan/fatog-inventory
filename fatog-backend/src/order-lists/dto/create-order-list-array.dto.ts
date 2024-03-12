@@ -36,7 +36,6 @@ export class CreateOrderListArrayDto {
   @ApiProperty({ required: false })
   deliveryStatus?: string;
 
-  @ApiProperty({ required: false })
   outStandingPayment?: number;
 
   @IsString()
