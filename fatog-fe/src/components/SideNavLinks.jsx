@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Stack, Flex, HStack, Text, Icon, Link, Spacer, Menu, MenuButton, MenuList, MenuItem, MenuDivider } from '@chakra-ui/react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { links } from '../constants';
 import { RiLogoutCircleRLine } from "react-icons/ri";
 import { PiUsersFourLight } from "react-icons/pi";
@@ -12,7 +12,6 @@ const SideNavLinks = () => {
         <Stack flex='1' spacing='1' pt='4' borderTopWidth='1px' borderColor='gray.200'>
             {
                 links.map(link => {
-
                     return link.title === 'Users' ?
                         <UsersMenu key={link.title} link={link} /> :
                         <Link
@@ -57,10 +56,16 @@ const SideNavLinks = () => {
 }
 
 const UsersMenu = ({ link }) => {
+    const { pathname } = useLocation();
+
     const menuItems = [
         { title: 'Staff', ref: '/staff', icon: PiUsersFourLight },
         { title: 'Customers', ref: '/customers', icon: LiaUsersSolid },
     ];
+
+    const isActive = (pathname === '/staff' || pathname === '/customers') ? true : false;
+
+    console.log(isActive);
 
     return (
         <Menu>
@@ -70,6 +75,11 @@ const UsersMenu = ({ link }) => {
                 _hover={{
                     bg: '#BEE3F8', borderLeftWidth: '5px', borderColor: '#2B6CB0', color: '#2B6CB0', fontWeight: 'medium'
                 }}
+                bg={isActive && '#BEE3F8'}
+                borderLeftWidth={isActive && '5px'}
+                borderColor={isActive && '#2B6CB0'}
+                color={isActive && '#2B6CB0'}
+                fontWeight={isActive && 'medium'}
             >
                 <HStack spacing='3'>
                     <Icon
