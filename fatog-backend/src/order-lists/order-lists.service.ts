@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateOrderListDto } from './dto/create-order-list.dto';
 import { UpdateOrderListDto } from './dto/update-order-list.dto';
 import { ApiTags } from '@nestjs/swagger';
@@ -8,6 +12,8 @@ import { OrdersService } from 'src/orders/orders.service';
 import { OrderList } from '@prisma/client';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { CreateOrderDto } from 'src/orders/dto/create-order.dto';
+import { generateReferenceId } from 'src/utils/referenceIdGenerator';
+import { OrderEntity } from 'src/orders/entities/order.entity';
 
 @Injectable()
 export class OrderListsService {
@@ -31,6 +37,19 @@ export class OrderListsService {
     let orderTotalAmount = 0;
     let orderTotalWeight = 0;
     let orderTotalNoOfBags = 0;
+    console.log({ staffId: user.id, message: 'Now in the service' });
+
+    const referenceId = generateReferenceId();
+
+    const existingOrder = await this.prisma.order.findUnique({
+      where: { refId: referenceId },
+    });
+
+    if (existingOrder) {
+      throw new ConflictException({
+        message: `Order with reference id ${referenceId} already exist`,
+      });
+    }
 
     const orderListData = await Promise.all(
       createOrderListArrayDto.data.map(async (orderItem) => {
@@ -42,10 +61,19 @@ export class OrderListsService {
         orderTotalAmount += orderItem.totalPrice;
         orderTotalWeight += orderItem.totalWeight;
         orderTotalNoOfBags += orderItem.noOfBags;
-        return orderItem;
+        return {
+          orderRefId: referenceId,
+          productRefId: orderItem.productRefId,
+          noOfBags: orderItem.noOfBags,
+          pricePerBag: orderItem.pricePerBag,
+          totalWeight: orderItem.totalWeight,
+          totalPrice: orderItem.totalPrice,
+        };
       }),
     );
+
     const orderDTO: CreateOrderDto = {
+      refId: referenceId,
       totalAmount: orderTotalAmount,
       totalWeight: orderTotalWeight,
       totalNoOfBags: orderTotalNoOfBags,
@@ -54,20 +82,22 @@ export class OrderListsService {
         ? createOrderListArrayDto.shippingAddress
         : '',
     };
-    const order = await this.prisma.order.create({ data: orderDTO });
-    orderListData.forEach((orderItem) => {
-      // TODO: work around affecting inventory with order
-      orderItem.orderId = order.id;
-    });
 
-    const createdOrderItems = await this.prisma.orderList.createMany({
-      data: orderListData,
-    });
+    // Implementing DB transaction for order and order items creation
+    const transaction = await this.prisma.$transaction([
+      this.prisma.order.create({ data: orderDTO }),
+      this.prisma.orderList.createMany({
+        data: orderListData,
+      }),
+    ]);
 
     const orderItems = await this.prisma.orderList.findMany({
-      where: { orderId: order.id },
+      where: { orderRefId: referenceId },
       include: { order: true, product: true },
     });
+
+    const order: OrderEntity = transaction[0];
+    // const orderItems = transaction[1];
     return orderItems;
   }
 

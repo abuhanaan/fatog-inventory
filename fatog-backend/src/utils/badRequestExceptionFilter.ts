@@ -13,12 +13,13 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
     const request = ctx.getRequest();
-    let stringError;
 
     const validationErrors = exception.getResponse()?.['message'] || [];
+    let stringError;
     if (!Array.isArray(validationErrors)) {
       stringError = exception.getResponse()?.['message'];
     }
+
     const formattedErrors = this.formatErrors(validationErrors, stringError);
 
     const status = HttpStatus.BAD_REQUEST;
@@ -30,18 +31,17 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
     };
-    console.log(badRequestResponse);
 
     response.status(status).json(badRequestResponse);
   }
 
   private formatErrors(
-    errors: ValidationError[] | string[],
-    stringError?,
+    errors: (ValidationError | string)[] | undefined,
+    stringError?: string,
   ): string[] {
     const result: string[] = [];
 
-    if (Array.isArray(errors)) {
+    if (errors && Array.isArray(errors)) {
       errors.forEach((err) => {
         if (err instanceof ValidationError) {
           Object.values(err.constraints).forEach((message) => {
@@ -51,9 +51,10 @@ export class BadRequestExceptionFilter implements ExceptionFilter {
           result.push(err);
         }
       });
-    } else {
+    } else if (typeof stringError === 'string') {
       result.push(stringError);
     }
+
     return result;
   }
 }

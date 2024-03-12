@@ -8,15 +8,22 @@ import {
   Delete,
   Req,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { StockListsService } from './stock-lists.service';
 import { CreateStockListDto } from './dto/create-stock-list.dto';
 import { UpdateStockListDto } from './dto/update-stock-list.dto';
 import { CreateStockListArrayDto } from './dto/create-stock-list-array.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StockListEntity } from './entities/stock-list.entity';
 import { AuthenticatedRequest } from 'src/utils/interfaces/authRequest.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('stock-lists')
 @ApiTags('stock-lists')
@@ -24,12 +31,15 @@ export class StockListsController {
   constructor(private readonly stockListsService: StockListsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: StockListEntity, isArray: true })
   async create(
     @Body() createStockListArrayDto: CreateStockListArrayDto,
     @Req() request: AuthenticatedRequest,
   ) {
     const user = request.user as UserEntity;
+    console.log(user);
     const stocklists = await this.stockListsService.create(
       createStockListArrayDto,
       user,

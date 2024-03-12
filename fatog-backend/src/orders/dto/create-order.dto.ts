@@ -2,6 +2,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateOrderDto {
+  @IsString()
+  @ApiProperty()
+  @IsNotEmpty()
+  refId: string;
+
   @IsNumber()
   @ApiProperty()
   @IsNotEmpty()

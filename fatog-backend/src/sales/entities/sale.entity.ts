@@ -8,7 +8,7 @@ export class SalesEntity implements Sales {
   id: number;
 
   @ApiProperty()
-  orderId: number;
+  orderRefId: string;
 
   @ApiProperty()
   amountPayable: number;

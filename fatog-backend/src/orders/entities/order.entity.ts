@@ -9,6 +9,9 @@ export class OrderEntity implements Order {
   id: number;
 
   @ApiProperty()
+  refId: string;
+
+  @ApiProperty()
   totalAmount: number;
 
   @ApiProperty()

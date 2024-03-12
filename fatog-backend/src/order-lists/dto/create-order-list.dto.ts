@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateOrderListDto {
-  @IsNumber()
+  @IsString()
   @ApiProperty()
   @IsNotEmpty()
-  orderId: number;
+  orderRefId?: string;
 
   @IsNumber()
   @ApiProperty()
@@ -25,10 +25,10 @@ export class CreateOrderListDto {
   @IsNumber()
   @ApiProperty()
   @IsNotEmpty()
-  totalWeight: number;
+  totalWeight?: number;
 
   @IsNumber()
   @ApiProperty()
   @IsNotEmpty()
-  totalPrice: number;
+  totalPrice?: number;
 }

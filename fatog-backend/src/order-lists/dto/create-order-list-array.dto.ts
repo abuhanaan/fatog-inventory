@@ -17,30 +17,30 @@ export class CreateOrderListArrayDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  shippingAddress: string;
+  shippingAddress?: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  paymentStatus: string;
+  paymentStatus?: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  deliveryStatus: string;
+  deliveryStatus?: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  amountPaid: number;
+  amountPaid?: number;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  outStandingPayment: number;
+  outStandingPayment?: number;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  note: string;
+  note?: string;
 }

@@ -8,6 +8,9 @@ export class StockEntity implements Stock {
   id: number;
 
   @ApiProperty()
+  refId: string;
+
+  @ApiProperty()
   totalAmount: number;
 
   @ApiProperty()

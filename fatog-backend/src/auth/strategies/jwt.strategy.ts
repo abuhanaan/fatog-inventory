@@ -14,6 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'user-auth') {
   }
 
   async validate(payload: { userId: number }) {
+    console.log('auth bearer in action');
     const user = await this.usersService.findOne(payload.userId);
 
     if (!user) {

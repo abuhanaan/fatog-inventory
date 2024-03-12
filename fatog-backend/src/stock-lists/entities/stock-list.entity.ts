@@ -9,7 +9,10 @@ export class StockListEntity implements StockList {
   id: number;
 
   @ApiProperty()
-  stockId: number;
+  refId: string;
+
+  @ApiProperty()
+  stockRefId: string;
 
   @ApiProperty()
   productRefId: string;

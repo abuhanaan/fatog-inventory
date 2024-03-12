@@ -6,6 +6,10 @@ export class CreateStockDto {
   @ApiProperty()
   totalAmount: number;
 
+  @IsString()
+  @ApiProperty()
+  refId: string;
+
   @IsNumber()
   @ApiProperty()
   totalWeight: number;

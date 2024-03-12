@@ -15,7 +15,7 @@ export class InventoryHistoryEntity implements InventoryHistory {
   orderItemId: number;
 
   @ApiProperty()
-  stockItemId: number;
+  stockItemRefId: string;
 
   @ApiProperty()
   remainderBefore: number;

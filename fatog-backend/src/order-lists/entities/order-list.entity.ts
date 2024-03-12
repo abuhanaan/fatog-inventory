@@ -8,7 +8,7 @@ export class OrderListEntity implements OrderList {
   id: number;
 
   @ApiProperty()
-  orderId: number;
+  orderRefId: string;
 
   @ApiProperty()
   productRefId: string;

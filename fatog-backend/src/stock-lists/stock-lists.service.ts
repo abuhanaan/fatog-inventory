@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -15,6 +16,7 @@ import { StockEntity } from 'src/stocks/entities/stock.entity';
 import { StockList } from '@prisma/client';
 import { StockListEntity } from './entities/stock-list.entity';
 import { ProductEntity } from 'src/products/entities/product.entity';
+import { generateReferenceId } from 'src/utils/referenceIdGenerator';
 
 @Injectable()
 export class StockListsService {
@@ -45,57 +47,145 @@ export class StockListsService {
           error: 'Unauthorized Operation',
         });
       }
+      const referenceId = generateReferenceId();
+
+      const existingStock = await this.prisma.stock.findUnique({
+        where: { refId: referenceId },
+      });
+
+      if (existingStock) {
+        throw new ConflictException({
+          message: `Stock with reference id ${referenceId} already exist`,
+        });
+      }
       const { data: stockListData } = createStockListArrayDto;
 
       // Calculate total amount, weight, and number of bags
-      let totalAmount = 0;
-      let totalWeight = 0;
-      let totalNoOfBags = 0;
+      let overallStockTotalAmount = 0;
+      let overallStockTotalWeight = 0;
+      let overallStockTotalNoOfBags = 0;
+
+      // Prepare arrays for batch operations
+      const inventoryUpdateData = [];
+      const stockListCreationData = [];
+      const inventoryHistoryCreationData = [];
+
       for (const memberStock of stockListData) {
-        totalAmount += memberStock.totalAmount;
-        totalWeight += memberStock.totalWeight;
-        totalNoOfBags += memberStock.noOfBags;
+        const product = await this.prisma.product.findUnique({
+          where: { refId: memberStock.productRefId },
+        });
+        if (!product) {
+          throw new NotFoundException({
+            message: `Product with id ${memberStock.productRefId} does not exist`,
+            error: 'Not Found',
+          });
+        }
+        const inventory = await this.prisma.inventory.findFirst({
+          where: { productRefId: memberStock.productRefId },
+        });
+        if (!inventory) {
+          throw new NotFoundException({
+            message: `Inventory not found for product ID ${memberStock.productRefId}`,
+            error: 'Not Found',
+          });
+        }
+        memberStock.totalAmount =
+          memberStock.pricePerBag * memberStock.noOfBags;
+        overallStockTotalAmount += memberStock.totalAmount;
+        memberStock.totalWeight = product.weight * memberStock.noOfBags;
+        overallStockTotalWeight += memberStock.totalWeight;
+        overallStockTotalNoOfBags += memberStock.noOfBags;
+
+        // Prepare data for inventory update
+        inventoryUpdateData.push({
+          where: { id: inventory.id },
+          data: { remainingQty: { increment: memberStock.noOfBags } },
+        });
+
+        const stockItemandHistoryItemRelation = generateReferenceId();
+
+        // Prepare data for stock items creation
+        stockListCreationData.push({
+          refId: stockItemandHistoryItemRelation,
+          stockRefId: referenceId,
+          productRefId: memberStock.productRefId,
+          noOfBags: memberStock.noOfBags,
+          pricePerBag: memberStock.pricePerBag,
+          totalWeight: memberStock.totalWeight,
+          totalAmount: memberStock.totalAmount,
+        });
+
+        // Prepare data for inventory history creation
+        inventoryHistoryCreationData.push({
+          inventoryId: inventory.id,
+          orderItemId: null,
+          stockItemRefId: stockItemandHistoryItemRelation,
+          remainderBefore: inventory.remainingQty,
+          remainderAfter: inventory.remainingQty + memberStock.noOfBags,
+          effectQuantity: memberStock.noOfBags,
+          increment: true,
+          decrement: false,
+        });
       }
 
       // Create the stock record
       const stockDTO: CreateStockDto = {
-        totalAmount,
-        totalWeight,
-        totalNoOfBags,
+        refId: referenceId,
+        totalAmount: overallStockTotalAmount,
+        totalWeight: overallStockTotalWeight,
+        totalNoOfBags: overallStockTotalNoOfBags,
         staffId: user.id,
+        invoice: '',
       };
-
-      // Initialize an array to store promises for transaction operations
-      const transactionOperations = [];
-
-      const stock = await this.stockService.create(stockDTO, user);
-
-      // Push stock creation into transactionOperations array
-      transactionOperations.push(stock);
-
-      // Update inventory and inventory history for each stock item
-      for (const memberStock of stockListData) {
-        const inventory = await this.updateInventory(
-          memberStock.productRefId,
-          memberStock.noOfBags,
-        );
-        transactionOperations.push(inventory);
-      }
-
-      // Create stock lists
-      const createdStockItems = await this.prisma.stockList.createMany({
-        data: stockListData.map((stockItem) => ({
-          ...stockItem,
-          stockId: stock.id,
-        })),
+      console.log({
+        stockDTO,
+        inventoryUpdateData,
+        stockListCreationData,
+        inventoryHistoryCreationData,
       });
-      transactionOperations.push(createdStockItems);
+      // const transaction = await this.prisma.$transaction([
+      //   this.prisma.stock.create({ data: stockDTO }),
+      //   this.prisma.inventory.updateMany({ data: inventoryUpdateData }),
+      //   this.prisma.stockList.createMany({ data: stockListCreationData }),
+      // ]);
 
-      // Start the transaction with the array of promises
-      await this.prisma.$transaction(transactionOperations);
+      // const stock = transaction[0];
+      // const stock = await this.prisma.stock.create({ data: stockDTO });
+      // const inventoryUpdates = await this.prisma.inventory.updateMany({
+      //   data: inventoryUpdateData,
+      // });
+      // const newStockLists = await this.prisma.stockList.createMany({
+      //   data: stockListCreationData,
+      // });
 
+      const transaction = await this.prisma.$transaction(async (prisma) => {
+        const stock = await prisma.stock.create({ data: stockDTO });
+        // const inventoryUpdates = await prisma.inventory.updateMany({
+        //   data: inventoryUpdateData,
+        // });
+        const inventoryUpdates = await Promise.all(
+          inventoryUpdateData.map(async (updateData) => {
+            const { where, data } = updateData;
+            return prisma.inventory.update({
+              where: { id: where.id },
+              data: data,
+            });
+          }),
+        );
+        const newStockLists = await prisma.stockList.createMany({
+          data: stockListCreationData,
+        });
+        const inventoryHistories = await prisma.inventoryHistory.createMany({
+          data: inventoryHistoryCreationData,
+        });
+
+        return [stock, inventoryUpdates, newStockLists, inventoryHistories];
+      });
+
+      // const stock = transaction[0];
       // Return formatted stock items
-      const formattedStockItems = await this.getFormattedStockItems(stock.id);
+      const formattedStockItems =
+        await this.getFormattedStockItems(referenceId);
       return formattedStockItems;
     } catch (error) {
       console.error(error);
@@ -106,40 +196,40 @@ export class StockListsService {
     }
   }
 
-  private async updateInventory(productRefId: string, quantity: number) {
-    const inventory = await this.prisma.inventory.findFirst({
-      where: { productRefId },
-    });
-    if (!inventory) {
-      throw new NotFoundException({
-        message: `Inventory not found for product ID ${productRefId}`,
-        error: 'Not Found',
-      });
-    }
+  // private async updateInventory(productRefId: string, quantity: number) {
+  //   const inventory = await this.prisma.inventory.findFirst({
+  //     where: { productRefId },
+  //   });
+  //   if (!inventory) {
+  //     throw new NotFoundException({
+  //       message: `Inventory not found for product ID ${productRefId}`,
+  //       error: 'Not Found',
+  //     });
+  //   }
 
-    return this.prisma.$transaction([
-      this.prisma.inventory.update({
-        where: { id: inventory.id },
-        data: { remainingQty: { increment: quantity } },
-      }),
-      this.prisma.inventoryHistory.create({
-        data: {
-          inventoryId: inventory.id,
-          remainderBefore: inventory.remainingQty,
-          remainderAfter: inventory.remainingQty + quantity,
-          effectQuantity: quantity,
-          increment: true,
-          decrement: false,
-        },
-      }),
-    ]);
-  }
+  //   return this.prisma.$transaction([
+  //     this.prisma.inventory.update({
+  //       where: { id: inventory.id },
+  //       data: { remainingQty: { increment: quantity } },
+  //     }),
+  //     this.prisma.inventoryHistory.create({
+  //       data: {
+  //         inventoryId: inventory.id,
+  //         remainderBefore: inventory.remainingQty,
+  //         remainderAfter: inventory.remainingQty + quantity,
+  //         effectQuantity: quantity,
+  //         increment: true,
+  //         decrement: false,
+  //       },
+  //     }),
+  //   ]);
+  // }
 
   private async getFormattedStockItems(
-    stockId: number,
+    stockRefId: string,
   ): Promise<StockListEntity[]> {
     const stockItems = await this.prisma.stockList.findMany({
-      where: { stockId },
+      where: { stockRefId },
       include: { stock: true, product: true },
     });
     return Promise.all(
@@ -233,7 +323,7 @@ export class StockListsService {
       }),
       this.prisma.inventoryHistory.create({
         data: {
-          stockItemId: null,
+          stockItemRefId: null,
           inventoryId: inventory.id,
           remainderBefore: inventory.remainingQty,
           remainderAfter: inventory.remainingQty - quantity,

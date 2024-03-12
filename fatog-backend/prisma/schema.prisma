@@ -60,7 +60,7 @@ model InventoryHistory {
   id              Int      @id @default(autoincrement())
   inventoryId     Int
   orderItemId     Int? @unique  // this comes from sales record, the effect only takes place when the corresponding sales record is approved
-  stockItemId     Int? @unique  // stockItem is also stockList and likewise orderItem is also orderList
+  stockItemRefId  String? @unique  // stockItem is also stockList and likewise orderItem is also orderList
   remainderBefore Int
   remainderAfter  Int
   effectQuantity  Int
@@ -72,7 +72,7 @@ model InventoryHistory {
 
   inventory       Inventory   @relation(fields: [inventoryId], references: [id])
   orderItem       OrderList?  @relation(fields: [orderItemId], references: [id])
-  stockItem       StockList?  @relation(fields: [stockItemId], references: [id])
+  stockItem       StockList?  @relation(fields: [stockItemRefId], references: [refId])
 }
 
 model Inventory {
@@ -88,7 +88,7 @@ model Inventory {
 
 model Sales {
   id                 Int      @id @default(autoincrement())
-  orderId            Int      @unique
+  orderRefId         String   @unique
   amountPayable      Int
   amountPaid         Int
   paymentStatus      String
@@ -98,13 +98,13 @@ model Sales {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
-  order Order? @relation(fields: [orderId], references: [id])
+  order Order? @relation(fields: [orderRefId], references: [refId])
   staff Staff? @relation(fields: [cashierId], references: [id])
 }
 
 model OrderList {
   id             Int      @id @default(autoincrement())
-  orderId        Int
+  orderRefId     String
   productRefId   String
   noOfBags       Int
   pricePerBag    Int
@@ -113,13 +113,14 @@ model OrderList {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  order     Order?   @relation(fields: [orderId], references: [id])
+  order     Order?   @relation(fields: [orderRefId], references: [refId])
   product   Product? @relation(fields: [productRefId], references: [refId])
   inventory InventoryHistory?
 }
 
 model Order {
   id                 Int      @id @default(autoincrement())
+  refId              String   @unique
   totalAmount        Int
   totalWeight        Int
   totalNoOfBags      Int
@@ -143,7 +144,8 @@ model Order {
 
 model StockList {
   id             Int      @id @default(autoincrement())
-  stockId        Int
+  refId          String   @unique
+  stockRefId     String
   productRefId   String
   noOfBags       Int
   pricePerBag    Int
@@ -152,13 +154,14 @@ model StockList {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  stock       Stock?   @relation(fields: [stockId], references: [id])
+  stock       Stock?   @relation(fields: [stockRefId], references: [refId])
   product     Product? @relation(fields: [productRefId], references: [refId])
   inventory   InventoryHistory?
 }
 
 model Stock {
   id            Int      @id @default(autoincrement())
+  refId         String   @unique
   totalAmount   Int
   totalWeight   Int
   totalNoOfBags Int

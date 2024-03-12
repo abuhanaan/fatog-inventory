@@ -126,7 +126,7 @@ export class StocksService {
       }),
       this.prisma.inventoryHistory.create({
         data: {
-          stockItemId: null,
+          stockItemRefId: null,
           inventoryId: inventory.id,
           remainderBefore: inventory.remainingQty,
           remainderAfter: inventory.remainingQty - quantity,

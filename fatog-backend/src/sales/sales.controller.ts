@@ -29,7 +29,7 @@ export class SalesController {
     @Req() request: AuthenticatedRequest,
   ) {
     const user = request.user as UserEntity;
-    const invoice = await this.salesService.create(createSaleDto, user);
+    const invoice = await this.salesService.create3(createSaleDto, user);
     return new SalesEntity(invoice);
   }
 
