@@ -17,11 +17,9 @@ export class CreateStockListDto {
   @ApiProperty()
   pricePerBag: number;
 
-  @IsNumber()
   @ApiProperty({ required: false })
   totalWeight?: number;
 
-  @IsNumber()
   @ApiProperty({ required: false })
   totalAmount?: number;
 }
