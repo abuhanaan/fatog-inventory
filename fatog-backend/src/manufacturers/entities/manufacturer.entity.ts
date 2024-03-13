@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Manufacturer } from '@prisma/client';
+import { ProductEntity } from 'src/products/entities/product.entity';
 
 export class ManufacturerEntity implements Manufacturer {
   @ApiProperty()
@@ -14,20 +15,20 @@ export class ManufacturerEntity implements Manufacturer {
   @ApiProperty()
   repPhoneNumber: string;
 
-  //   TODO: make maufatorer return associated Products
+  @ApiProperty({ required: false, isArray: true, type: () => ProductEntity })
+  products?: ProductEntity[];
+
+  constructor({ products, ...data }: Partial<ManufacturerEntity>) {
+    Object.assign(this, data);
+
+    if (products) {
+      this.products = products.map((product) => new ProductEntity(product));
+    }
+  }
 
   @ApiProperty()
   createdAt: Date;
 
   @ApiProperty({ required: false, nullable: true })
   updatedAt: Date;
-
-  constructor(manufacturer: Manufacturer) {
-    this.id = manufacturer.id;
-    this.brandName = manufacturer.brandName;
-    this.repName = manufacturer.repName;
-    this.repPhoneNumber = manufacturer.repPhoneNumber;
-    this.createdAt = manufacturer.createdAt;
-    this.updatedAt = manufacturer.updatedAt;
-  }
 }

@@ -44,7 +44,7 @@ export class ManufacturersController {
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const manufacturer = await this.manufacturersService.findOne(id);
     // return new ManufacturerEntity(manufacturer);
-    return manufacturer;
+    return new ManufacturerEntity(manufacturer);
   }
 
   @Patch(':id')

@@ -74,10 +74,11 @@ export class ManufacturersService {
   }
 
   async findOne(id: number) {
-    const manufacturer = await this.checkIfManufacturerExists(
-      undefined as string | undefined,
-      id,
-    );
+    const manufacturer = await this.prismaService.manufacturer.findUnique({
+      where: { id },
+      include: { products: true },
+    });
+    await this.checkIfManufacturerExists(undefined as string | undefined, id);
     return manufacturer;
   }
 
