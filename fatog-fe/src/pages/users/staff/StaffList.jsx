@@ -1,11 +1,11 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useNavigation, Link, useLoaderData, useLocation } from 'react-router-dom';
 import ListingsTable from '../../../components/Table';
-import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Menu, MenuButton, MenuList, MenuItem, Tooltip } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
-import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
+import { FaRegThumbsUp, FaEllipsisVertical, FaUserCheck, FaUserXmark } from "react-icons/fa6";
 import Modal from '../../../components/Modal';
 import Breadcrumb from '../../../components/Breadcrumb';
 import { EmptySearch } from '../../../components/EmptySearch';
@@ -281,49 +281,59 @@ const ActionButtons = ({ staff }) => {
 
     return (
         <>
-            <HStack spacing='1'>
-                <Tooltip hasArrow label='Preview staff' placement='bottom' borderRadius='md'>
-                    <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-staff-id={staff.id} onClick={viewStaff} />
-                </Tooltip>
-
-                <Tooltip hasArrow label='Edit staff' placement='bottom' borderRadius='md'>
-                    <IconButton as={Link} to='/users/create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentUser: staff, entity: 'staff' }} />
-                </Tooltip>
-
-                <Tooltip hasArrow label='Delete staff' placement='bottom' borderRadius='md'>
-                    <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-staff-id={staff.id} onClick={onOpen} />
-                </Tooltip>
-
-                {
-                    staff.active ?
-                        <Tooltip hasArrow label='Deactivate staff' placement='left'>
-                            <IconButton
+            <Menu>
+                <MenuButton
+                    as={IconButton}
+                    aria-label='Options'
+                    icon={<FaEllipsisVertical />}
+                    variant='unstyled'
+                />
+                <MenuList py='0'>
+                    <MenuItem icon={<IoEyeOutline />} data-staff-id={staff.id} onClick={viewStaff}>
+                        Preview
+                    </MenuItem>
+                    <MenuItem as={Link} to='/users/create' icon={<MdOutlineEdit />} state={{ currentUser: staff, entity: 'staff' }}>
+                        Edit Staff
+                    </MenuItem>
+                    {
+                        staff.active ?
+                            <MenuItem
+                                as={Button}
                                 icon={<FaUserXmark />}
-                                size='sm'
                                 data-staff-id={staff.id}
                                 onClick={staffDeactivate}
-                                colorScheme='red'
+                                size='sm'
+                                _hover={{bg: 'gray.100'}}
+                                borderRadius='0'
+                                fontWeight='normal'
+                                closeOnSelect={false}
                                 aria-label='Deactivate staff'
-                                isLoading={isActivating ? true : false}
+                                isLoading={isActivating}
+                                loadingText='Deactivating...'
                                 spinnerPlacement='end'
-                                spinner={<Spinner
+                                spinner={< Spinner
                                     thickness='4px'
                                     speed='0.5s'
                                     emptyColor='gray.200'
                                     color='blue.300'
                                     size='md'
                                 />}
-                            />
-                        </Tooltip> :
-                        <Tooltip hasArrow label='Activate staff' placement='left' borderRadius='md'>
-                            <IconButton
+                            >
+                                Deactivate Staff
+                            </MenuItem> :
+                            <MenuItem
+                                as={Button}
                                 icon={<FaUserCheck />}
                                 size='sm'
                                 data-staff-id={staff.id}
                                 onClick={staffActivate}
-                                colorScheme='green'
+                                _hover={{bg: 'gray.100'}}
+                                borderRadius='0'
+                                fontWeight='normal'
+                                closeOnSelect={false}
                                 aria-label='Activate staff'
                                 isLoading={isActivating ? true : false}
+                                loadingText='Activating...'
                                 spinnerPlacement='end'
                                 spinner={<Spinner
                                     thickness='4px'
@@ -332,10 +342,15 @@ const ActionButtons = ({ staff }) => {
                                     color='blue.300'
                                     size='md'
                                 />}
-                            />
-                        </Tooltip>
-                }
-            </HStack>
+                            >
+                                Activate Staff
+                            </MenuItem>
+                    }
+                    {/* <MenuItem icon={<MdDeleteOutline />} data-staff-id={staff.id} onClick={onOpen}>
+                        Delete Staff
+                    </MenuItem> */}
+                </MenuList>
+            </Menu>
 
             <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Staff'>
                 <Box>
