@@ -8,14 +8,21 @@ import {
   Delete,
   Req,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AuthenticatedRequest } from 'src/utils/interfaces/authRequest.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { CustomerEntity } from './entities/customer.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('customer')
 @ApiTags('customer')
@@ -42,10 +49,16 @@ export class CustomerController {
     return customers.map((customer) => new CustomerEntity(customer));
   }
 
-  @Get(':id')
+  @Get('/profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: CustomerEntity })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    const customer = await this.customerService.findOne(id);
+  async findOne(
+    // @Param('id', ParseIntPipe) id: number,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    const user = request.user as UserEntity;
+    const customer = await this.customerService.findOne(user.id);
     return new CustomerEntity(customer);
   }
 

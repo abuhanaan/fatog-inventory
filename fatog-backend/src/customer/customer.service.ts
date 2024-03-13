@@ -43,12 +43,12 @@ export class CustomerService {
     return customers;
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number) {
     const customer = await this.prisma.customer.findUnique({
-      where: { id },
+      where: { customerId: userId },
       include: { user: true, orders: true },
     });
-    this.checkIfCustomerExists(customer, id);
+    this.checkIfCustomerExists(customer, customer.id);
     return customer;
   }
 
