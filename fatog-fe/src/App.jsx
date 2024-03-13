@@ -43,6 +43,14 @@ import Stocks from "./pages/stocks/Stocks";
 import { loader as StocksLoader } from "./pages/stocks/Stocks";
 import StockCreate from "./pages/stocks/StockCreate";
 import { loader as StockCreateLoader } from "./pages/stocks/StockCreate";
+import StaffList from "./pages/users/staff/StaffList";
+import { loader as StaffListLoader } from "./pages/users/staff/StaffList";
+import StaffView from "./pages/users/staff/StaffView";
+import { loader as StaffViewLoader } from "./pages/users/staff/StaffView";
+import Customers from "./pages/users/customers/Customers";
+import { loader as CustomersLoader } from "./pages/users/customers/Customers";
+import Customer from "./pages/users/customers/Customer";
+import { loader as CustomerLoader } from "./pages/users/customers/Customer";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -60,6 +68,12 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='users' loader={UsersLoader} element={<Users />} />
                 <Route path='users/create' element={<UserForm />} />
                 <Route path='users/:id' loader={UserViewLoader} element={<UserView />} />
+
+                <Route path='staff' loader={StaffListLoader} element={<StaffList />} />
+                <Route path='staff/:id' loader={StaffViewLoader} element={<StaffView />} />
+
+                <Route path='customers' loader={CustomersLoader} element={<Customers />} />
+                <Route path='customers/:id' loader={CustomerLoader} element={<Customer />} />
 
                 <Route path='profile' element={<ProfileView />} loader={ProfileViewLoader} />
                 <Route path='profile/update' element={<ProfileForm />} />

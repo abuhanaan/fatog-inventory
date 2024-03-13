@@ -46,6 +46,7 @@ export async function loader({ request }) {
         phone: staff.phoneNumber,
         email: staff.user.email,
         role: staff.user.role,
+        category: staff.user.category,
         active: staff.user.active
     }));
 

@@ -37,19 +37,16 @@ export async function loader({ request }) {
         };
     }
 
-    const filtered = response.filter(customer => customer.customerId !== null);
-
-    const data = filtered.map(customer => ({
-        id: customer.customerId,
+    const data = response.map(customer => ({
+        id: customer.id,
         firstName: customer.firstName,
         lastName: customer.lastName,
         phone: customer.phoneNumber,
         email: customer.user.email,
         role: customer.user.role,
+        category: customer.user.category,
         active: customer.user.active
     }));
-
-    console.log(data);
 
     return data;
 }
@@ -105,7 +102,7 @@ const Customers = () => {
                 </Box>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Customers</Heading>
-                    <AddButton navigateTo='/users/create' state={{ entity: 'customer' }}>Add Customer</AddButton>
+                    <AddButton navigateTo='/users/create' state={{ entity: 'customers' }}>Add Customer</AddButton>
                 </HStack>
                 <Box marginTop='8'>
                     {

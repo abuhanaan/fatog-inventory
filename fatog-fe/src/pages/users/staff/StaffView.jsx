@@ -319,7 +319,7 @@ const GeneralInfo = ({ staff }) => {
     const getUserArray = (staff) => {
         const userArray = [];
         for (const [key, value] of Object.entries(staff)) {
-            if (key === 'orders' || key === 'sales' || key === 'stocks') {
+            if (key === 'orders' || key === 'sales' || key === 'stocks' || key === 'id') {
                 continue;
             }
 
