@@ -22,12 +22,12 @@ import { CustomerEntity } from './entities/customer.entity';
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
-  @Post()
-  @ApiCreatedResponse({ type: CustomerEntity })
-  async create(@Body() createCustomerDto: CreateCustomerDto) {
-    const newCustomer = await this.customerService.create(createCustomerDto);
-    return new CustomerEntity(newCustomer);
-  }
+  // @Post()
+  // @ApiCreatedResponse({ type: CustomerEntity })
+  // async create(@Body() createCustomerDto: CreateCustomerDto) {
+  //   const newCustomer = await this.customerService.create(createCustomerDto);
+  //   return new CustomerEntity(newCustomer);
+  // }
 
   @Get('dashboard')
   dashboard() {}

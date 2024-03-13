@@ -23,18 +23,18 @@ export class CustomerService {
     }
   }
 
-  async create(createCustomerDto: CreateCustomerDto) {
-    const existingCustomer = await this.prisma.customer.findUnique({
-      where: { customerId: createCustomerDto.customerId },
-    });
-    if (existingCustomer) {
-      throw new ConflictException({
-        message: `Customer with Id ${createCustomerDto.customerId} already have a customer profile`,
-        error: 'Conflict Operation',
-      });
-    }
-    return this.prisma.customer.create({ data: createCustomerDto });
-  }
+  // async create(createCustomerDto: CreateCustomerDto) {
+  //   const existingCustomer = await this.prisma.customer.findUnique({
+  //     where: { customerId: createCustomerDto.customerId },
+  //   });
+  //   if (existingCustomer) {
+  //     throw new ConflictException({
+  //       message: `Customer with Id ${createCustomerDto.customerId} already have a customer profile`,
+  //       error: 'Conflict Operation',
+  //     });
+  //   }
+  //   return this.prisma.customer.create({ data: createCustomerDto });
+  // }
 
   async findAll() {
     const customers = await this.prisma.customer.findMany({

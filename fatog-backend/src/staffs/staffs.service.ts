@@ -22,18 +22,18 @@ export class StaffsService {
       });
     }
   }
-  async create(createStaffDto: CreateStaffDto) {
-    const existingStaff = await this.prisma.staff.findUnique({
-      where: { staffId: createStaffDto.staffId },
-    });
-    if (existingStaff) {
-      throw new ConflictException({
-        message: `Staff with Id ${createStaffDto.staffId} already have a staff profile`,
-        error: 'Conflict Operation',
-      });
-    }
-    return this.prisma.staff.create({ data: createStaffDto });
-  }
+  // async create(createStaffDto: CreateStaffDto) {
+  //   const existingStaff = await this.prisma.staff.findUnique({
+  //     where: { staffId: createStaffDto.staffId },
+  //   });
+  //   if (existingStaff) {
+  //     throw new ConflictException({
+  //       message: `Staff with Id ${createStaffDto.staffId} already have a staff profile`,
+  //       error: 'Conflict Operation',
+  //     });
+  //   }
+  //   return this.prisma.staff.create({ data: createStaffDto });
+  // }
 
   async findAll() {
     const staffs = await this.prisma.staff.findMany({

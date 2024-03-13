@@ -22,12 +22,12 @@ import { UserEntity } from 'src/users/entities/user.entity';
 export class StaffsController {
   constructor(private readonly staffsService: StaffsService) {}
 
-  @Post()
-  @ApiCreatedResponse({ type: StaffEntity })
-  async create(@Body() createStaffDto: CreateStaffDto) {
-    const newStaff = await this.staffsService.create(createStaffDto);
-    return new StaffEntity(newStaff);
-  }
+  // @Post()
+  // @ApiCreatedResponse({ type: StaffEntity })
+  // async create(@Body() createStaffDto: CreateStaffDto) {
+  //   const newStaff = await this.staffsService.create(createStaffDto);
+  //   return new StaffEntity(newStaff);
+  // }
 
   @Get('dashboard')
   dashboard() {}
