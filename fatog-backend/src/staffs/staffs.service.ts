@@ -42,12 +42,12 @@ export class StaffsService {
     return staffs;
   }
 
-  async findOne(id: number) {
+  async findOne(userId: number) {
     const staff = await this.prisma.staff.findUnique({
-      where: { id },
+      where: { staffId: userId },
       include: { sales: true, user: true, orders: true, stocks: true },
     });
-    this.checkIfStaffExists(staff, id);
+    this.checkIfStaffExists(staff, staff.id);
     return staff;
   }
 

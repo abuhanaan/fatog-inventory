@@ -8,14 +8,21 @@ import {
   Delete,
   ParseIntPipe,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { StaffsService } from './staffs.service';
 import { CreateStaffDto } from './dto/create-staff.dto';
 import { UpdateStaffDto } from './dto/update-staff.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StaffEntity } from './entities/staff.entity';
 import { AuthenticatedRequest } from 'src/utils/interfaces/authRequest.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('staffs')
 @ApiTags('staffs')
@@ -34,7 +41,6 @@ export class StaffsController {
 
   @Get('my-sales')
   orders() {}
-
   @Get()
   @ApiOkResponse({ type: StaffEntity, isArray: true })
   async findAll() {
@@ -42,10 +48,16 @@ export class StaffsController {
     return staffs.map((staff) => new StaffEntity(staff));
   }
 
-  @Get(':id')
+  @Get('/profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: StaffEntity })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    const staff = await this.staffsService.findOne(id);
+  async findOne(
+    // @Param('userId', ParseIntPipe) id: number,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    const user = request.user as UserEntity;
+    const staff = await this.staffsService.findOne(user.id);
     return new StaffEntity(staff);
   }
 
