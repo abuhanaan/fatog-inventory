@@ -65,8 +65,6 @@ const UsersMenu = ({ link }) => {
 
     const isActive = (pathname === '/staff' || pathname === '/customers') ? true : false;
 
-    console.log(isActive);
-
     return (
         <Menu>
             <MenuButton
