@@ -1,5 +1,5 @@
 // ProductsListing.js
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { createColumnHelper, getCoreRowModel, useReactTable, flexRender, getPaginationRowModel, getFilteredRowModel } from '@tanstack/react-table';
 import { TableContainer, Table, Tbody, Td, Th, Thead, Tr, Button, Flex, HStack, Input, Box, Select, Icon, Spacer, Badge } from '@chakra-ui/react';
@@ -8,7 +8,7 @@ import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
 import UsersFilter from './UsersFilter';
 
-const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => {
+const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState, fileName, render }) => {
     const { pathname } = useLocation();
     const columnHelper = createColumnHelper();
 
@@ -54,8 +54,8 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => 
                 id: col.id,
                 cell: info => <span>
                     {
-                        typeof info.getValue() === 'number' ? info.getValue() : 
-                        info.getValue() ? info.getValue() : 'N/A'
+                        typeof info.getValue() === 'number' ? info.getValue() :
+                            info.getValue() ? info.getValue() : 'N/A'
                     }
                 </span>,
                 header: col.header
@@ -63,7 +63,12 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => 
         )
     });
 
-    const [data] = useState(() => [...tableData]);
+    const [data, setData] = useState(tableData);
+
+    useEffect(() => {
+        setData(tableData);
+    }, [tableData]);
+
     const [globalFilter, setGlobalFilter] = useState('');
     const table = useReactTable({
         data,
@@ -93,9 +98,15 @@ const ListingsTable = ({ data: tableData, columns: cols, fileName, render }) => 
                     value={globalFilter ?? ''}
                     onChange={(value) => setGlobalFilter(String(value))}
                 />
+
                 <Spacer />
-                {pathname === '/users' && <UsersFilter />}
+
+                {
+                    (pathname === '/staff' || pathname === '/customers' || pathname === '/users') && <UsersFilter filterData={filterData} buttonState={buttonState} />
+                }
+
                 <Spacer />
+
                 <DownloadBtn data={tableData} fileName={fileName}>Download</DownloadBtn>
             </Flex>
             <TableContainer overflowX='auto'>

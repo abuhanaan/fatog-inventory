@@ -14,12 +14,6 @@ import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { MdOutlineSyncLock } from "react-icons/md";
 
-const breadcrumbData = [
-    { name: 'Home', ref: '/dashboard' },
-    { name: 'Users', ref: '/users' },
-    { name: 'User Form', ref: '/users/create' },
-];
-
 const userRoleOptions = ['ADMIN', 'CASHIER', 'CEO', 'CUSTOMER', 'DEALER', 'MANAGER'];
 const userCategoryOptions = ['staff', 'customer'];
 
@@ -28,6 +22,7 @@ const UserForm = () => {
     const navigate = useNavigate();
     const { state, pathname } = useLocation();
     const currentUser = state && state.currentUser;
+    const entity = state && state.entity;
     const submitBtnRef = useRef(null);
     const emailRef = useRef(null);
     const roleRef = useRef(null);
@@ -41,11 +36,17 @@ const UserForm = () => {
         setValue,
     } = useForm();
 
+    const breadcrumbData = [
+        { name: 'Home', ref: '/dashboard' },
+        { name: `${entity.slice(0, 1).toUpperCase()}${entity.slice(1)}`, ref: `/${entity}` },
+        { name: 'Staff Form', ref: '/users/create' },
+    ];
+
     const submitUser = async (data) => {
         if (!password) {
             setToastState({
                 title: 'Password Required',
-                description: 'Click generate password button to create this user',
+                description: `Click generate password button to ${currentUser ? 'update' : 'create'} this user.`,
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
@@ -56,7 +57,7 @@ const UserForm = () => {
         if (!categoryRef.current.value) {
             setToastState({
                 title: 'Category Required',
-                description: 'Select a category to create this user',
+                description: `Select a category to ${currentUser ? 'update' : 'create'} this user`,
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
@@ -105,7 +106,7 @@ const UserForm = () => {
                 });
 
                 setTimeout(() => {
-                    navigate(`/users`);
+                    navigate(`/${entity}`);
                 }, 6000);
 
             } catch (error) {
@@ -143,7 +144,7 @@ const UserForm = () => {
                 });
 
                 setTimeout(() => {
-                    navigate(`/users`);
+                    navigate(`/${entity}`);
                 }, 6000);
 
             } catch (error) {

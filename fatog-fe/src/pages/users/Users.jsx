@@ -92,7 +92,7 @@ const Users = () => {
                 <Box marginTop='8'>
                     {
                         users?.length === 0 ?
-                            <EmptySearch headers={['S/N', 'EMAIL', 'ROLE', 'CATEGORY', 'STATUS']} type='product' /> :
+                            <EmptySearch headers={['S/N', 'EMAIL', 'ROLE', 'CATEGORY', 'STATUS']} type='user' /> :
                             <FilterContext.Provider value={{ userStatusFilter, setFilterParams }}>
                                 <ListingsTable data={filteredUsers} columns={columns} fileName='users-data.csv' render={(user) => (
                                     <ActionButtons user={user} />
