@@ -10,8 +10,6 @@ import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { UserEntity } from './entities/user.entity';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { CustomerService } from 'src/customer/customer.service';
-import { StaffsService } from 'src/staffs/staffs.service';
 
 export const roundsOfHashing = 10;
 
@@ -25,11 +23,7 @@ export class UsersService {
       });
     }
   }
-  constructor(
-    private prisma: PrismaService,
-    private customerService: CustomerService,
-    private staffService: StaffsService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
   async create(createUserDto: CreateUserDto) {
     try {
       const existingUser = await this.prisma.user.findUnique({
@@ -47,17 +41,37 @@ export class UsersService {
       );
 
       createUserDto.password = hashedPassword;
-      const newUser = await this.prisma.user.create({ data: createUserDto });
+      // const newUser = await this.prisma.user.create({ data: createUserDto });
 
-      if (newUser.category === 'customer') {
-        await this.customerService.create({ customerId: newUser.id });
-      }
+      const transaction = await this.prisma.$transaction(async (prisma) => {
+        const newUser = await prisma.user.create({
+          data: createUserDto,
+        });
+        if (newUser.category === 'customer') {
+          const newCustomer = await prisma.customer.create({
+            data: { customerId: newUser.id },
+          });
+        }
+        if (newUser.category === 'staff') {
+          const newStaff = await prisma.staff.create({
+            data: { staffId: newUser.id },
+          });
+        }
+        return [newUser];
+      });
+      return transaction[0];
 
-      if (newUser.category === 'staff') {
-        await this.staffService.create({ staffId: newUser.id });
-      }
-
-      return newUser;
+      // if (createUserDto.category === 'staff') {
+      //   const transaction = await this.prisma.$transaction(async (prisma) => {
+      //     const newUser = await this.prisma.user.create({
+      //       data: createUserDto,
+      //     });
+      //     const newStaff = await this.staffService.create({
+      //       staffId: newUser.id,
+      //     });
+      //     return transaction[0];
+      //   });
+      // }
     } catch (error) {
       console.log(error);
       throw error;

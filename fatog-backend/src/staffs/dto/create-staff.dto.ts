@@ -25,5 +25,5 @@ export class CreateStaffDto {
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
-  staffId?: number;
+  staffId: number;
 }

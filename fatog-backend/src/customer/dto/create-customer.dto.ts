@@ -30,5 +30,5 @@ export class CreateCustomerDto {
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
-  customerId?: number;
+  customerId: number;
 }

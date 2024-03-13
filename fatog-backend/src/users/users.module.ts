@@ -8,7 +8,7 @@ import { StaffsModule } from 'src/staffs/staffs.module';
 @Module({
   controllers: [UsersController],
   providers: [UsersService],
-  imports: [PrismaModule, CustomerModule, StaffsModule],
+  imports: [PrismaModule],
   exports: [UsersService],
 })
 export class UsersModule {}
