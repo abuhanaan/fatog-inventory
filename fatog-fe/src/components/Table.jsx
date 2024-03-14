@@ -7,10 +7,16 @@ import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
 import UsersFilter from './UsersFilter';
+import { getMonetaryValue } from '../pages/stocks/StockCreate';
 
 const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState, fileName, render }) => {
     const { pathname } = useLocation();
     const columnHelper = createColumnHelper();
+
+    const formatDate = (dateParam) => {
+        const date = new Date(dateParam);
+        return date.toLocaleString();
+    }
 
     const columns = cols.map(col => {
         if (col.id === 'S/N') {
@@ -31,6 +37,38 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
                         <Badge colorScheme={info.getValue() === true ? 'green' : 'red'} variant='subtle'>
                             {info.getValue() === true ? 'Active' : 'Inactive'}
                         </Badge>
+                    ),
+                    header: col.header
+                })
+            )
+        }
+
+        if (col.id === 'totalAmount') {
+            return (
+                columnHelper.accessor(col.id, {
+                    id: col.id,
+                    cell: info => (
+                        <span>
+                            {
+                                getMonetaryValue(info.getValue())
+                            }
+                        </span>
+                    ),
+                    header: col.header
+                })
+            )
+        }
+
+        if (col.id === 'date') {
+            return (
+                columnHelper.accessor(col.id, {
+                    id: col.id,
+                    cell: info => (
+                        <span>
+                            {
+                                formatDate(info.getValue())
+                            }
+                        </span>
                     ),
                     header: col.header
                 })

@@ -15,7 +15,10 @@ export async function createStock(stockData) {
         body: JSON.stringify(stockData)
     });
 
+    console.log('res', res);
+    
     const data = await res.json();
+    console.log('data', data);
 
     if (res.status === 401) {
         return {
