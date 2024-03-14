@@ -3,13 +3,13 @@ import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateSaleDto {
   @IsString()
-  @IsNumber()
+  @IsNotEmpty()
   @ApiProperty()
   orderRefId: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  @ApiProperty()
+  // @IsNotEmpty()
+  // @IsNumber()
+  // @ApiProperty()
   amountPayable: number;
 
   @IsNotEmpty()
@@ -17,14 +17,14 @@ export class CreateSaleDto {
   @ApiProperty()
   amountPaid: number;
 
-  @IsNotEmpty()
-  @IsString()
-  @ApiProperty()
+  // @IsNotEmpty()
+  // @IsString()
+  // @ApiProperty()
   paymentStatus: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  @ApiProperty()
+  // @IsNotEmpty()
+  // @IsNumber()
+  // @ApiProperty()
   outStandingPayment: number;
 
   @IsNotEmpty()
@@ -32,8 +32,8 @@ export class CreateSaleDto {
   @ApiProperty()
   note: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  @ApiProperty()
+  // @IsNotEmpty()
+  // @IsNumber()
+  // @ApiProperty()
   cashierId: number;
 }

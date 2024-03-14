@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -42,7 +43,7 @@ export class SalesService {
 
     if (!order) {
       throw new NotFoundException({
-        message: `Order with id ${createSaleDto.orderRefId} does not exist`,
+        message: `Order with reference id ${createSaleDto.orderRefId} does not exist`,
         error: 'Not Found',
       });
     }
@@ -52,199 +53,18 @@ export class SalesService {
       where: { orderRefId: createSaleDto.orderRefId },
     });
 
-    // Calculate payable and outstanding amounts
-    const amountPayable = order.totalAmount;
-    const outStandingPayment = amountPayable - createSaleDto.amountPaid;
-
-    // Initialize an array to store promises for transaction operations
-    const transactionOperations = [];
-
-    try {
-      // Update inventory and record history for each order item
-      for (const orderItem of orderItems) {
-        const inventory = await this.prisma.inventory.findFirst({
-          where: { productRefId: orderItem.productRefId },
-        });
-
-        if (!inventory) {
-          throw new NotFoundException({
-            message: `Inventory not found for product ID ${orderItem.productRefId}`,
-            error: 'Not Found',
-          });
-        }
-
-        // Push each operation into the array
-        transactionOperations.push(
-          this.prisma.inventory.update({
-            where: { id: inventory.id },
-            data: { remainingQty: { decrement: orderItem.noOfBags } },
-          }),
-          this.prisma.inventoryHistory.create({
-            data: {
-              inventoryId: inventory.id,
-              orderItemId: orderItem.id,
-              stockItemRefId: null,
-              remainderBefore: inventory.remainingQty,
-              remainderAfter: inventory.remainingQty - orderItem.noOfBags,
-              effectQuantity: orderItem.noOfBags,
-              increment: false,
-              decrement: true,
-            },
-          }),
-        );
-      }
-
-      // Create sales record
-      const sales = await this.prisma.sales.create({
-        data: {
-          ...createSaleDto,
-          amountPayable,
-          outStandingPayment,
-          cashierId: staff.id,
-        },
-      });
-
-      // Push sales creation into transaction operations
-      transactionOperations.push(sales);
-
-      // Start the transaction with the array of promises
-      await this.prisma.$transaction(transactionOperations);
-
-      return sales;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException({
-        message:
-          'Failed to create sales and other corresponding inventory update',
-        error: 'Internal Server Error',
-      }); // Let the global error handler manage the error
-    }
-  }
-
-  async create2(createSaleDto: CreateSaleDto, user: UserEntity) {
-    const staff = await this.prisma.staff.findFirst({
-      where: { staffId: user.id },
-    });
-
-    if (!staff) {
-      throw new UnauthorizedException({
-        message: 'You are not authorized to perform this operation',
-        error: 'Unauthorized Operation',
+    if (createSaleDto.amountPaid > order.totalAmount) {
+      throw new ConflictException({
+        message: 'Amount paid is greater than amount payable',
+        error: 'Conflicting Operation',
       });
     }
-
-    const order = await this.prisma.order.findUnique({
-      where: { refId: createSaleDto.orderRefId },
-    });
-
-    if (!order) {
-      throw new NotFoundException({
-        message: `Order with id ${createSaleDto.orderRefId} does not exist`,
-        error: 'Not Found',
-      });
-    }
-
-    // Fetch order items
-    const orderItems = await this.prisma.orderList.findMany({
-      where: { orderRefId: createSaleDto.orderRefId },
-    });
 
     // Calculate payable and outstanding amounts
     const amountPayable = order.totalAmount;
     const outStandingPayment = amountPayable - createSaleDto.amountPaid;
-
-    try {
-      // Start a Prisma transaction
-      const transaction = await this.prisma.$transaction(async (prisma) => {
-        // Update inventory and record history for each order item
-        for (const orderItem of orderItems) {
-          const inventory = await prisma.inventory.findFirst({
-            where: { productRefId: orderItem.productRefId },
-          });
-
-          if (!inventory) {
-            throw new NotFoundException({
-              message: `Inventory not found for product ID ${orderItem.productRefId}`,
-              error: 'Not Found',
-            });
-          }
-
-          // Update inventory
-          await prisma.inventory.update({
-            where: { id: inventory.id },
-            data: { remainingQty: { decrement: orderItem.noOfBags } },
-          });
-
-          // Create inventory history
-          await prisma.inventoryHistory.create({
-            data: {
-              inventoryId: inventory.id,
-              orderItemId: orderItem.id,
-              stockItemRefId: null,
-              remainderBefore: inventory.remainingQty,
-              remainderAfter: inventory.remainingQty - orderItem.noOfBags,
-              effectQuantity: orderItem.noOfBags,
-              increment: false,
-              decrement: true,
-            },
-          });
-        }
-
-        // Create sales record
-        const sales = await prisma.sales.create({
-          data: {
-            ...createSaleDto,
-            amountPayable,
-            outStandingPayment,
-            cashierId: staff.id,
-          },
-        });
-
-        return sales;
-      });
-
-      return transaction;
-    } catch (error) {
-      console.log(error);
-      throw new InternalServerErrorException({
-        message:
-          'Failed to create sales and other corresponding inventory update',
-        error: 'Internal Server Error',
-      }); // Let the global error handler manage the error
-    }
-  }
-
-  async create3(createSaleDto: CreateSaleDto, user: UserEntity) {
-    const staff = await this.prisma.staff.findFirst({
-      where: { staffId: user.id },
-    });
-
-    if (!staff) {
-      throw new UnauthorizedException({
-        message: 'You are not authorized to perform this operation',
-        error: 'Unauthorized Operation',
-      });
-    }
-
-    const order = await this.prisma.order.findUnique({
-      where: { refId: createSaleDto.orderRefId },
-    });
-
-    if (!order) {
-      throw new NotFoundException({
-        message: `Order with id ${createSaleDto.orderRefId} does not exist`,
-        error: 'Not Found',
-      });
-    }
-
-    // Fetch order items
-    const orderItems = await this.prisma.orderList.findMany({
-      where: { orderRefId: createSaleDto.orderRefId },
-    });
-
-    // Calculate payable and outstanding amounts
-    const amountPayable = order.totalAmount;
-    const outStandingPayment = amountPayable - createSaleDto.amountPaid;
+    const paymentStatus: String =
+      outStandingPayment === 0 ? 'FULLY_PAID' : 'PARTLY_PAID';
 
     // Prepare arrays for batch operations
     const inventoryUpdateData = [];
@@ -272,7 +92,7 @@ export class SalesService {
       inventoryHistoryData.push({
         inventoryId: inventory.id,
         orderItemId: orderItem.id,
-        stockItemId: null,
+        stockItemRefId: null,
         remainderBefore: inventory.remainingQty,
         remainderAfter: inventory.remainingQty - orderItem.noOfBags,
         effectQuantity: orderItem.noOfBags,
@@ -282,44 +102,31 @@ export class SalesService {
     }
 
     try {
-      // Batch update inventory quantities
-      // await this.prisma.inventory.updateMany({
-      //   data: inventoryUpdateData,
-      // });
-
-      // // Create inventory history records
-      // await this.prisma.inventoryHistory.createMany({
-      //   data: inventoryHistoryData,
-      // });
-
-      // // Create sales record
-      // const sales = await this.prisma.sales.create({
-      //   data: {
-      //     ...createSaleDto,
-      //     amountPayable,
-      //     outStandingPayment,
-      //     cashierId: staff.id,
-      //   },
-      // });
-
-      const transaction = await this.prisma.$transaction([
-        this.prisma.inventory.updateMany({
-          data: inventoryUpdateData,
-        }),
-        this.prisma.inventoryHistory.createMany({
+      const transaction = await this.prisma.$transaction(async (prisma) => {
+        const inventoryUpdates = await Promise.all(
+          inventoryUpdateData.map(async (updateData) => {
+            const { where, data } = updateData;
+            return prisma.inventory.update({
+              where: { id: where.id },
+              data: data,
+            });
+          }),
+        );
+        const inventoryHistories = await prisma.inventoryHistory.createMany({
           data: inventoryHistoryData,
-        }),
-        this.prisma.sales.create({
+        });
+        const sales = await prisma.sales.create({
           data: {
             ...createSaleDto,
             amountPayable,
             outStandingPayment,
             cashierId: staff.id,
           },
-        }),
-      ]);
+        });
+        return { inventoryUpdates, inventoryHistories, sales };
+      });
 
-      return transaction[2];
+      return transaction.sales;
     } catch (error) {
       console.log(error);
       throw new InternalServerErrorException({
