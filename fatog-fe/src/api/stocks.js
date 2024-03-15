@@ -62,6 +62,20 @@ export async function getStock(request, stockId) {
     return data;
 }
 
+export async function getStockList(request, stockId) {
+    const res = await fetch(`${BASE_URL}${endpoint}/${stockId}`, {
+        method: 'GET',
+        headers,
+    });
+
+    const data = await res.json();
+
+    isUnauthorized(res, request);
+    isError(res, data);
+
+    return data;
+}
+
 const isUnauthorized = (res, request) => {
     if (res.status === 401) {
         const pathname = new URL(request.url).pathname;

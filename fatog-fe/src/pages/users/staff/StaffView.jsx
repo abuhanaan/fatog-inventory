@@ -17,9 +17,9 @@ import { getStaffData } from '../../../api/staff';
 import { deleteUser, activateUser, deactivateUser } from '../../../api/users';
 import { useToastHook } from '../../../hooks/useToast';
 
-export async function loader({ params, request }) {
+export async function loader({ request }) {
     await requireAuth(request);
-    const response = await getStaffData(request, params.id);
+    const response = await getStaffData(request);
 
     if (response.error || response.message) {
         return {
@@ -65,15 +65,22 @@ const StaffView = () => {
         { name: 'Staff', ref: `/staff/${staff.id}` },
     ];
 
+    const stocksColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'totalAmount', header: 'Total Amount' },
+        { id: 'totalNoOfBags', header: 'No. of Bags' },
+        { id: 'totalWeight', header: 'Total Weight' },
+        { id: 'date', header: 'Date' },
+        { id: 'actions', header: '' },
+    ];
+
     const tabTitles = ['Bio Data', 'Sales', 'Stocks', 'Orders'];
     const tabPanels = [
         <GeneralInfo staff={staff} />,
         <SalesTable sales={sales} />,
-        <StocksTable stocks={stocks} />,
+        <StocksTable stocks={stocks} columns={stocksColumns} />,
         <OrdersTable orders={orders} />
     ];
-
-    // console.log(staff);
 
     useEffect(() => {
         if (error.error || error.message) {

@@ -78,9 +78,10 @@ const Stocks = () => {
 
     return (
         error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
+            <VStack h='30rem' justifyContent='center'>
+                <Heading>{error.error}</Heading>
+                <Text>{error.message}</Text>
+                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
             </VStack> :
             <Stack spacing='6'>
                 <Box>
