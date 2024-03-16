@@ -48,8 +48,8 @@ export async function getStocks(request) {
     return data;
 }
 
-export async function getStock(request, stockId) {
-    const res = await fetch(`${BASE_URL}${endpoint}/${stockId}`, {
+export async function getStockItem(request, stockId) {
+    const res = await fetch(`${BASE_URL}/stock-lists/${stockId}`, {
         method: 'GET',
         headers,
     });

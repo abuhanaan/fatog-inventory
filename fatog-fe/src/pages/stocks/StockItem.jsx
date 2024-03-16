@@ -12,11 +12,11 @@ import Tabs from '../../components/Tabs';
 import StocksTable from '../../components/StocksTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
-import { getStockList } from '../../api/stocks';
+import { getStockItem } from '../../api/stocks';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getStockList(request, params.id);
+    const response = await getStockItem(request, params.id);
 
     if (response.error || response.message) {
         return {
@@ -28,55 +28,67 @@ export async function loader({ params, request }) {
     const data = {
         id: response.id,
         refId: response.refId,
-        totalNoOfBags: response.totalNoOfBags,
+        productRefId: response.productRefId,
+        noOfBags: response.noOfBags,
+        pricePerBag: response.pricePerBag,
         totalWeight: response.totalWeight,
         totalAmount: response.totalAmount,
         date: response.createdAt,
-        stockList: response.stockLists,
-        staffId: response.staffId,
-        staff: response.staff,
-        invoice: response.invoice
+        product: response.product,
+        stock: response.stock,
     };
 
     return data;
 }
 
-const StockList = () => {
+const StockItem = () => {
     const navigate = useNavigate();
-    const stock = useLoaderData();
-    const { stockList, staff } = stock;
+    const stockItem = useLoaderData();
+    const { product, stock } = stockItem;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: stockList.error ?? '',
-        message: stockList.message ?? ''
+        error: stockItem.error ?? '',
+        message: stockItem.message ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
         { name: 'Stocks', ref: '/stocks' },
         { name: 'Stock List', ref: `/stocks/${stock.id}` },
+        { name: 'Stock Item', ref: `/stocks/${stock.id}/stocklist/${stockItem.id}` },
     ];
 
-    const basicStockInfo = {
-        staff: (staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'N/A',
-        totalAmount: stock.totalAmount,
+    const basicStockItemInfo = {
+        product: product.name,
+        purchasePricePerBag: stockItem.pricePerBag,
+        noOfBags: stockItem.noOfBags,
+        purchaseAmount: stockItem.totalAmount,
+        totalWeight: stockItem.totalWeight,
+        currentSellingPricePerBag: product.pricePerBag,
+        totalNoOfBagsInStock: stock.totalNoOfBags,
+        date: stockItem.date,
+        // staff: (staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'N/A',
+    };
+
+    const productInfo = {
+        productName: product.name,
+        currentSellingPricePerBag: product.pricePerBag,
+        type: product.type,
+        size: product.size,
+        weight: product.weight,
+    };
+
+    const stockInfo = {
         totalNoOfBags: stock.totalNoOfBags,
-        totalWeight: stock.totalWeight,
-        date: stock.date
-    }
+        totalAmount: stock.totalAmount,
+        totalWeight: stock.totalWeight
+    };
 
-    const stockListColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'pricePerBag', header: 'Price per Bag' },
-        { id: 'noOfBags', header: 'No. of Bags' },
-        { id: 'totalAmount', header: 'Total Amount' },
-        { id: 'totalWeight', header: 'Total Weight' },
-        { id: 'actions', header: '' },
-    ];
-
-    const tabTitles = ['Basic Stock Details', 'Stock List'];
+    const tabTitles = ['Overview', 'Product Details', 'Stock Details'];
     const tabPanels = [
-        <GeneralInfo info={basicStockInfo} />,
-        <StocksTable stocks={stockList} columns={stockListColumns} path={`/stocks/${stock.id}/stocklist`} />,
+        <TabPanel info={basicStockItemInfo} />,
+        <TabPanel info={productInfo} />,
+        <TabPanel info={stockInfo} />,
+        
     ];
 
     useEffect(() => {
@@ -102,7 +114,7 @@ const StockList = () => {
                     <Breadcrumb linkList={breadcrumbData} />
                 </Box>
                 <HStack justifyContent='space-between'>
-                    <Heading fontSize='3xl' color='blue.700'>Stock</Heading>
+                    <Heading fontSize='3xl' color='blue.700'>Stock Item</Heading>
                 </HStack>
                 <Box marginTop='8'>
                     <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />
@@ -111,7 +123,7 @@ const StockList = () => {
     )
 }
 
-const GeneralInfo = ({ info }) => {
+const TabPanel = ({ info }) => {
     const getInfoArray = (info) => {
         const infoArray = [];
         for (const [key, value] of Object.entries(info)) {
@@ -136,4 +148,4 @@ const GeneralInfo = ({ info }) => {
     )
 }
 
-export default StockList;
+export default StockItem;
