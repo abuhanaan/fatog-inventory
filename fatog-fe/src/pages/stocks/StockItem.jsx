@@ -115,6 +115,12 @@ const StockItem = () => {
                 </Box>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Stock Item</Heading>
+
+                    <HStack spacing='2'>
+                        <Tooltip hasArrow label='Edit stock item' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to={`/stocks/${stock.id}/stocklist/${stockItem.id}/edit`} state={{ stockItem: stockItem }} icon={<MdOutlineEdit />} colorScheme='orange' />
+                        </Tooltip>
+                    </HStack>
                 </HStack>
                 <Box marginTop='8'>
                     <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />

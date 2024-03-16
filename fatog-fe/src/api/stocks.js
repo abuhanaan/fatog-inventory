@@ -62,6 +62,29 @@ export async function getStockItem(request, stockId) {
     return data;
 }
 
+export async function updateStockItem(stockItemId, stockItemData) {
+    const res = await fetch(`${BASE_URL}/stock-lists/${stockItemId}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(stockItemData)
+    });
+
+    const data = await res.json();
+
+    if (res.status === 401) {
+        return {
+            unAuthorized: true,
+            statusCode: data.statusCode,
+            message: data.message,
+            error: data.error ?? 'Unauthorized',
+        }
+    }
+
+    isError(res, data);
+
+    return data;
+}
+
 export async function getStockList(request, stockId) {
     const res = await fetch(`${BASE_URL}${endpoint}/${stockId}`, {
         method: 'GET',
