@@ -1,14 +1,12 @@
 import ListingsTable from "./Table";
 import { EmptySearch } from "./EmptySearch";
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Box, IconButton, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
+import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { FaEllipsisVertical } from "react-icons/fa6";
 
 const StocksTable = ({ stocks, columns, path }) => {
-
-    // console.log(stocks);
-    
     const stocksData = stocks.map(stock => ({
         ...stock,
         date: stock.createdAt
@@ -35,7 +33,7 @@ const ActionButtons = ({ stock, path }) => {
         e.preventDefault();
 
         const dataStockId = e.currentTarget.getAttribute('data-stock-id');
-        navigate(`${path}/${dataStockId}`, { state: {from: pathname} });
+        navigate(`${path}/${dataStockId}`, { state: { from: pathname } });
     }
 
     return (
@@ -51,6 +49,13 @@ const ActionButtons = ({ stock, path }) => {
                     <MenuItem icon={<IoEyeOutline />} data-stock-id={stock.id} onClick={viewStock}>
                         Preview
                     </MenuItem>
+
+                    {
+                        pathname.includes('stocks') &&
+                        <MenuItem as={Link} to={`/stocks/${stock.stockId}/stocklist/${stock.id}/edit`} icon={<MdOutlineEdit />} state={{ stockItem: stock }}>
+                            Edit
+                        </MenuItem>
+                    }
                 </MenuList>
             </Menu>
         </>

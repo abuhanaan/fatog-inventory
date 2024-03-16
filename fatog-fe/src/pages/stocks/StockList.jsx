@@ -73,10 +73,15 @@ const StockList = () => {
         { id: 'actions', header: '' },
     ];
 
+    const stockListData = stockList.map(prev => ({
+        ...prev,
+        stockId: stock.id
+    }));
+
     const tabTitles = ['Basic Stock Details', 'Stock List'];
     const tabPanels = [
         <GeneralInfo info={basicStockInfo} />,
-        <StocksTable stocks={stockList} columns={stockListColumns} path={`/stocks/${stock.id}/stocklist`} />,
+        <StocksTable stocks={stockListData} columns={stockListColumns} path={`/stocks/${stock.id}/stocklist`} />,
     ];
 
     useEffect(() => {
