@@ -6,7 +6,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import { FaEllipsisVertical } from "react-icons/fa6";
 
 const OrdersTable = ({ orders }) => {
-    console.log(orders);
+    // console.log(orders);
 
     const columns = [
         { id: 'S/N', header: 'S/N' },

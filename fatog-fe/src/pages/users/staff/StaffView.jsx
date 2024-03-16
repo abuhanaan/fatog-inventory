@@ -28,6 +28,8 @@ export async function loader({ request }) {
         };
     }
 
+    // console.log(response);
+
     const data = {
         id: response.staffId,
         firstName: response.firstName,
@@ -78,7 +80,7 @@ const StaffView = () => {
     const tabPanels = [
         <GeneralInfo staff={staff} />,
         <SalesTable sales={sales} />,
-        <StocksTable stocks={stocks} columns={stocksColumns} />,
+        <StocksTable stocks={stocks} columns={stocksColumns} path='/stocks' />,
         <OrdersTable orders={orders} />
     ];
 

@@ -5,7 +5,9 @@ import { Box, IconButton, Menu, MenuButton, MenuList, MenuItem } from '@chakra-u
 import { IoEyeOutline } from "react-icons/io5";
 import { FaEllipsisVertical } from "react-icons/fa6";
 
-const StocksTable = ({ stocks, columns }) => {
+const StocksTable = ({ stocks, columns, path }) => {
+
+    // console.log(stocks);
     
     const stocksData = stocks.map(stock => ({
         ...stock,
@@ -18,14 +20,14 @@ const StocksTable = ({ stocks, columns }) => {
                 stocks.length === 0 ?
                     <EmptySearch headers={['S/N', 'Amount', 'No. of Bags', 'Total Weight', ' ']} type='stock' /> :
                     <ListingsTable data={stocksData} columns={columns} fileName='stocks-data.csv' render={(stock) => (
-                        <ActionButtons stock={stock} />
+                        <ActionButtons stock={stock} path={path} />
                     )} />
             }
         </Box>
     )
 }
 
-const ActionButtons = ({ stock }) => {
+const ActionButtons = ({ stock, path }) => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
 
@@ -33,7 +35,7 @@ const ActionButtons = ({ stock }) => {
         e.preventDefault();
 
         const dataStockId = e.currentTarget.getAttribute('data-stock-id');
-        navigate(`/stocks/${dataStockId}`, { state: {from: pathname} });
+        navigate(`${path}/${dataStockId}`, { state: {from: pathname} });
     }
 
     return (

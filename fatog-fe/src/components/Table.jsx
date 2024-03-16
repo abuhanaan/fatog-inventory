@@ -9,14 +9,15 @@ import DownloadBtn from './DownloadBtn';
 import UsersFilter from './UsersFilter';
 import { getMonetaryValue } from '../pages/stocks/StockCreate';
 
+export const formatDate = (dateParam) => {
+    const date = new Date(dateParam);
+    return date.toLocaleString();
+};
+
 const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState, fileName, render }) => {
     const { pathname } = useLocation();
     const columnHelper = createColumnHelper();
 
-    const formatDate = (dateParam) => {
-        const date = new Date(dateParam);
-        return date.toLocaleString();
-    }
 
     const columns = cols.map(col => {
         if (col.id === 'S/N') {
