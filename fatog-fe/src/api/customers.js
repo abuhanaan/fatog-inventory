@@ -49,8 +49,8 @@ export async function getCustomers(request) {
     return data;
 }
 
-export async function getCustomer(request, customerId) {
-    const res = await fetch(`${BASE_URL}${endpoint}/${customerId}`, {
+export async function getCustomer(request) {
+    const res = await fetch(`${BASE_URL}${endpoint}/profile`, {
         method: 'GET',
         headers,
     });

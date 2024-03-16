@@ -5,23 +5,19 @@ import { Box, IconButton, Menu, MenuButton, MenuList, MenuItem } from '@chakra-u
 import { IoEyeOutline } from "react-icons/io5";
 import { FaEllipsisVertical } from "react-icons/fa6";
 
-const StocksTable = ({ stocks }) => {
-    console.log(stocks);
-
-    const columns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'totalAmount', header: 'Total Amount' },
-        { id: 'totalNoOfBags', header: 'No. of Bags' },
-        { id: 'totalWeight', header: 'Total Weight' },
-        { id: 'actions', header: '' },
-    ];
+const StocksTable = ({ stocks, columns }) => {
+    
+    const stocksData = stocks.map(stock => ({
+        ...stock,
+        date: stock.createdAt
+    }));
 
     return (
         <Box>
             {
                 stocks.length === 0 ?
                     <EmptySearch headers={['S/N', 'Amount', 'No. of Bags', 'Total Weight', ' ']} type='stock' /> :
-                    <ListingsTable data={stocks} columns={columns} fileName='stocks-data.csv' render={(stock) => (
+                    <ListingsTable data={stocksData} columns={columns} fileName='stocks-data.csv' render={(stock) => (
                         <ActionButtons stock={stock} />
                     )} />
             }

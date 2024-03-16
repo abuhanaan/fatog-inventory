@@ -28,7 +28,7 @@ const breadcrumbData = [
     { name: 'Create Stock', ref: '/stocks/create' },
 ];
 
-const getMonetaryValue = (value) => {
+export const getMonetaryValue = (value) => {
     return new Intl.NumberFormat('en-NG', {
         style: 'currency',
         currency: 'NGN',
@@ -62,7 +62,7 @@ const StockCreate = () => {
         let totalWeightValue = 0;
 
         stockList.forEach(stockItem => {
-            totalAmountValue += stockItem.totalPrice;
+            totalAmountValue += stockItem.totalAmount;
             totalNoOfBagsValue += stockItem.noOfBags;
             totalWeightValue += stockItem.totalWeight;
         });
@@ -90,7 +90,7 @@ const StockCreate = () => {
             return;
         }
 
-        const totalPrice = Number(pricePerBag) * Number(noOfBags);
+        const totalAmount = Number(pricePerBag) * Number(noOfBags);
         const totalWeight = Number(selectedProduct.weight) * Number(noOfBags);
 
         const newStockItem = {
@@ -98,23 +98,31 @@ const StockCreate = () => {
             noOfBags: Number(noOfBags),
             pricePerBag: Number(pricePerBag),
             totalWeight,  // optional
-            totalPrice //optional
+            totalAmount //optional
         };
 
         const existingStockItemIndex = stockList.findIndex(stockItem => stockItem.productRefId === selectedProduct.refId);
 
         if (existingStockItemIndex !== -1) {
-            const updatedStockItem = {
-                ...stockList[existingStockItemIndex],
-                pricePerBag: Number(pricePerBag),
-                noOfBags: Number(stockList[existingStockItemIndex].noOfBags) + Number(noOfBags),
-                totalPrice: Number(stockList[existingStockItemIndex].totalPrice) + Number(totalPrice),
-                totalWeight: Number(stockList[existingStockItemIndex].totalWeight) + Number(totalWeight)
-            };
+            setToastState({
+                title: 'Duplicate Entry!',
+                description: 'The stock item you intend to add already exist.',
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
 
-            const updatedStockList = [...stockList];
-            updatedStockList[existingStockItemIndex] = updatedStockItem;
-            setStockList(updatedStockList);
+            return;
+            // const updatedStockItem = {
+            //     ...stockList[existingStockItemIndex],
+            //     pricePerBag: Number(pricePerBag),
+            //     noOfBags: Number(stockList[existingStockItemIndex].noOfBags) + Number(noOfBags),
+            //     totalAmount: Number(stockList[existingStockItemIndex].totalAmount) + Number(totalAmount),
+            //     totalWeight: Number(stockList[existingStockItemIndex].totalWeight) + Number(totalWeight)
+            // };
+
+            // const updatedStockList = [...stockList];
+            // updatedStockList[existingStockItemIndex] = updatedStockItem;
+            // setStockList(updatedStockList);
         } else {
             // TODO: Add stock item to stocks
             setStockList(prev => ([
@@ -157,7 +165,7 @@ const StockCreate = () => {
             productRefId: selectedProduct.refId,
             pricePerBag: pricePerBag,
             noOfBags: noOfBags,
-            totalPrice: pricePerBag * noOfBags,
+            totalAmount: pricePerBag * noOfBags,
             totalWeight: selectedProduct.weight * noOfBags
         };
 
@@ -198,14 +206,14 @@ const StockCreate = () => {
             return;
         }
 
-        const stockData = {
+        const stockListData = {
             data: [...stockList],
-            file
         }
+        console.log(stockListData);
 
         // TODO: Consume create stock list API endpoint
         try {
-            const response = await createStock(stockList);
+            const response = await createStock(stockListData);
 
             if (response.unAuthorize) {
                 sessionStorage.removeItem('user');
@@ -440,7 +448,7 @@ const StockItem = ({ stockItem, products, deleteStockItem, showUpdateStockItemFo
                             Amount
                         </Heading>
                         <Text fontSize='sm'>
-                            {getMonetaryValue(stockItem.totalPrice)}
+                            {getMonetaryValue(stockItem.totalAmount)}
                         </Text>
                     </Box>
                     <Box>

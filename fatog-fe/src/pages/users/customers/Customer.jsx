@@ -15,9 +15,9 @@ import { getCustomer } from '../../../api/customers';
 import { deleteUser, activateUser, deactivateUser } from '../../../api/users';
 import { useToastHook } from '../../../hooks/useToast';
 
-export async function loader({ params, request }) {
+export async function loader({ request }) {
     await requireAuth(request);
-    const response = await getCustomer(request, params.id);
+    const response = await getCustomer(request);
 
     if (response.error || response.message) {
         return {

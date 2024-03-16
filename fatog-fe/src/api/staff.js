@@ -72,8 +72,8 @@ export async function getStaff(request) {
     return data;
 }
 
-export async function getStaffData(request, staffId) {
-    const res = await fetch(`${BASE_URL}${endpoint}/${staffId}`, {
+export async function getStaffData(request) {
+    const res = await fetch(`${BASE_URL}${endpoint}/profile`, {
         method: 'GET',
         headers,
     });

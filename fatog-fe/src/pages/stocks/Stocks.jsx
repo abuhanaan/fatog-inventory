@@ -15,10 +15,10 @@ import { requireAuth } from '../../hooks/useAuth';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
+    { id: 'staff', header: 'Staff' },
     { id: 'totalAmount', header: 'Amount(₦)' },
     { id: 'totalNoOfBags', header: 'No. of Bags' },
     { id: 'totalWeight', header: 'Total Weight(kg)' },
-    { id: 'staff', header: 'Staff' },
     { id: 'date', header: 'Date' },
     { id: 'actions', header: '' },
 ];
@@ -44,7 +44,7 @@ export async function loader({ request }) {
             totalAmount: stock.totalAmount,
             totalNoOfBags: stock.totalNoOfBags,
             totalWeight: stock.totalWeight,
-            staff: `${stock.staff.firstName} ${stock.staff.lastName}`,
+            staff: (stock.staff.firstName && stock.staff.lastName) ? `${stock.staff.firstName} ${stock.staff.lastName}` : 'N/A',
             date: stock.createdAt,
         }
     });
@@ -78,9 +78,10 @@ const Stocks = () => {
 
     return (
         error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
+            <VStack h='30rem' justifyContent='center'>
+                <Heading>{error.error}</Heading>
+                <Text>{error.message}</Text>
+                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
             </VStack> :
             <Stack spacing='6'>
                 <Box>

@@ -15,7 +15,10 @@ export async function createStock(stockData) {
         body: JSON.stringify(stockData)
     });
 
+    console.log('res', res);
+    
     const data = await res.json();
+    console.log('data', data);
 
     if (res.status === 401) {
         return {
@@ -46,6 +49,20 @@ export async function getStocks(request) {
 }
 
 export async function getStock(request, stockId) {
+    const res = await fetch(`${BASE_URL}${endpoint}/${stockId}`, {
+        method: 'GET',
+        headers,
+    });
+
+    const data = await res.json();
+
+    isUnauthorized(res, request);
+    isError(res, data);
+
+    return data;
+}
+
+export async function getStockList(request, stockId) {
     const res = await fetch(`${BASE_URL}${endpoint}/${stockId}`, {
         method: 'GET',
         headers,

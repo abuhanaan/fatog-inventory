@@ -43,6 +43,8 @@ import Stocks from "./pages/stocks/Stocks";
 import { loader as StocksLoader } from "./pages/stocks/Stocks";
 import StockCreate from "./pages/stocks/StockCreate";
 import { loader as StockCreateLoader } from "./pages/stocks/StockCreate";
+import StockList from "./pages/stocks/StockList";
+import { loader as StockListLoader } from "./pages/stocks/StockList";
 import StaffList from "./pages/users/staff/StaffList";
 import { loader as StaffListLoader } from "./pages/users/staff/StaffList";
 import StaffView from "./pages/users/staff/StaffView";
@@ -94,6 +96,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
 
                 <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
                 <Route path='stocks/create' loader={StockCreateLoader} element={<StockCreate />} />
+                <Route path='stocks/:id' loader={StockListLoader} element={<StockList />} />
             </Route>
         </Route>
 
