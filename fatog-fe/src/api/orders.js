@@ -14,11 +14,8 @@ export async function createOrder(orderData) {
         headers,
         body: JSON.stringify(orderData)
     });
-
-    console.log('res', res);
     
     const data = await res.json();
-    console.log('data', data);
 
     if (res.status === 401) {
         return {

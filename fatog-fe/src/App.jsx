@@ -59,6 +59,8 @@ import StockItemUpdate from "./pages/stocks/StockItemUpdate";
 import { loader as StockItemUpdateLoader } from "./pages/stocks/StockItemUpdate";
 import Orders from "./pages/orders/Orders";
 import { loader as OrdersLoader } from "./pages/orders/Orders";
+import OrderCreate from "./pages/orders/OrderCreate";
+import { loader as OrderCreateLoader } from "./pages/orders/OrderCreate";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -108,6 +110,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
 
                 {/* Orders */}
                 <Route path='orders' loader={OrdersLoader} element={<Orders />} />
+                <Route path='orders/create' loader={OrderCreateLoader} element={<OrderCreate />} />
             </Route>
         </Route>
 
