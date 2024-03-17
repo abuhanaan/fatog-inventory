@@ -61,6 +61,8 @@ import Orders from "./pages/orders/Orders";
 import { loader as OrdersLoader } from "./pages/orders/Orders";
 import OrderCreate from "./pages/orders/OrderCreate";
 import { loader as OrderCreateLoader } from "./pages/orders/OrderCreate";
+import OrderList from "./pages/orders/OrderList";
+import { loader as OrderListLoader } from "./pages/orders/OrderList";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -111,6 +113,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 {/* Orders */}
                 <Route path='orders' loader={OrdersLoader} element={<Orders />} />
                 <Route path='orders/create' loader={OrderCreateLoader} element={<OrderCreate />} />
+                <Route path='orders/:id' loader={OrderListLoader} element={<OrderList />} />
             </Route>
         </Route>
 
