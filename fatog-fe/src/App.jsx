@@ -57,6 +57,8 @@ import StockItem from "./pages/stocks/StockItem";
 import { loader as StockItemLoader } from "./pages/stocks/StockItem";
 import StockItemUpdate from "./pages/stocks/StockItemUpdate";
 import { loader as StockItemUpdateLoader } from "./pages/stocks/StockItemUpdate";
+import Orders from "./pages/orders/Orders";
+import { loader as OrdersLoader } from "./pages/orders/Orders";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -97,12 +99,15 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='inventories/:id' loader={InventoryViewLoader} element={<InventoryView />} />
                 <Route path='inventories/history' loader={HistoriesLoader} element={<Histories />} />
 
-
+                {/* Stocks */}
                 <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
                 <Route path='stocks/create' loader={StockCreateLoader} element={<StockCreate />} />
                 <Route path='stocks/:id' loader={StockListLoader} element={<StockList />} />
                 <Route path='stocks/:id/stocklist/:id' loader={StockItemLoader} element={<StockItem />} />
                 <Route path='stocks/:id/stocklist/:id/edit' loader={StockItemUpdateLoader} element={<StockItemUpdate />} />
+
+                {/* Orders */}
+                <Route path='orders' loader={OrdersLoader} element={<Orders />} />
             </Route>
         </Route>
 
