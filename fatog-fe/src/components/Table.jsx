@@ -44,7 +44,7 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
             )
         }
 
-        if (col.id === 'totalAmount' || col.id === 'pricePerBag') {
+        if (col.id === 'totalAmount' || col.id === 'pricePerBag' || col.id === 'totalPrice') {
             return (
                 columnHelper.accessor(col.id, {
                     id: col.id,

@@ -9,14 +9,14 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Modal from '../../components/Modal';
 import UserField from '../../components/UserField';
 import Tabs from '../../components/Tabs';
-import StocksTable from '../../components/StocksTable';
+import OrdersTable from '../../components/OrdersTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
-import { getStockList } from '../../api/stocks';
+import { getOrderList } from '../../api/orders';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getStockList(request, params.id);
+    const response = await getOrderList(request, params.id);
 
     if (response.error || response.message) {
         return {
@@ -25,63 +25,82 @@ export async function loader({ params, request }) {
         };
     }
 
+    console.log(response);
+
     const data = {
         id: response.id,
         refId: response.refId,
         totalNoOfBags: response.totalNoOfBags,
         totalWeight: response.totalWeight,
         totalAmount: response.totalAmount,
+        customerPhoneNumber: response.phoneNumber,
+        shippingAddress: response.shippingAddress,
+        paymentStatus: response.paymentStatus,
+        amountPaid: response.amountPaid,
+        outstandingPayment: response.outStandingPayment,
+        deliveryStatus: response.deliveryStatus,
+        note: response.note,
         date: response.createdAt,
-        stockList: response.stockLists,
+        orderList: response.orderLists,
         staffId: response.staffId,
+        customerId: response.customerId,
         staff: response.staff,
-        invoice: response.invoice
+        // customer: response.customer,
+
     };
 
     return data;
 }
 
-const StockList = () => {
+const OrderList = () => {
     const navigate = useNavigate();
-    const stock = useLoaderData();
-    const { stockList, staff } = stock;
+    const order = useLoaderData();
+    const { orderList, staff, customer } = order;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: stockList.error ?? '',
-        message: stockList.message ?? ''
+        error: order.error ?? '',
+        message: order.message ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
-        { name: 'Stocks', ref: '/stocks' },
-        { name: 'Stock List', ref: `/stocks/${stock.id}` },
+        { name: 'Orders', ref: '/orders' },
+        { name: 'Order List', ref: `/orders/${order.id}` },
     ];
 
-    const basicStockInfo = {
+    const basicOrderInfo = {
         staff: (staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'N/A',
-        totalAmount: stock.totalAmount,
-        totalNoOfBags: stock.totalNoOfBags,
-        totalWeight: stock.totalWeight,
-        date: stock.date
+        // customer: (customer.firstName && customer.lastName) ? `${customer.firstName} ${customer.lastName}` : 'N/A',
+        totalAmount: order.totalAmount,
+        totalNoOfBags: order.totalNoOfBags,
+        totalWeight: order.totalWeight,
+        customerPhoneNumber: order.customerPhoneNumber,
+        shippingAddress: order.shippingAddress,
+        amountPaid: order.amountPaid,
+        outstandingPayment: order.outstandingPayment,
+        paymentStatus: order.paymentStatus,
+        deliveryStatus: order.deliveryStatus,
+        note: order.note,
+        date: order.date
     }
 
-    const stockListColumns = [
+    const orderListColumns = [
         { id: 'S/N', header: 'S/N' },
         { id: 'pricePerBag', header: 'Price per Bag' },
         { id: 'noOfBags', header: 'No. of Bags' },
-        { id: 'totalAmount', header: 'Total Amount' },
+        { id: 'totalPrice', header: 'Total Amount' },
         { id: 'totalWeight', header: 'Total Weight' },
         { id: 'actions', header: '' },
     ];
 
-    const stockListData = stockList.map(prev => ({
+    const orderListData = orderList.map(prev => ({
         ...prev,
-        stockId: stock.id
+        orderId: order.id
     }));
 
-    const tabTitles = ['Overview', 'Stock List'];
+    const tabTitles = ['Overview', 'Order List'];
     const tabPanels = [
-        <GeneralInfo info={basicStockInfo} />,
-        <StocksTable stocks={stockListData} columns={stockListColumns} path={`/stocks/${stock.id}/stocklist`} />,
+        <GeneralInfo info={basicOrderInfo} />,
+        <OrdersTable orders={orderListData} columns={orderListColumns} path={`/orders/${order.id}/orderlist`} />,
     ];
 
     useEffect(() => {
@@ -107,7 +126,7 @@ const StockList = () => {
                     <Breadcrumb linkList={breadcrumbData} />
                 </Box>
                 <HStack justifyContent='space-between'>
-                    <Heading fontSize='3xl' color='blue.700'>Stock</Heading>
+                    <Heading fontSize='3xl' color='blue.700'>Order</Heading>
                 </HStack>
                 <Box marginTop='8'>
                     <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />
@@ -141,4 +160,4 @@ const GeneralInfo = ({ info }) => {
     )
 }
 
-export default StockList;
+export default OrderList;

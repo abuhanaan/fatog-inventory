@@ -255,6 +255,16 @@ const StockCreate = () => {
         setStockList(updatedStockList);
     }
 
+    const clearStockList = () => {
+        setStockList([]);
+        resetForm();
+    }
+
+    const closeDrawer = () => {
+        resetForm();
+        onClose();
+    }
+
     const filterProduct = (key, value) => {
         return products.filter(prod => prod[key] === value)[0];
     }
@@ -303,7 +313,7 @@ const StockCreate = () => {
             </Stack>
 
             <Stack direction={{base: 'column', lg: 'row'}} spacing='4' mt='4'>
-                <Button w='full' variant='outline' colorScheme='red' onClick={() => setStockList([])}>Clear Stock List</Button>
+                <Button w='full' variant='outline' colorScheme='red' onClick={clearStockList}>Clear Stock List</Button>
                 <Button
                     w='full'
                     colorScheme='blue'
@@ -347,7 +357,7 @@ const StockCreate = () => {
             }
 
             {/* Stock Creation Form */}
-            <Drawer isOpen={isOpen} onClose={onClose} initialFocusRef={focusInput} closeOnOverlayClick='false'>
+            <Drawer isOpen={isOpen} onClose={closeDrawer} initialFocusRef={focusInput} closeOnOverlayClick={false}>
                 <DrawerOverlay />
                 <DrawerContent>
                     <DrawerCloseButton />
@@ -397,7 +407,7 @@ const StockCreate = () => {
                     </DrawerBody>
 
                     <DrawerFooter>
-                        <Button variant='outline' mr={3} onClick={onClose}>
+                        <Button variant='outline' mr={3} onClick={closeDrawer}>
                             Cancel
                         </Button>
                         <Button onClick={selectedStockItem ? updateStockItem : addStockItem} colorScheme='blue'>{selectedStockItem ? 'Update' : 'Add'}</Button>

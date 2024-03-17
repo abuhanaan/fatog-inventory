@@ -15,6 +15,7 @@ import { requireAuth } from '../../hooks/useAuth';
 import { getInventory } from '../../api/inventories';
 import { getManufacturers } from '../../api/manufacturers';
 import { useToastHook } from '../../hooks/useToast';
+import ListingsTable from '../../components/Table';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
