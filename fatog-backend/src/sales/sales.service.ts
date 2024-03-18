@@ -63,8 +63,8 @@ export class SalesService {
     // Calculate payable and outstanding amounts
     const amountPayable = order.totalAmount;
     const outStandingPayment = amountPayable - createSaleDto.amountPaid;
-    const paymentStatus: String =
-      outStandingPayment === 0 ? 'FULLY_PAID' : 'PARTLY_PAID';
+    const paymentStatus =
+      outStandingPayment == 0 ? 'FULLY_PAID' : 'PARTLY_PAID';
 
     // Prepare arrays for batch operations
     const inventoryUpdateData = [];
@@ -121,6 +121,7 @@ export class SalesService {
             amountPayable,
             outStandingPayment,
             cashierId: staff.id,
+            paymentStatus: paymentStatus,
           },
         });
         return { inventoryUpdates, inventoryHistories, sales };
