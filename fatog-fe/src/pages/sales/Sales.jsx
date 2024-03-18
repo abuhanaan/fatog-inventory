@@ -8,81 +8,79 @@ import { MdOutlineCreateNewFolder } from "react-icons/md";
 import { FaEllipsisVertical, FaMoneyBill } from "react-icons/fa6";
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
-import { getOrders } from '../../api/orders';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
+import { getSales } from '../../api/sales';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
     { id: 'staff', header: 'Staff' },
-    { id: 'totalAmount', header: 'Amount(₦)' },
+    { id: 'amountPaid', header: 'Amount Paid' },
+    { id: 'amountPayable', header: 'Amount Payable' },
+    { id: 'outstandingPayment', header: 'Balance' },
+    { id: 'paymentStatus', header: 'Payment Status' },
     { id: 'totalNoOfBags', header: 'No. of Bags' },
-    { id: 'totalWeight', header: 'Total Weight(kg)' },
     { id: 'date', header: 'Date' },
     { id: 'actions', header: '' },
 ];
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
-    { name: 'Orders', ref: '/orders' },
+    { name: 'Sales', ref: '/sales' },
 ];
 
-export async function loader({ request }) {
+export const loader = async ({ request }) => {
     await requireAuth(request);
-    const orders = await getOrders(request);
+    const sales = await getSales(request);
 
-    if (orders.error || orders.message) {
+    if (sales.error || sales.message) {
         return {
-            error: orders.error,
-            message: orders.message
+            error: sales.error,
+            message: sales.message
         }
     }
 
-    // console.log(orders);
-
-    const data = orders.map(order => {
+    const data = sales.map(sale => {
         return {
-            id: order.id,
-            refId: order.refId,
-            totalAmount: order.totalAmount,
-            totalNoOfBags: order.totalNoOfBags,
-            totalWeight: order.totalWeight,
-            staff: (order.staff.firstName && order.staff.lastName) ? `${order.staff.firstName} ${order.staff.lastName}` : 'N/A',
-            // customer: (order.customer.firstName && order.customer.lastName) ? `${order.customer.firstName} ${order.customer.lastName}` : 'N/A',
-            phoneNumber: order.phoneNumber,
-            ShippingAddress: order.ShippingAddress,
-            paymentStatus: order.paymentStatus,
-            deliveryStatus: order.deliveryStatus,
-            amountPaid: order.amountPaid,
-            outstandingPayment: order.outStandingPayment,
-            date: order.createdAt,
+            id: sale.id,
+            orderRefId: sale.orderRefId,
+            amountPaid: sale.amountPaid,
+            amountPayable: sale.amountPayable,
+            outstandingPayment: sale.outStandingPayment,
+            paymentStatus: sale.paymentStatus,
+            totalNoOfBags: sale.order.totalNoOfBags,
+            staff: (sale.staff.firstName && sale.staff.lastName) ? `${sale.staff.firstName} ${sale.staff.lastName}` : 'N/A',
+            customerPhone: sale.order.phoneNumber,
+            shippingAddress: sale.order.shippingAddress,
+            deliveryStatus: sale.order.deliveryStatus,
+            date: sale.createdAt,
         }
     });
 
     return data;
-}
+};
 
-const Orders = () => {
-    const orders = useLoaderData();
+const Sales = () => {
+    const sales = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: '',
         message: ''
     });
 
-    // console.log(orders);
+    // console.log(sales);
 
     useEffect(() => {
-        if (orders.error || orders.message) {
+        if (sales.error || sales.message) {
             setToastState({
-                title: orders.error,
-                description: orders.message,
+                title: sales.error,
+                description: sales.message,
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
 
             setError({
-                error: orders.error,
-                message: orders.message
+                error: sales.error,
+                message: sales.message
             });
         }
     }, []);
@@ -99,15 +97,15 @@ const Orders = () => {
                     <Breadcrumb linkList={breadcrumbData} />
                 </Box>
                 <HStack justifyContent='space-between'>
-                    <Heading fontSize='3xl' color='blue.700'>Orders</Heading>
-                    <Button as={RouterLink} to='create' colorScheme='blue' leftIcon={<MdOutlineCreateNewFolder />}>Create Order</Button>
+                    <Heading fontSize='3xl' color='blue.700'>Sales</Heading>
+                    {/* <Button as={RouterLink} to='create' colorScheme='blue' leftIcon={<MdOutlineCreateNewFolder />}>Create Order</Button> */}
                 </HStack>
                 <Box marginTop='8'>
                     {
-                        orders?.length === 0 ?
-                            <EmptySearch headers={['S/N', 'AMOUNT', 'NO. OF BAGS', 'CUSTOMER', 'STAFF', 'AMOUNT PAID', 'DELIVERY STATUS', 'PAYMENT STATUS', 'DATE']} type='order' /> :
-                            <ListingsTable data={orders} columns={columns} fileName='orders-data.csv' render={(order) => (
-                                <ActionButtons order={order} />
+                        sales?.length === 0 ?
+                            <EmptySearch headers={['S/N', 'AMOUNT PAID', 'AMOUNT PAYABLE', 'bALANCE', 'NO. OF BAGS', 'CUSTOMER', 'STAFF', 'DELIVERY STATUS', 'PAYMENT STATUS', 'DATE']} type='order' /> :
+                            <ListingsTable data={sales} columns={columns} fileName='sales-data.csv' render={(sale) => (
+                                <ActionButtons sale={sale} />
                             )} />
                     }
                 </Box>
@@ -115,14 +113,14 @@ const Orders = () => {
     )
 }
 
-const ActionButtons = ({ order }) => {
+const ActionButtons = ({ sale }) => {
     const navigate = useNavigate();
 
-    function viewOrder(e) {
+    function viewSale(e) {
         e.preventDefault();
 
-        const dataOrderId = e.currentTarget.getAttribute('data-order-id');
-        navigate(`./${dataOrderId}`);
+        const dataSaleId = e.currentTarget.getAttribute('data-sale-id');
+        navigate(`./${dataSaleId}`);
     }
 
     return (
@@ -134,16 +132,12 @@ const ActionButtons = ({ order }) => {
                 variant='unstyled'
             />
             <MenuList py='0'>
-                <MenuItem icon={<IoEyeOutline />} data-order-id={order.id} onClick={viewOrder}>
+                <MenuItem icon={<IoEyeOutline />} data-sale-id={sale.id} onClick={viewSale}>
                     Preview
-                </MenuItem>
-
-                <MenuItem as={RouterLink} to={`/sales/create/${order.id}`} icon={<FaMoneyBill />}>
-                    Create Sales
                 </MenuItem>
             </MenuList>
         </Menu>
     )
 }
 
-export default Orders;
+export default Sales;

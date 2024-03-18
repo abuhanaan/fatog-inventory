@@ -225,7 +225,6 @@ const OrderCreate = () => {
             deliveryStatus: shippingForm.deliveryStatus,
             note: shippingForm.note,
         }
-        console.log(orderListData);
 
         // TODO: Consume create order list API endpoint
         try {

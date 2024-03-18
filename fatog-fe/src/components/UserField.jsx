@@ -11,12 +11,12 @@ const UserField = ({ field }) => {
 
     let outputValue;
 
-    if ((key === 'totalAmount' || key === 'pricePerBag' || key === 'purchaseAmount' || key === 'purchasePricePerBag' || key === 'currentSellingPricePerBag' || key === 'outstandingPayment' || key === 'amountPaid') && (value)) {
+    if ((key === 'totalAmount' || key === 'pricePerBag' || key === 'purchaseAmount' || key === 'purchasePricePerBag' || key === 'currentSellingPricePerBag' || key === 'outstandingPayment' || key === 'amountPaid' || key === 'amountPayable') && (value)) {
         outputValue = getMonetaryValue(value)
     } else if (key === 'date') {
         outputValue = formatDate(value)
     } else if (!value) {
-        if (key === 'amountPaid') {
+        if (key === 'amountPaid' || key === 'outstandingPayment') {
             outputValue = getMonetaryValue(value);
         } else {
             outputValue = 'N/A';

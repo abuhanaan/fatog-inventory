@@ -6,9 +6,10 @@ const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${user?.accessToken}`,
 };
+const endpoint = '/manufacturers';
 
 export async function createManufacturer(manufacturerData) {
-    const res = await fetch(`${BASE_URL}/manufacturers`, {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers,
         body: JSON.stringify(manufacturerData)
@@ -31,7 +32,7 @@ export async function createManufacturer(manufacturerData) {
 }
 
 export async function updateManufacturer(manufacturerId, manufacturerData) {
-    const res = await fetch(`${BASE_URL}/manufacturers/${manufacturerId}`, {
+    const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify(manufacturerData)
@@ -54,7 +55,7 @@ export async function updateManufacturer(manufacturerId, manufacturerData) {
 }
 
 export async function getManufacturers(request) {
-    const res = await fetch(`${BASE_URL}/manufacturers`, {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers,
     });
@@ -68,7 +69,7 @@ export async function getManufacturers(request) {
 }
 
 export async function getManufacturer(request, manufacturerId) {
-    const res = await fetch(`${BASE_URL}/manufacturer/${manufacturerId}`, {
+    const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
         method: 'GET',
         headers,
     });
@@ -83,7 +84,7 @@ export async function getManufacturer(request, manufacturerId) {
 
 export async function deleteManufacturer(manufacturerId) {
     try {
-        const res = await fetch(`${BASE_URL}/manufacturers/${manufacturerId}`, {
+        const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
             method: 'DELETE',
             headers,
         });
