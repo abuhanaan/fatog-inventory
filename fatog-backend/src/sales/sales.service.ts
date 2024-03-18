@@ -48,6 +48,16 @@ export class SalesService {
       });
     }
 
+    const existingSales = await this.prisma.sales.findUnique({
+      where: { orderRefId: createSaleDto.orderRefId },
+    });
+    if (existingSales) {
+      throw new ConflictException({
+        message: `Order with ref-id ${createSaleDto.orderRefId} already has a sales record. It is not ideal to create multiple invoices for the same order`,
+        error: 'Conflict Operation',
+      });
+    }
+
     // Fetch order items
     const orderItems = await this.prisma.orderList.findMany({
       where: { orderRefId: createSaleDto.orderRefId },
