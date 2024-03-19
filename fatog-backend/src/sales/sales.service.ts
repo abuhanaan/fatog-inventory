@@ -134,7 +134,18 @@ export class SalesService {
             paymentStatus: paymentStatus,
           },
         });
-        return { inventoryUpdates, inventoryHistories, sales };
+        const payment = await prisma.paymentHistory.create({
+          data: {
+            orderId: order.id,
+            salesId: sales.id,
+            outstandingBefore: 0,
+            prevPaymentSum: 0,
+            amountPaid: createSaleDto.amountPaid,
+            outstandingAfter: sales.amountPayable - createSaleDto.amountPaid,
+            date: sales.createdAt,
+          },
+        });
+        return { inventoryUpdates, inventoryHistories, sales, payment };
       });
 
       return transaction.sales;

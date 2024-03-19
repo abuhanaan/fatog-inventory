@@ -15,6 +15,7 @@ import { OrderListsModule } from './order-lists/order-lists.module';
 import { SalesModule } from './sales/sales.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { InventoryHistoryModule } from './inventory-history/inventory-history.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { InventoryHistoryModule } from './inventory-history/inventory-history.mo
     SalesModule,
     InventoryModule,
     InventoryHistoryModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
