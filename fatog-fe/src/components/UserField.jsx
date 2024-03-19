@@ -21,6 +21,8 @@ const UserField = ({ field }) => {
         } else {
             outputValue = 'N/A';
         }
+    } else if (key.toLowerCase().includes('weight')) {
+        outputValue = `${value} kg`
     } else {
         outputValue = value
     }

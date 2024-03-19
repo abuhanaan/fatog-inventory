@@ -99,7 +99,7 @@ const Inventories = () => {
                 </Box>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Inventories</Heading>
-                    <Button as={RouterLink} to='history' leftIcon={<LuHistory />} colorScheme='blue'>History</Button>
+                    <Button as={RouterLink} to='histories' leftIcon={<LuHistory />} colorScheme='blue'>History</Button>
                 </HStack>
                 <Box marginTop='8'>
                     {

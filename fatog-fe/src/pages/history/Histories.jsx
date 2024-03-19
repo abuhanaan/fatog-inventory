@@ -12,13 +12,11 @@ import { requireAuth } from '../../hooks/useAuth';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
-    { id: 'product', header: 'Product' },
-    { id: 'manufacturer', header: 'Manufacturer' },
-    { id: 'staff', header: 'Staff' },
-    { id: 'customer', header: 'Customer' },
-    { id: 'orderAmount', header: 'Order Amount(₦)' },
-    { id: 'orderQty', header: 'Order Quantity' },
-    { id: 'paymentStatus', header: 'Payment Status' },
+    { id: 'remainderBefore', header: 'Remainder Before' },
+    { id: 'effectQuantity', header: 'Effect Qty' },
+    { id: 'remainderAfter', header: 'Remainder After' },
+    { id: 'operationStatus', header: 'Status' },
+    { id: 'operationType', header: 'Type' },
     { id: 'date', header: 'Date' },
     { id: 'actions', header: '' },
 ];
@@ -38,20 +36,18 @@ export async function loader({ request }) {
         }
     }
 
-    const data = histories.map(history => {
-        return {
-            id: history.id,
-            productName: history.inventory.product.name,
-            manufacturer: history.inventory.product.manufacturer.brandName,
-            customer: `${history.orderItem.order.customer.firstName} ${history.orderItem.order.customer.lastName}`,
-            staff: `${history.orderItem.order.staff.firstName} ${history.orderItem.order.staff.lastName}`,
-            orderAmount: history.orderItem.order.totalAmount,
-            noOfBags: history.orderItem.order.totalNoOfBags,
-            paymentStatus: history.orderItem.order.paymentStatus,
-            deliveryStatus: history.orderItem.order.deliveryStatus,
-            date: history.createdAt,
-        }
-    });
+    const data = histories.map(history => ({
+        id: history.id,
+        operationStatus: history.decrement ? 'Decrement' : 'Increment',
+        operationType: history.orderItemId ? 'Order' : 'Stock',
+        effectQuantity: history.effectQuantity,
+        remainderAfter: history.remainderAfter,
+        remainderBefore: history.remainderBefore,
+        orderItemId: history.orderItemId,
+        note: history.note,
+        date: history.createdAt,
+        inventory: history.inventory,
+    }));
 
     return data;
 }
@@ -63,11 +59,8 @@ const Histories = () => {
         error: '',
         message: ''
     });
-    console.log(histories.error);
-    console.log(histories.message);
 
     useEffect(() => {
-        console.log('useEffect hit');
         if (histories.error || histories.message) {
             console.log('UseEffect If condition');
             setToastState({

@@ -9,6 +9,8 @@ const headers = {
 };
 
 export async function createOrder(orderData) {
+    // console.log(headers);
+    // console.log(orderData);
     const res = await fetch(`${BASE_URL}/order-lists`, {
         method: 'POST',
         headers,

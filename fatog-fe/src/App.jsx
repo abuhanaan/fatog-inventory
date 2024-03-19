@@ -73,6 +73,8 @@ import Sales from "./pages/sales/Sales";
 import { loader as SalesLoader } from "./pages/sales/Sales";
 import Sale from "./pages/sales/Sale";
 import { loader as SaleLoader } from "./pages/sales/Sale";
+import History from "./pages/history/History";
+import { loader as HistoryLoader } from "./pages/history/History";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -111,7 +113,8 @@ const router = createBrowserRouter(createRoutesFromChildren(
 
                 <Route path='inventories' loader={InventoriesLoader} element={<Inventories />} />
                 <Route path='inventories/:id' loader={InventoryViewLoader} element={<InventoryView />} />
-                <Route path='inventories/history' loader={HistoriesLoader} element={<Histories />} />
+                <Route path='inventories/histories' loader={HistoriesLoader} element={<Histories />} />
+                <Route path='inventories/histories/:id' loader={HistoryLoader} element={<History />} />
 
                 {/* Stocks */}
                 <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
