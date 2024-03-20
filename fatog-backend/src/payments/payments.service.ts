@@ -77,21 +77,38 @@ export class PaymentsService {
     }
 
     if (createPaymentDto.outstandingAfter == 0) {
-      const transaction = await this.prisma.$transaction([
-        this.prisma.paymentHistory.create({
+      const transaction = await this.prisma.$transaction(async (prisma) => {
+        const payment = await prisma.paymentHistory.create({
           data: createPaymentDto,
-        }),
-        this.prisma.sales.update({
+        });
+        const salesUpdate = await this.prisma.sales.update({
           where: { id: sales.id },
-          data: { paymentStatus: 'FULLY_PAID' },
-        }),
-      ]);
-      return transaction[0];
+          data: {
+            paymentStatus: 'FULLY_PAID',
+            amountPaid: payment.prevPaymentSum + payment.amountPaid,
+            outStandingPayment: payment.outstandingAfter,
+          },
+        });
+        return { payment, salesUpdate };
+      });
+      return transaction.payment;
     }
-    const payment = await this.prisma.paymentHistory.create({
-      data: createPaymentDto,
+
+    const transaction = await this.prisma.$transaction(async (prisma) => {
+      const payment = await prisma.paymentHistory.create({
+        data: createPaymentDto,
+      });
+      const salesUpdate = await this.prisma.sales.update({
+        where: { id: sales.id },
+        data: {
+          amountPaid: payment.prevPaymentSum + payment.amountPaid,
+          outStandingPayment: payment.outstandingAfter,
+        },
+      });
+      return { payment, salesUpdate };
     });
-    return payment;
+
+    return transaction.payment;
   }
 
   findAll() {
