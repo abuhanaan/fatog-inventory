@@ -9,6 +9,7 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Modal from '../../components/Modal';
 import UserField from '../../components/UserField';
 import Tabs from '../../components/Tabs';
+import PaymentsTable from '../../components/PaymentsTable';
 import StocksTable from '../../components/StocksTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
@@ -34,6 +35,7 @@ export async function loader({ params, request }) {
         date: response.createdAt,
         product: response.product,
         order: response.order,
+        payments: response.payments,
     };
 
     return data;
@@ -42,7 +44,7 @@ export async function loader({ params, request }) {
 const OrderItem = () => {
     const navigate = useNavigate();
     const orderItem = useLoaderData();
-    const { product, order } = orderItem;
+    const { product, order, payments } = orderItem;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: orderItem.error ?? '',
@@ -82,12 +84,25 @@ const OrderItem = () => {
         shippingAddress: order.shippingAddress,
     };
 
-    const tabTitles = ['Overview', 'Product Details', 'Order Details'];
+    const paymentsData = payments.map(payment => ({
+        amountPaid: payment.amountPaid,
+        outstandingPayment: payment.outStandingPayment,
+        date: payment.createdAt
+    }));
+
+    const paymentColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'amountPaid', header: 'Amount Paid' },
+        { id: 'outstandingPayment', header: 'Outstanding Payment' },
+        { id: 'date', header: 'Date' },
+    ];
+
+    const tabTitles = ['Overview', 'Product Details', 'Order Details', 'Payments'];
     const tabPanels = [
         <TabPanel info={basicOrderItemInfo} />,
         <TabPanel info={productInfo} />,
         <TabPanel info={orderInfo} />,
-        
+        <PaymentsTable payments={paymentsData} columns={paymentColumns} />,       
     ];
 
     useEffect(() => {

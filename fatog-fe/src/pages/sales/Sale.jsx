@@ -9,6 +9,7 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Modal from '../../components/Modal';
 import UserField from '../../components/UserField';
 import Tabs from '../../components/Tabs';
+import PaymentsTable from '../../components/PaymentsTable';
 import StocksTable from '../../components/StocksTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
@@ -24,7 +25,6 @@ export async function loader({ params, request }) {
             message: sale.message
         };
     }
-
     
     const data = {
         id: sale.id,
@@ -36,6 +36,7 @@ export async function loader({ params, request }) {
         cashierId: sale.cashierId,
         staff: sale.staff,
         order: sale.order,
+        payments: sale.payments,
         note: sale.note,
         date: sale.createdAt,
     };
@@ -46,7 +47,7 @@ export async function loader({ params, request }) {
 const Sale = () => {
     const navigate = useNavigate();
     const sale = useLoaderData();
-    const { staff, order } = sale;
+    const { staff, order, payments } = sale;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: sale.error ?? '',
@@ -83,10 +84,24 @@ const Sale = () => {
         note: order.note,
     };
 
-    const tabTitles = ['Overview', 'Order Details', 'Staff Details'];
+    const paymentsData = payments.map(payment => ({
+        amountPaid: payment.amountPaid,
+        outstandingPayment: payment.outStandingPayment,
+        date: payment.createdAt
+    }));
+
+    const paymentColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'amountPaid', header: 'Amount Paid' },
+        { id: 'outstandingPayment', header: 'Outstanding Payment' },
+        { id: 'date', header: 'Date' },
+    ];
+
+    const tabTitles = ['Overview', 'Order Details', 'Payments', 'Staff Details', ];
     const tabPanels = [
         <TabPanel info={basicSaleInfo} />,
         <TabPanel info={orderInfo} />,
+        <PaymentsTable payments={paymentsData} columns={paymentColumns} />,
         <TabPanel info={staffInfo} />,
         
     ];
@@ -115,14 +130,8 @@ const Sale = () => {
                 </Box>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Sale</Heading>
-
-                    {/* <HStack spacing='2'>
-                        <Tooltip hasArrow label='Edit stock item' placement='bottom' borderRadius='md'>
-                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to={`/orders/${order.id}/orderlist/${orderItem.id}/edit`} state={{ orderItem: orderItem }} icon={<MdOutlineEdit />} colorScheme='orange' />
-                        </Tooltip>
-                    </HStack> */}
                 </HStack>
-                <Box marginTop='8'>
+                <Box>
                     <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />
                 </Box>
             </Stack>
