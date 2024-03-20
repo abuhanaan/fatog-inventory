@@ -23,7 +23,7 @@ export class OrderListEntity implements OrderList {
   totalWeight: number;
 
   @ApiProperty()
-  totalPrice: number;
+  totalAmount: number;
 
   @ApiProperty({ required: false, type: () => OrderEntity })
   order?: OrderEntity;

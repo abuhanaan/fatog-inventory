@@ -127,7 +127,7 @@ model OrderList {
   noOfBags       Int
   pricePerBag    Int
   totalWeight    Int
-  totalPrice     Int
+  totalAmount    Int
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

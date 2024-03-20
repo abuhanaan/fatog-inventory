@@ -20,5 +20,5 @@ export class CreateOrderListDto {
   totalWeight?: number;
 
   @ApiProperty({ default: 0, required: false })
-  totalPrice?: number;
+  totalAmount?: number;
 }

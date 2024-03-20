@@ -57,9 +57,9 @@ export class OrderListsService {
         const product = await this.prisma.product.findFirst({
           where: { refId: orderItem.productRefId },
         });
-        orderItem.totalPrice = product.pricePerBag * orderItem.noOfBags;
+        orderItem.totalAmount = product.pricePerBag * orderItem.noOfBags;
         orderItem.totalWeight = product.weight * orderItem.noOfBags;
-        orderTotalAmount += orderItem.totalPrice;
+        orderTotalAmount += orderItem.totalAmount;
         orderTotalWeight += orderItem.totalWeight;
         orderTotalNoOfBags += orderItem.noOfBags;
         return {
@@ -68,7 +68,7 @@ export class OrderListsService {
           noOfBags: orderItem.noOfBags,
           pricePerBag: product.pricePerBag,
           totalWeight: orderItem.totalWeight,
-          totalPrice: orderItem.totalPrice,
+          totalAmount: orderItem.totalAmount,
         };
       }),
     );
