@@ -37,7 +37,13 @@ export class OrdersService {
   async findOne(id: number) {
     const order = await this.prisma.order.findUnique({
       where: { id },
-      include: { customer: true, staff: true, orderLists: true, invoice: true },
+      include: {
+        customer: true,
+        staff: true,
+        orderLists: true,
+        payments: true,
+        invoice: true,
+      },
     });
     await this.checkIfOrderExists(order, id);
     return order;

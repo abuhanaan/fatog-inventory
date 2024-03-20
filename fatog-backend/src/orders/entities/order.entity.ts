@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Order } from '@prisma/client';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { OrderListEntity } from 'src/order-lists/entities/order-list.entity';
+import { PaymentEntity } from 'src/payments/entities/payment.entity';
 import { StaffEntity } from 'src/staffs/entities/staff.entity';
 
 export class OrderEntity implements Order {
@@ -56,7 +57,16 @@ export class OrderEntity implements Order {
   @ApiProperty({ required: false, type: () => OrderListEntity, isArray: true })
   orderLists?: OrderListEntity[];
 
-  constructor({ customer, staff, orderLists, ...data }: Partial<OrderEntity>) {
+  @ApiProperty({ required: false, type: () => PaymentEntity, isArray: true })
+  payments?: PaymentEntity[];
+
+  constructor({
+    customer,
+    staff,
+    orderLists,
+    payments,
+    ...data
+  }: Partial<OrderEntity>) {
     Object.assign(this, data);
 
     if (customer) {
@@ -71,6 +81,10 @@ export class OrderEntity implements Order {
       this.orderLists = orderLists.map(
         (orderList) => new OrderListEntity(orderList),
       );
+    }
+
+    if (payments) {
+      this.payments = payments.map((payment) => new PaymentEntity(payment));
     }
   }
 
