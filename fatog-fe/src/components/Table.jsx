@@ -18,6 +18,7 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
     const { pathname } = useLocation();
     const columnHelper = createColumnHelper();
 
+    console.log(tableData);
 
     const columns = cols.map(col => {
         if (col.id === 'S/N') {

@@ -37,7 +37,7 @@ export async function loader({ request }) {
         }
     }
 
-    // console.log(orders);
+    console.log(orders);
 
     const data = orders.map(order => {
         return {
@@ -65,8 +65,8 @@ const Orders = () => {
     const orders = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: orders.error ?? '',
+        message: orders.message ?? ''
     });
 
     // console.log(orders);
@@ -79,16 +79,11 @@ const Orders = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
-
-            setError({
-                error: orders.error,
-                message: orders.message
-            });
         }
     }, []);
 
     return (
-        error.error ?
+        error.error || error.message ?
             <VStack h='30rem' justifyContent='center'>
                 <Heading>{error.error}</Heading>
                 <Text>{error.message}</Text>

@@ -4,7 +4,7 @@ import ListingsTable from '../../components/Table';
 import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
-import { MdOutlineCreateNewFolder } from "react-icons/md";
+import { MdOutlineCreateNewFolder, MdAddCard } from "react-icons/md";
 import { FaEllipsisVertical, FaMoneyBill } from "react-icons/fa6";
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
@@ -39,10 +39,13 @@ export const loader = async ({ request }) => {
         }
     }
 
+    // console.log(sales)
+
     const data = sales.map(sale => {
         return {
             id: sale.id,
             orderRefId: sale.orderRefId,
+            orderId: sale.order.id,
             amountPaid: sale.amountPaid,
             amountPayable: sale.amountPayable,
             outstandingPayment: sale.outStandingPayment,
@@ -63,11 +66,9 @@ const Sales = () => {
     const sales = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: sales.error ?? '',
+        message: sales.message ?? ''
     });
-
-    // console.log(sales);
 
     useEffect(() => {
         if (sales.error || sales.message) {
@@ -77,16 +78,11 @@ const Sales = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
-
-            setError({
-                error: sales.error,
-                message: sales.message
-            });
         }
     }, []);
 
     return (
-        error.error ?
+        error.error || error.message ?
             <VStack h='30rem' justifyContent='center'>
                 <Heading>{error.error}</Heading>
                 <Text>{error.message}</Text>
@@ -134,6 +130,10 @@ const ActionButtons = ({ sale }) => {
             <MenuList py='0'>
                 <MenuItem icon={<IoEyeOutline />} data-sale-id={sale.id} onClick={viewSale}>
                     Preview
+                </MenuItem>
+
+                <MenuItem as={RouterLink} to={`/sales/${sale.id}/payments/add`} icon={<MdAddCard />}>
+                    Add Payment
                 </MenuItem>
             </MenuList>
         </Menu>

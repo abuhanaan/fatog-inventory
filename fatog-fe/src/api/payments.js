@@ -2,22 +2,21 @@ import { redirect } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const user = JSON.parse(sessionStorage.getItem('user'));
-const endpoint = '/orders';
+const endpoint = '/payments';
 const headers = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${user?.accessToken}`,
 };
 
-export async function createOrder(orderData) {
-    // console.log(headers);
-    // console.log(orderData);
-    const res = await fetch(`${BASE_URL}/order-lists`, {
+export async function addPayment(paymentsData) {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(paymentsData)
     });
-    
+
     const data = await res.json();
+    console.log(data);
 
     if (res.status === 401) {
         return {
@@ -33,14 +32,12 @@ export async function createOrder(orderData) {
     return data;
 }
 
-export async function getOrders(request) {
+export async function getPayments(request) {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers,
     });
 
-    console.log(res);
-
     const data = await res.json();
 
     isUnauthorized(res, request);
@@ -49,8 +46,8 @@ export async function getOrders(request) {
     return data;
 }
 
-export async function getOrderItem(request, orderId) {
-    const res = await fetch(`${BASE_URL}/order-lists/${orderId}`, {
+export async function getPayment(request, paymentId) {
+    const res = await fetch(`${BASE_URL}${endpoint}/${paymentId}`, {
         method: 'GET',
         headers,
     });
@@ -63,11 +60,11 @@ export async function getOrderItem(request, orderId) {
     return data;
 }
 
-export async function updateOrderItem(orderItemId, orderItemData) {
-    const res = await fetch(`${BASE_URL}/order-lists/${orderItemId}`, {
+export async function updatePayment(paymentId, paymentData) {
+    const res = await fetch(`${BASE_URL}${endpoint}/${paymentId}`, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify(orderItemData)
+        body: JSON.stringify(paymentData)
     });
 
     const data = await res.json();
@@ -81,20 +78,6 @@ export async function updateOrderItem(orderItemId, orderItemData) {
         }
     }
 
-    isError(res, data);
-
-    return data;
-}
-
-export async function getOrderList(request, orderId) {
-    const res = await fetch(`${BASE_URL}${endpoint}/${orderId}`, {
-        method: 'GET',
-        headers,
-    });
-
-    const data = await res.json();
-
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;

@@ -75,6 +75,8 @@ import Sale from "./pages/sales/Sale";
 import { loader as SaleLoader } from "./pages/sales/Sale";
 import History from "./pages/history/History";
 import { loader as HistoryLoader } from "./pages/history/History";
+import AddPayment from "./pages/sales/AddPayment";
+import { loader as AddPaymentLoader } from "./pages/sales/AddPayment";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -134,6 +136,7 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='sales' loader={SalesLoader} element={<Sales />} />
                 <Route path='sales/create/:id' loader={SalesCreateLoader} element={<SalesCreate />} />
                 <Route path='sales/:id' loader={SaleLoader} element={<Sale />} />
+                <Route path='sales/:id/payments/add' loader={AddPaymentLoader} element={<AddPayment />} />
             </Route>
         </Route>
 

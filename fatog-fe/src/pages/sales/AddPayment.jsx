@@ -9,13 +9,13 @@ import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
-import { createSales } from '../../api/sales';
-import { getOrderList } from '../../api/orders';
+import { addPayment } from '../../api/payments';
+import { getSale } from '../../api/sales';
 import TextArea from '../../components/form/TextArea';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getOrderList(request, params.id);
+    const response = await getSale(request, params.id);
 
     if (response.error || response.message) {
         return {
@@ -24,40 +24,27 @@ export async function loader({ params, request }) {
         };
     }
 
-    // console.log(response)
+    console.log(response)
 
     const data = {
         id: response.id,
-        refId: response.refId,
-        totalNoOfBags: response.totalNoOfBags,
-        totalWeight: response.totalWeight,
-        totalAmount: response.totalAmount,
-        customerPhoneNumber: response.phoneNumber,
-        shippingAddress: response.shippingAddress,
-        paymentStatus: response.paymentStatus,
+        orderId: response.order.id,
         amountPaid: response.amountPaid,
+        amountPayable: response.amountPayable,
         outstandingPayment: response.outStandingPayment,
-        deliveryStatus: response.deliveryStatus,
-        note: response.note,
-        date: response.createdAt,
-        orderList: response.orderLists,
-        staffId: response.staffId,
-        customerId: response.customerId,
-        staff: response.staff,
-
+        paymentStatus: response.paymentStatus,
     };
 
     return data;
 }
 
-const SalesCreate = () => {
+const AddPayment = () => {
     const navigate = useNavigate();
-    const orderItem = useLoaderData();
-    const { staff, orderList } = orderItem;
+    const sale = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: orderItem.error ?? '',
-        message: orderItem.message ?? ''
+        error: sale.error ?? '',
+        message: sale.message ?? ''
     });
     const {
         handleSubmit,
@@ -68,19 +55,15 @@ const SalesCreate = () => {
 
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
-        { name: 'Orders', ref: '/orders' },
-        { name: 'Create Sales', ref: `/sales/create/${orderItem.id}` },
+        { name: 'Sales', ref: '/sales' },
+        { name: 'Add Payment', ref: `/sales/${sale.id}/payments/add` },
     ];
 
-    const basicOrderInfo = {
-        staff: (staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'N/A',
-        totalAmount: orderItem.totalAmount,
-        totalNoOfBags: orderItem.totalNoOfBags,
-        totalWeight: orderItem.totalWeight,
-        customerPhoneNumber: orderItem.customerPhoneNumber,
-        shippingAddress: orderItem.shippingAddress,
-        date: orderItem.date,
-        note: orderItem.note,
+    const basicSaleInfo = {
+        amountPayable: sale.amountPayable,
+        amountPaid: sale.amountPaid,
+        outstandingPayment: sale.outstandingPayment,
+        paymentStatus: sale.paymentStatus,
     }
 
     useEffect(() => {
@@ -94,16 +77,19 @@ const SalesCreate = () => {
         }
     }, []);
 
-    const submitSales = async (data) => {
-        const salesData = {
-            orderRefId: orderItem.refId,
+    const submitPayment = async (data) => {
+        const paymentData = {
+            orderId: sale.orderId,
+            salesId: sale.id,
             amountPaid: Number(data.amountPaid),
-            note: data.note,
+            date: new Date(data.date).toISOString(),
         };
+
+        console.log(paymentData);
 
         // TODO: Consume sales create API endpoint
         try {
-            const response = await createSales(salesData);
+            const response = await addPayment(paymentData);
 
             if (response.unAuthorize) {
                 sessionStorage.removeItem('user');
@@ -123,7 +109,7 @@ const SalesCreate = () => {
 
             setToastState({
                 title: 'Success!',
-                description: 'Sales created successfully',
+                description: 'Payment added successfully',
                 status: 'success',
                 icon: <Icon as={FaRegThumbsUp} />
             });
@@ -149,26 +135,26 @@ const SalesCreate = () => {
                     <Breadcrumb linkList={breadcrumbData} />
                 </Box>
                 <HStack justifyContent='space-between'>
-                    <Heading fontSize='3xl' color='blue.700'>Create Sales</Heading>
+                    <Heading fontSize='3xl' color='blue.700'>Add Payment</Heading>
                 </HStack>
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing='4' py='6' borderTopWidth='1px'>
                     <Stack>
                         <Heading fontSize='sm' textTransform='uppercase'>
-                            Order Overview
+                            Sales Overview
                         </Heading>
 
-                        <GeneralInfo info={basicOrderInfo} />
+                        <GeneralInfo info={basicSaleInfo} />
                     </Stack>
 
                     <Stack borderLeftWidth='1px' px='4'>
                         <Heading fontSize='sm' textTransform='uppercase'>
-                            Sales Form
+                            Payment Form
                         </Heading>
-                        <form onSubmit={handleSubmit(submitSales)}>
+                        <form onSubmit={handleSubmit(submitPayment)}>
                             <Stack spacing='6' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
-                                <TextInput name='amountPaid' label='Amount Paid' control={control} type='number' defaultVal={orderItem.amountPaid ? orderItem.amountPaid : ''} />
+                                <TextInput name='amountPaid' label='Amount Paid' control={control} type='number' defaultVal={''} />
 
-                                <TextArea name='note' label='Note' control={control} />
+                                <TextInput name='date' label='Date' control={control} type='date' />
 
                                 <Button
                                     type='submit'
@@ -185,7 +171,7 @@ const SalesCreate = () => {
                                         size='md'
                                     />}
                                 >
-                                    Create Sales
+                                    Add Payment
                                 </Button>
                             </Stack>
                         </form>
@@ -220,4 +206,4 @@ const GeneralInfo = ({ info }) => {
     )
 }
 
-export default SalesCreate;
+export default AddPayment;
