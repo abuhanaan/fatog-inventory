@@ -83,12 +83,20 @@ export class SalesService {
     for (const orderItem of orderItems) {
       const inventory = await this.prisma.inventory.findFirst({
         where: { productRefId: orderItem.productRefId },
+        include: { product: true },
       });
 
       if (!inventory) {
         throw new NotFoundException({
           message: `Inventory not found for product ID ${orderItem.productRefId}`,
           error: 'Not Found',
+        });
+      }
+
+      if (inventory.remainingQty < orderItem.noOfBags) {
+        throw new ConflictException({
+          message: `Inventory for product ${inventory.product.name} is low at the moment and cannot suffice order Item with id ${orderItem.id}`,
+          error: 'Product out of stock',
         });
       }
 
