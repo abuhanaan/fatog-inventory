@@ -62,14 +62,17 @@ export class StaffsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: StaffEntity })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    // @Param('id', ParseIntPipe) id: number,
     @Req() request: AuthenticatedRequest,
     @Body() updateStaffDto: UpdateStaffDto,
   ) {
     const user = request.user as UserEntity;
-    const staff = await this.staffsService.update(id, updateStaffDto, user);
+    console.log({ user });
+    const staff = await this.staffsService.update(updateStaffDto, user);
     return new StaffEntity(staff);
   }
 

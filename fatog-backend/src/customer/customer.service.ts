@@ -52,21 +52,19 @@ export class CustomerService {
     return customer;
   }
 
-  async update(
-    id: number,
-    updateCustomerDto: UpdateCustomerDto,
-    user: UserEntity,
-  ) {
-    if (id !== user.id) {
+  async update(updateCustomerDto: UpdateCustomerDto, user: UserEntity) {
+    if (user.category !== 'customer') {
       throw new UnauthorizedException({
-        message: "You are not Authorised to update someone else's profile",
+        message: 'You are not Authorised to access this resource',
         error: 'Unauthorised',
       });
     }
-    const customer = await this.prisma.customer.findUnique({ where: { id } });
-    this.checkIfCustomerExists(customer, id);
+    const customer = await this.prisma.customer.findUnique({
+      where: { id: user.id },
+    });
+    this.checkIfCustomerExists(customer, customer.id);
     return this.prisma.customer.update({
-      where: { customerId: id },
+      where: { customerId: customer.id },
       data: updateCustomerDto,
     });
   }

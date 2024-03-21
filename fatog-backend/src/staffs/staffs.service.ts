@@ -51,17 +51,19 @@ export class StaffsService {
     return staff;
   }
 
-  async update(id: number, updateStaffDto: UpdateStaffDto, user: UserEntity) {
-    if (id !== user.id) {
+  async update(updateStaffDto: UpdateStaffDto, user: UserEntity) {
+    if (user.category !== 'staff') {
       throw new UnauthorizedException({
-        message: "You are not Authorised to update someone else's profile",
+        message: 'You are not Authorised to access this resource',
         error: 'Unauthorised',
       });
     }
-    const staff = await this.prisma.staff.findUnique({ where: { id } });
-    this.checkIfStaffExists(staff, id);
+    const staff = await this.prisma.staff.findUnique({
+      where: { id: user.id },
+    });
+    this.checkIfStaffExists(staff, staff.id);
     return this.prisma.staff.update({
-      where: { staffId: id },
+      where: { staffId: staff.id },
       data: updateStaffDto,
     });
   }

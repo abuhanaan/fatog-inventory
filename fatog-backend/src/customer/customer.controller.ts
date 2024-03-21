@@ -63,18 +63,16 @@ export class CustomerController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: CustomerEntity })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    // @Param('id', ParseIntPipe) id: number,
     @Req() request: AuthenticatedRequest,
     @Body() updateCustomerDto: UpdateCustomerDto,
   ) {
     const user = request.user as UserEntity;
-    const customer = await this.customerService.update(
-      id,
-      updateCustomerDto,
-      user,
-    );
+    const customer = await this.customerService.update(updateCustomerDto, user);
     return new CustomerEntity(customer);
   }
 
