@@ -86,14 +86,16 @@ const Sale = () => {
 
     const paymentsData = payments.map(payment => ({
         amountPaid: payment.amountPaid,
-        outstandingPayment: payment.outStandingPayment,
-        date: payment.createdAt
+        outstandingPayment: payment.outstandingAfter,
+        previousPaymentTotal: payment.prevPaymentSum,
+        date: payment.date
     }));
 
     const paymentColumns = [
         { id: 'S/N', header: 'S/N' },
         { id: 'amountPaid', header: 'Amount Paid' },
         { id: 'outstandingPayment', header: 'Outstanding Payment' },
+        { id: 'previousPaymentTotal', header: 'Prev. Payment Total' },
         { id: 'date', header: 'Date' },
     ];
 

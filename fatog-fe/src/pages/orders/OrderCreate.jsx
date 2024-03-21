@@ -98,7 +98,7 @@ const OrderCreate = () => {
         const newOrderItem = {
             productRefId: selectedProduct.refId,
             noOfBags: Number(noOfBags),
-            pricePerBag: Number(selectedProduct.pricePerBag),
+            // pricePerBag: Number(selectedProduct.pricePerBag),
             totalWeight,  // optional
             totalAmount //optional
         };
@@ -204,7 +204,7 @@ const OrderCreate = () => {
             return;
         }
 
-        if (!shippingForm.phoneNumber || !shippingForm.shippingAddress || !shippingForm.deliveryStatus || !shippingForm.paymentStatus) {
+        if (!shippingForm.phoneNumber || !shippingForm.shippingAddress) {
             setToastState({
                 title: 'Missing field(s)',
                 description: 'Please fill all required fields.',
@@ -225,6 +225,8 @@ const OrderCreate = () => {
             deliveryStatus: shippingForm.deliveryStatus,
             note: shippingForm.note,
         }
+
+        console.log(orderListData)
 
         // TODO: Consume create order list API endpoint
         try {
@@ -438,7 +440,7 @@ const ShippingForm = ({ setShippingForm, shippingForm, submit, isSubmitting }) =
                 </FormControl>
             </Flex>
 
-            <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
+            {/* <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
                 <FormControl>
                     <FormLabel htmlFor='paymentStatus'>Payment Status</FormLabel>
                     <Select
@@ -468,7 +470,7 @@ const ShippingForm = ({ setShippingForm, shippingForm, submit, isSubmitting }) =
                         <option value='delivered'>Delivered</option>
                     </Select>
                 </FormControl>
-            </Flex>
+            </Flex> */}
 
             <FormControl>
                 <FormLabel htmlFor='note'>Note</FormLabel>

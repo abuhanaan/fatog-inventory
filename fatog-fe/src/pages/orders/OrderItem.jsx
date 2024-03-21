@@ -35,7 +35,6 @@ export async function loader({ params, request }) {
         date: response.createdAt,
         product: response.product,
         order: response.order,
-        payments: response.payments,
     };
 
     return data;
@@ -44,7 +43,7 @@ export async function loader({ params, request }) {
 const OrderItem = () => {
     const navigate = useNavigate();
     const orderItem = useLoaderData();
-    const { product, order, payments } = orderItem;
+    const { product, order } = orderItem;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: orderItem.error ?? '',
@@ -84,25 +83,11 @@ const OrderItem = () => {
         shippingAddress: order.shippingAddress,
     };
 
-    const paymentsData = payments.map(payment => ({
-        amountPaid: payment.amountPaid,
-        outstandingPayment: payment.outStandingPayment,
-        date: payment.createdAt
-    }));
-
-    const paymentColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'amountPaid', header: 'Amount Paid' },
-        { id: 'outstandingPayment', header: 'Outstanding Payment' },
-        { id: 'date', header: 'Date' },
-    ];
-
-    const tabTitles = ['Overview', 'Product Details', 'Order Details', 'Payments'];
+    const tabTitles = ['Overview', 'Product Details', 'Order Details'];
     const tabPanels = [
         <TabPanel info={basicOrderItemInfo} />,
         <TabPanel info={productInfo} />,
-        <TabPanel info={orderInfo} />,
-        <PaymentsTable payments={paymentsData} columns={paymentColumns} />,       
+        <TabPanel info={orderInfo} />,      
     ];
 
     useEffect(() => {
@@ -131,7 +116,7 @@ const OrderItem = () => {
                     <Heading fontSize='3xl' color='blue.700'>Order Item</Heading>
 
                     <HStack spacing='2'>
-                        <Tooltip hasArrow label='Edit stock item' placement='bottom' borderRadius='md'>
+                        <Tooltip hasArrow label='Edit order item' placement='bottom' borderRadius='md'>
                             <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to={`/orders/${order.id}/orderlist/${orderItem.id}/edit`} state={{ orderItem: orderItem }} icon={<MdOutlineEdit />} colorScheme='orange' />
                         </Tooltip>
                     </HStack>

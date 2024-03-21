@@ -43,7 +43,7 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
             )
         }
 
-        if (col.id === 'totalAmount' || col.id === 'pricePerBag' || col.id === 'totalPrice' || col.id === 'amountPaid' || col.id === 'outstandingPayment' || col.id === 'amountPayable') {
+        if (col.id === 'totalAmount' || col.id === 'pricePerBag' || col.id === 'totalPrice' || col.id === 'amountPaid' || col.id === 'outstandingPayment' || col.id === 'amountPayable' || col.id === 'previousPaymentTotal') {
             return (
                 columnHelper.accessor(col.id, {
                     id: col.id,

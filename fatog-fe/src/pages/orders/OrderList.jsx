@@ -10,6 +10,7 @@ import Modal from '../../components/Modal';
 import UserField from '../../components/UserField';
 import Tabs from '../../components/Tabs';
 import OrdersTable from '../../components/OrdersTable';
+import PaymentsTable from '../../components/PaymentsTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
 import { getOrderList } from '../../api/orders';
@@ -45,8 +46,8 @@ export async function loader({ params, request }) {
         staffId: response.staffId,
         customerId: response.customerId,
         staff: response.staff,
+        payments: response.payments,
         // customer: response.customer,
-
     };
 
     return data;
@@ -55,7 +56,7 @@ export async function loader({ params, request }) {
 const OrderList = () => {
     const navigate = useNavigate();
     const order = useLoaderData();
-    const { orderList, staff, customer } = order;
+    const { orderList, staff, payments } = order;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: order.error ?? '',
@@ -97,10 +98,26 @@ const OrderList = () => {
         orderId: order.id
     }));
 
-    const tabTitles = ['Overview', 'Order List'];
+    const paymentsData = payments.map(payment => ({
+        amountPaid: payment.amountPaid,
+        outstandingPayment: payment.outstandingAfter,
+        previousPaymentTotal: payment.prevPaymentSum,
+        date: payment.date
+    }));
+
+    const paymentColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'amountPaid', header: 'Amount Paid' },
+        { id: 'outstandingPayment', header: 'Outstanding Payment' },
+        { id: 'previousPaymentTotal', header: 'Prev. Payment Total' },
+        { id: 'date', header: 'Date' },
+    ];
+
+    const tabTitles = ['Overview', 'Order List', 'Payments'];
     const tabPanels = [
         <GeneralInfo info={basicOrderInfo} />,
         <OrdersTable orders={orderListData} columns={orderListColumns} path={`/orders/${order.id}/orderlist`} />,
+        <PaymentsTable payments={paymentsData} columns={paymentColumns} />,
     ];
 
     useEffect(() => {
