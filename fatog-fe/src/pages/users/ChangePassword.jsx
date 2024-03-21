@@ -31,7 +31,7 @@ const ChangePassword = () => {
         formState: { isSubmitting },
     } = useForm();
 
-    const changePassword = async (data) => {
+    const passwordChange = async (data) => {
         if (passwordRef.current.value !== confirmPasswordRef.current.value) {
             setToastState({
                 title: 'Password Mismatch',
@@ -50,8 +50,10 @@ const ChangePassword = () => {
             password: data.password
         };
 
+        console.log(passwordData)
+
         try {
-            const response = await changePassword(userId, passwordData);
+            const response = await changePassword(passwordData);
 
             if (response.unAuthorize) {
                 sessionStorage.removeItem('user');
@@ -94,7 +96,7 @@ const ChangePassword = () => {
                 <Heading fontSize='3xl' color='blue.700'>Update Password</Heading>
             </HStack>
 
-            <form onSubmit={handleSubmit(changePassword)}>
+            <form onSubmit={handleSubmit(passwordChange)}>
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                     <TextInput name='password' label='New Password' control={control} type='password' fieldRef={passwordRef} />
 
@@ -106,6 +108,7 @@ const ChangePassword = () => {
                         isLoading={isSubmitting ? true : false}
                         loadingText='Updating...'
                         spinnerPlacement='end'
+                        mt='4'
                         spinner={<Spinner
                             thickness='4px'
                             speed='0.5s'
@@ -114,7 +117,7 @@ const ChangePassword = () => {
                             size='md'
                         />}
                     >
-                        Update Profile
+                        Change Password
                     </Button>
                 </Stack>
             </form>

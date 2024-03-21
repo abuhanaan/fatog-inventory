@@ -114,6 +114,7 @@ const ProfileForm = () => {
                         loadingText='Updating...'
                         spinnerPlacement='end'
                         ref={submitBtnRef}
+                        mt='4'
                         spinner={<Spinner
                             thickness='4px'
                             speed='0.5s'

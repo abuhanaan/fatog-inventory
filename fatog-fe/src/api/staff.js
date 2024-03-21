@@ -79,6 +79,7 @@ export async function getStaffData(request) {
     });
 
     const data = await res.json();
+    console.log(data);
 
     isUnauthorized(res, request);
     isError(res, data);

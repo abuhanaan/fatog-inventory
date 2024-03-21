@@ -82,7 +82,7 @@ export async function updateUser(userId, userData) {
     return data;
 }
 
-export async function changePassword(userId, userData) {
+export async function changePassword(userData) {
     const res = await fetch(`${BASE_URL}/users/change-password`, {
         method: 'PATCH',
         headers,

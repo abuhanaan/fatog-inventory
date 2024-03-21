@@ -15,11 +15,16 @@ import { getStaffData } from '../../api/staff';
 import useAuth from '../../hooks/useAuth';
 import UserField from '../../components/UserField';
 
-export async function loader({ params, request }) {
+export async function loader({ request }) {
     await requireAuth(request);
-    const { user } = JSON.parse(sessionStorage.getItem('user'));
-    const userId = user.userId;
-    const staff = await getStaffData(request, userId);
+    const staff = await getStaffData(request);
+
+    if (staff.error || staff.message) {
+        return {
+            error: staff.error,
+            message: staff.message
+        };
+    }
 
     return staff;
 }
@@ -31,8 +36,8 @@ const ProfileView = () => {
     const navigate = useNavigate();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: staff.error ?? '',
+        message: staff.message ?? ''
     });
 
     const breadcrumbData = [
@@ -47,15 +52,6 @@ const ProfileView = () => {
                 description: staff.message,
                 status: 'error',
                 icon: <Icon as={BiError} />
-            });
-
-            setTimeout(() => {
-                navigate('/users');
-            }, 6000);
-
-            setError({
-                error: staff.error,
-                message: staff.message
             });
         }
     }, []);
@@ -86,10 +82,11 @@ const ProfileView = () => {
     }
 
     return (
-        error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
+        error.error || error.message ?
+            <VStack h='30rem' justifyContent='center'>
+                <Heading>{error.error}</Heading>
+                <Text>{error.message}</Text>
+                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
             </VStack> :
             <Stack spacing='6'>
                 <Box>
@@ -98,13 +95,13 @@ const ProfileView = () => {
                 <HStack justifyContent='space-between'>
                     <Heading fontSize={{ base: '2xl', md: '3xl' }} color='blue.700'>User</Heading>
                     <HStack>
-                    <Tooltip hasArrow label='Edit Profile' placement='bottom' borderRadius='md'>
-                        <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/profile/update' state={{ staff }} icon={<LiaUserEditSolid />} colorScheme='orange' />
-                    </Tooltip>
+                        <Tooltip hasArrow label='Edit Profile' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/profile/update' state={{ staff }} icon={<LiaUserEditSolid />} colorScheme='orange' />
+                        </Tooltip>
 
-                    <Tooltip hasArrow label='Change Password' placement='bottom' borderRadius='md'>
-                        <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/profile/change-password' icon={<MdOutlineEdit />} colorScheme='purple' />
-                    </Tooltip>
+                        <Tooltip hasArrow label='Change Password' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/profile/change-password' icon={<MdOutlineEdit />} colorScheme='purple' />
+                        </Tooltip>
 
                     </HStack>
                 </HStack>
