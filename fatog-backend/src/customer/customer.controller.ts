@@ -62,7 +62,7 @@ export class CustomerController {
     return new CustomerEntity(customer);
   }
 
-  @Patch(':id')
+  @Patch('/profile-update')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: CustomerEntity })

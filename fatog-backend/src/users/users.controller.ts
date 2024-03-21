@@ -40,8 +40,8 @@ export class UsersController {
   }
 
   @Get()
-  // @UseGuards(AdminJwtAuthGuard)
-  // @ApiBearerAuth()
+  @UseGuards(AdminJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity, isArray: true })
   async findAll() {
     const users = await this.usersService.findAll();
@@ -49,8 +49,8 @@ export class UsersController {
   }
 
   @Get('/admin/dashboard')
-  // @UseGuards(AdminJwtAuthGuard)
-  // @ApiBearerAuth()
+  @UseGuards(AdminJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: Object })
   async dashboard() {
     const result = await this.usersService.adminDashboard();
@@ -58,8 +58,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const user = await this.usersService.findOne(id);
@@ -67,8 +67,8 @@ export class UsersController {
   }
 
   @Patch(':id')
-  // @UseGuards(AdminJwtAuthGuard)
-  // @ApiBearerAuth()
+  @UseGuards(AdminJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -79,26 +79,17 @@ export class UsersController {
   }
 
   @Patch('/activate/:id')
-  // @UseGuards(AdminJwtAuthGuard)
-  // @ApiBearerAuth()
+  @UseGuards(AdminJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
   async activateUser(@Param('id', ParseIntPipe) id: number) {
     const user = await this.usersService.activateUser(id);
     return new UserEntity(user);
   }
 
-  @Patch('deactivate/:id')
-  // @UseGuards(AdminJwtAuthGuard)
-  // @ApiBearerAuth()
-  @ApiOkResponse({ type: UserEntity })
-  async deactivateUser(@Param('id', ParseIntPipe) id: number) {
-    const user = await this.usersService.deactivateUser(id);
-    return new UserEntity(user);
-  }
-
-  @Patch('/change-password')
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
+  @Patch('/profile/change-password')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: Object })
   async changepassword(
     @Req() request: AuthenticatedRequest,
@@ -108,9 +99,18 @@ export class UsersController {
     return this.usersService.changepassword(user, changePasswordDto);
   }
 
+  @Patch('deactivate/:id')
+  @UseGuards(AdminJwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ type: UserEntity })
+  async deactivateUser(@Param('id', ParseIntPipe) id: number) {
+    const user = await this.usersService.deactivateUser(id);
+    return new UserEntity(user);
+  }
+
   @Delete(':id')
-  // @UseGuards(AdminJwtAuthGuard)
-  // @ApiBearerAuth()
+  @UseGuards(AdminJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: UserEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const user = await this.usersService.remove(id);

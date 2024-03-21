@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'user-auth') {
     const user = await this.usersService.findOne(payload.userId);
 
     if (!user) {
-      console.log('Nout User Exception Thrown');
+      console.log('Not User Exception Thrown');
       throw new UnauthorizedException();
     }
 

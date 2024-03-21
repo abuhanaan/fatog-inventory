@@ -61,7 +61,7 @@ export class StaffsController {
     return new StaffEntity(staff);
   }
 
-  @Patch(':id')
+  @Patch('/profile-update')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOkResponse({ type: StaffEntity })
