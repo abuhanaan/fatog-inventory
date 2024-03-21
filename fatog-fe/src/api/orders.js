@@ -39,7 +39,7 @@ export async function getOrders(request) {
         headers,
     });
 
-    console.log(res);
+    // console.log(res);
 
     const data = await res.json();
 

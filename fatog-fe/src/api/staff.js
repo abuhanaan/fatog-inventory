@@ -10,6 +10,11 @@ const headers = {
 const authHeaders = {
     'Content-Type': 'application/json'
 };
+
+const ordinaryHeaders = {
+    'Authorization': `Bearer ${user?.accessToken}`,
+};
+
 const endpoint = '/staffs';
 
 export async function createStaff(staffData) {
@@ -35,25 +40,34 @@ export async function createStaff(staffData) {
     return data;
 }
 
-export async function updateStaff(staffId, staffData) {
-    const res = await fetch(`${BASE_URL}${endpoint}/${staffId}`, {
+export async function updateStaff(staffData) {
+    const res = await fetch(`${BASE_URL}${endpoint}/profile-update`, {
         method: 'PATCH',
-        headers,
+        ordinaryHeaders,
         body: JSON.stringify(staffData)
     });
 
     const data = await res.json();
 
-    if (res.status === 401) {
+    // if (res.status === 401) {
+    //     return {
+    //         unAuthorized: true,
+    //         statusCode: data.statusCode,
+    //         message: data.message,
+    //         error: data.error ?? 'Unauthorized',
+    //     }
+    // }
+
+    if (!res.ok || data.error) {
         return {
-            unAuthorized: true,
             statusCode: data.statusCode,
             message: data.message,
-            error: data.error ?? 'Unauthorized',
+            error: data.error,
+            path: data.path
         }
     }
 
-    isError(res, data);
+    console.log(data);
 
     return data;
 }
@@ -66,7 +80,11 @@ export async function getStaff(request) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    if (res.status === 401) {
+        const pathname = new URL(request.url).pathname;
+        throw redirect(`/?message=Please log in to continue&redirectTo=${pathname}`);
+    }
+    
     isError(res, data);
 
     return data;
@@ -79,9 +97,13 @@ export async function getStaffData(request) {
     });
 
     const data = await res.json();
-    console.log(data);
+    console.log(res);
 
-    isUnauthorized(res, request);
+    if (res.status === 401) {
+        const pathname = new URL(request.url).pathname;
+        throw redirect(`/?message=Please log in to continue&redirectTo=${pathname}`);
+    }
+
     isError(res, data);
 
     return data;

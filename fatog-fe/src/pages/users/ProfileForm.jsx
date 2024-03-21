@@ -49,12 +49,13 @@ const ProfileForm = () => {
 
         const staffData = {
             ...data,
-            gender: genderRef.current.value,
-            staffId: staff.id
+            gender: genderRef.current.value
         };
 
         try {
-            const response = await updateStaff(staff.id, staffData);
+            const response = await updateStaff(staffData);
+
+            console.log(response)
 
             if (response.unAuthorize) {
                 sessionStorage.removeItem('user');
@@ -101,7 +102,7 @@ const ProfileForm = () => {
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                     <TextInput name='firstName' label='First Name' control={control} type='text' fieldRef={firstNameRef} defaultVal={staff ? staff.firstName : ''} />
 
-                    <TextInput name='lastName' label='Last Name' control={control} type='text' fieldRef={lastNameRef} defaultVal={staff ? staff.firstName : ''} />
+                    <TextInput name='lastName' label='Last Name' control={control} type='text' fieldRef={lastNameRef} defaultVal={staff ? staff.lastName : ''} />
 
                     <SelectElement data={genderOptions} label='Gender' fieldRef={genderRef} defaultVal={staff ? staff.gender?.toUpperCase() : ''} placeholder='Select Gender' />
 

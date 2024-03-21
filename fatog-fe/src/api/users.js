@@ -83,7 +83,7 @@ export async function updateUser(userId, userData) {
 }
 
 export async function changePassword(userData) {
-    const res = await fetch(`${BASE_URL}/users/change-password`, {
+    const res = await fetch(`${BASE_URL}/users/profile/change-password`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify(userData)

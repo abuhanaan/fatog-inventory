@@ -19,6 +19,8 @@ export async function loader({ request }) {
     await requireAuth(request);
     const staff = await getStaffData(request);
 
+    console.log(staff);
+
     if (staff.error || staff.message) {
         return {
             error: staff.error,
@@ -30,9 +32,8 @@ export async function loader({ request }) {
 }
 
 const ProfileView = () => {
-    const { user } = useAuth();
-    const currentUser = user.user;
     const staff = useLoaderData();
+    const { user, orders, sales, stocks } = staff;
     const navigate = useNavigate();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
@@ -60,20 +61,24 @@ const ProfileView = () => {
         const userData = {
             firstName: staff.firstName,
             lastName: staff.lastName,
-            gender: staff.gender,
+            email: user.email,
             phoneNumber: staff.phoneNumber,
+            gender: staff.gender,
             role: user.role,
             category: user.category,
             userId: user.userId,
-            status: user.status
+            status: user.active
         };
         const userInfoArray = [];
-        const fieldKeys = ['userId', 'firstName', 'lastName', 'gender', 'phoneNumber', 'category', 'role', 'status'];
+        const fieldKeys = ['firstName', 'lastName', 'email', 'gender', 'phoneNumber', 'category', 'role', 'status'];
 
         for (const [key, value] of Object.entries(userData)) {
             const find = fieldKeys.find(fieldKey => fieldKey === key);
 
             if (find) {
+                if (key === 'status') {
+                    userInfoArray.push({key, value: value ? 'Active' : 'Inactive'})
+                }
                 userInfoArray.push({ key, value });
             }
         }
@@ -111,7 +116,7 @@ const ProfileView = () => {
                         <CardBody>
                             <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
                                 {
-                                    getUserInfoArray(currentUser, staff).map((field, index) => (
+                                    getUserInfoArray(user, staff).map((field, index) => (
                                         <UserField key={index} field={field} />
                                     ))
                                 }

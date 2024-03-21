@@ -43,14 +43,9 @@ const ChangePassword = () => {
             return;
         }
 
-        const userId = user.user.userId;
-        const category = user.user.category;
         const passwordData = {
-            category: category,
             password: data.password
         };
-
-        console.log(passwordData)
 
         try {
             const response = await changePassword(passwordData);
@@ -60,7 +55,7 @@ const ChangePassword = () => {
                 navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
             }
 
-            if (response.error || response.message) {
+            if (response.error) {
                 setToastState({
                     title: response.error,
                     description: response.message,
