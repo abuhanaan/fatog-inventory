@@ -37,8 +37,6 @@ export async function loader({ request }) {
         }
     }
 
-    console.log(orders);
-
     const data = orders.map(order => {
         return {
             id: order.id,
@@ -55,6 +53,7 @@ export async function loader({ request }) {
             amountPaid: order.amountPaid,
             outstandingPayment: order.outStandingPayment,
             date: order.createdAt,
+            invoice: order.invoice,
         }
     });
 
@@ -63,6 +62,7 @@ export async function loader({ request }) {
 
 const Orders = () => {
     const orders = useLoaderData();
+    const { invoice } = orders;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: orders.error ?? '',
@@ -133,9 +133,13 @@ const ActionButtons = ({ order }) => {
                     Preview
                 </MenuItem>
 
-                <MenuItem as={RouterLink} to={`/sales/create/${order.id}`} icon={<FaMoneyBill />}>
-                    Create Sales
-                </MenuItem>
+                {
+                    !order.invoice ?
+                    <MenuItem as={RouterLink} to={`/sales/create/${order.id}`} icon={<FaMoneyBill />}>
+                        Create Sales
+                    </MenuItem> :
+                    null
+                }
             </MenuList>
         </Menu>
     )

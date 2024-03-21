@@ -39,7 +39,7 @@ export const loader = async ({ request }) => {
         }
     }
 
-    // console.log(sales)
+    console.log(sales)
 
     const data = sales.map(sale => {
         return {
@@ -132,9 +132,13 @@ const ActionButtons = ({ sale }) => {
                     Preview
                 </MenuItem>
 
-                <MenuItem as={RouterLink} to={`/sales/${sale.id}/payments/add`} icon={<MdAddCard />}>
-                    Add Payment
-                </MenuItem>
+                {
+                    sale.outstandingPayment ?
+                    <MenuItem as={RouterLink} to={`/sales/${sale.id}/payments/add`} icon={<MdAddCard />}>
+                        Add Payment
+                    </MenuItem> :
+                    null
+                }
             </MenuList>
         </Menu>
     )

@@ -76,19 +76,19 @@ const OrderList = () => {
         totalWeight: order.totalWeight,
         customerPhoneNumber: order.customerPhoneNumber,
         shippingAddress: order.shippingAddress,
-        amountPaid: order.amountPaid,
+        // amountPaid: order.amountPaid,
         outstandingPayment: order.outstandingPayment,
-        paymentStatus: order.paymentStatus,
-        deliveryStatus: order.deliveryStatus,
+        // paymentStatus: order.paymentStatus,
+        // deliveryStatus: order.deliveryStatus,
+        date: order.date,
         note: order.note,
-        date: order.date
     }
 
     const orderListColumns = [
         { id: 'S/N', header: 'S/N' },
         { id: 'pricePerBag', header: 'Price per Bag' },
         { id: 'noOfBags', header: 'No. of Bags' },
-        { id: 'totalPrice', header: 'Total Amount' },
+        { id: 'totalAmount', header: 'Total Amount' },
         { id: 'totalWeight', header: 'Total Weight' },
         { id: 'actions', header: '' },
     ];
