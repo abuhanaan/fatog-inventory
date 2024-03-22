@@ -7,12 +7,19 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { PaymentEntity } from './entities/payment.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('payments')
 @ApiTags('payments')
@@ -20,6 +27,8 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: PaymentEntity })
   async create(@Body() createPaymentDto: CreatePaymentDto) {
     const payment = await this.paymentsService.create(createPaymentDto);
@@ -27,6 +36,8 @@ export class PaymentsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: PaymentEntity, isArray: true })
   async findAll() {
     const payments = await this.paymentsService.findAll();
@@ -34,6 +45,8 @@ export class PaymentsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: PaymentEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const payment = await this.paymentsService.findOne(id);
@@ -41,6 +54,8 @@ export class PaymentsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: PaymentEntity })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -51,6 +66,8 @@ export class PaymentsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: PaymentEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const payment = await this.paymentsService.remove(id);

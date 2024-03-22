@@ -17,9 +17,10 @@ export const jwt_secret = process.env.JWT_SECRET;
     PassportModule,
     JwtModule.register({
       secret: jwt_secret,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '30m' },
     }),
     UsersModule,
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}

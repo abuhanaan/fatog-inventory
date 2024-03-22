@@ -44,6 +44,8 @@ export class SalesController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: SalesEntity, isArray: true })
   async findAll() {
     const invoices = await this.salesService.findAll();
@@ -51,11 +53,15 @@ export class SalesController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   findOne(@Param('id') id: string) {
     return this.salesService.findOne(+id);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   update(
     @Param('id') id: string,
     @Body() updateSaleDto: UpdateSaleDto,
@@ -66,6 +72,8 @@ export class SalesController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.salesService.remove(+id);
   }

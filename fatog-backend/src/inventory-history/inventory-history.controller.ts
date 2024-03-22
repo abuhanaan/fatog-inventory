@@ -7,12 +7,14 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { InventoryHistoryService } from './inventory-history.service';
 import { CreateInventoryHistoryDto } from './dto/create-inventory-history.dto';
 import { UpdateInventoryHistoryDto } from './dto/update-inventory-history.dto';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { InventoryHistoryEntity } from './entities/inventory-history.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('inventory-history')
 @ApiTags('inventory-history')
@@ -27,6 +29,8 @@ export class InventoryHistoryController {
   // }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: InventoryHistoryEntity, isArray: true })
   async findAll() {
     const histories = await this.inventoryHistoryService.findAll();
@@ -34,6 +38,8 @@ export class InventoryHistoryController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const history = await this.inventoryHistoryService.findOne(id);
     return new InventoryHistoryEntity(history);

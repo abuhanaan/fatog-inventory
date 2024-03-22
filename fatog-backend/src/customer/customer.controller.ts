@@ -37,12 +37,18 @@ export class CustomerController {
   // }
 
   @Get('dashboard')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   dashboard() {}
 
   @Get('my-orders')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   orders() {}
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: CustomerEntity, isArray: true })
   async findAll() {
     const customers = await this.customerService.findAll();
@@ -77,6 +83,8 @@ export class CustomerController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: CustomerEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const customer = await this.customerService.remove(id);

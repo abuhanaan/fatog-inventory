@@ -7,12 +7,19 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ManufacturersService } from './manufacturers.service';
 import { CreateManufacturerDto } from './dto/create-manufacturer.dto';
 import { UpdateManufacturerDto } from './dto/update-manufacturer.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ManufacturerEntity } from './entities/manufacturer.entity';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('manufacturers')
 @ApiTags('manufacturers')
@@ -20,6 +27,8 @@ export class ManufacturersController {
   constructor(private readonly manufacturersService: ManufacturersService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiCreatedResponse({ type: ManufacturerEntity })
   async create(@Body() createManufacturerDto: CreateManufacturerDto) {
     const newManufacturer = await this.manufacturersService.create(
@@ -30,6 +39,8 @@ export class ManufacturersController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: ManufacturerEntity, isArray: true })
   async findAll() {
     const manufacturers = await this.manufacturersService.findAll();
@@ -40,6 +51,8 @@ export class ManufacturersController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: ManufacturerEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const manufacturer = await this.manufacturersService.findOne(id);
@@ -48,6 +61,8 @@ export class ManufacturersController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: ManufacturerEntity })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -62,6 +77,8 @@ export class ManufacturersController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: ManufacturerEntity })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const manufacturer = await this.manufacturersService.remove(id);

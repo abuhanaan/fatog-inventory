@@ -47,6 +47,8 @@ export class OrderListsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: OrderListEntity, isArray: true })
   async findAll() {
     const orderItems = await this.orderListsService.findAll();
@@ -54,6 +56,8 @@ export class OrderListsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: OrderListEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const orderItem = await this.orderListsService.findOne(id);
@@ -61,6 +65,8 @@ export class OrderListsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: OrderListEntity })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -74,6 +80,8 @@ export class OrderListsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: OrderListEntity })
   async remove(@Param('id') id: string) {
     const orderItem = await this.orderListsService.remove(+id);

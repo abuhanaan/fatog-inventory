@@ -48,6 +48,8 @@ export class StockListsController {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: StockListEntity, isArray: true })
   async findAll() {
     const stockLists = await this.stockListsService.findAll();
@@ -55,6 +57,8 @@ export class StockListsController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: StockListEntity })
   async findOne(@Param('id', ParseIntPipe) id: number) {
     const stockList = await this.stockListsService.findOne(id);
@@ -62,6 +66,8 @@ export class StockListsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: StockListEntity })
   async update(
     @Param('id', ParseIntPipe) id: number,
@@ -75,6 +81,8 @@ export class StockListsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOkResponse({ type: String })
   async remove(@Param('id', ParseIntPipe) id: number) {
     const stockList = await this.stockListsService.remove(+id);
