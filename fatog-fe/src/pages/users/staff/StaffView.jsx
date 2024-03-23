@@ -28,8 +28,6 @@ export async function loader({ request }) {
         };
     }
 
-    // console.log(response);
-
     const data = {
         id: response.staffId,
         firstName: response.firstName,
@@ -76,12 +74,22 @@ const StaffView = () => {
         { id: 'actions', header: '' },
     ];
 
+    const ordersColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'totalAmount', header: 'Amount' },
+        { id: 'totalNoOfBags', header: 'No. of Bags' },
+        { id: 'totalWeight', header: 'Total Weight' },
+        { id: 'phoneNumber', header: 'Customer Phone' },
+        { id: 'date', header: 'Date' },
+        { id: 'actions', header: '' },
+    ]
+
     const tabTitles = ['Bio Data', 'Sales', 'Stocks', 'Orders'];
     const tabPanels = [
         <GeneralInfo staff={staff} />,
         <SalesTable sales={sales} />,
         <StocksTable stocks={stocks} columns={stocksColumns} path='/stocks' />,
-        <OrdersTable orders={orders} />
+        <OrdersTable orders={orders} columns={ordersColumns} path='/orders' />
     ];
 
     useEffect(() => {

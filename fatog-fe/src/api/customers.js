@@ -2,10 +2,10 @@ import { jwtDecode } from 'jwt-decode';
 import { redirect } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const user = JSON.parse(sessionStorage.getItem('user'));
+const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
 const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${user?.accessToken}`,
+    'Authorization': `Bearer ${token}`,
 };
 const authHeaders = {
     'Content-Type': 'application/json'

@@ -1,11 +1,11 @@
 import { redirect } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const user = JSON.parse(sessionStorage.getItem('user'));
+const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
 const endpoint = '/orders';
 const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${user?.accessToken}`,
+    'Authorization': `Bearer ${token}`,
 };
 
 export async function createOrder(orderData) {

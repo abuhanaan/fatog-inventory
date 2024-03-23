@@ -47,6 +47,7 @@ const Home = () => {
         }
 
         login(response);
+        // localStorage.setItem('user', JSON.stringify(response));
         navigate('/dashboard', { replace: true });
     };
 
