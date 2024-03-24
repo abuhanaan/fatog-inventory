@@ -19,11 +19,15 @@ export async function createProduct(productData) {
 }
 
 export async function updateProduct(productId, productData) {
+    console.log(productId);
+    console.log(productData);
     const res = await fetch(`${BASE_URL}${endpoint}/${productId}`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify(productData)
     });
+
+    // console.log(res)
 
     const data = await res.json();
 

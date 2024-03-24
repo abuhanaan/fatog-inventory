@@ -37,7 +37,7 @@ const ProductForm = () => {
     const currentProduct = state && state.currentProduct;
     const manufacturerIdRef = useRef(null);
     const submitBtnRef = useRef(null);
-    const [brandName, setBrandName] = useState('');
+    const [brandName, setBrandName] = useState(currentProduct?.manufacturer.replace(/\s+/g, '').toUpperCase() || '');
     const [feedSize, setFeedSize] = useState('');
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
@@ -57,6 +57,8 @@ const ProductForm = () => {
         { name: 'Product Form', ref: '/products/create' },
     ];
     const manufacturersOptions = manufacturers.map(manufacturer => manufacturer.brandName);
+
+    // console.log(currentProduct)
 
     useEffect(() => {
         if (error.error || error.message) {
@@ -175,7 +177,7 @@ const ProductForm = () => {
 
     const setManufacturerOption = () => {
         if (currentProduct) {
-            const selectedManufacturer = manufacturers.filter(manufacturer => manufacturer.brandName === currentProduct.manufacturer);
+            const selectedManufacturer = manufacturers.filter(manufacturer => manufacturer.id === currentProduct.manufacturerId);
 
             return selectedManufacturer[0].brandName;
         }

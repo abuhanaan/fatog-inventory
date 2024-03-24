@@ -31,8 +31,6 @@ export async function loader({ request }) {
     await requireAuth(request);
     const response = await getProducts();
 
-    // console.log(response);
-
     if (response.error || response.message) {
         return {
             error: response.error,
@@ -49,7 +47,8 @@ export async function loader({ request }) {
             weight: product.weight,
             size: product.size,
             pricePerBag: product.pricePerBag,
-            manufacturer: product.manufacturer.brandName
+            manufacturer: product.manufacturer.brandName,
+            manufacturerId: product.manufacturerId
         }
     });
 
