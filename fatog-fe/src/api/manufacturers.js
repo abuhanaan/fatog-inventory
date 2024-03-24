@@ -1,13 +1,17 @@
 import { redirect } from 'react-router-dom';
-import { headers } from '../utils';
+import { isError } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/manufacturers';
 
 export async function createManufacturer(manufacturerData) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(manufacturerData)
     });
 
@@ -19,9 +23,13 @@ export async function createManufacturer(manufacturerData) {
 }
 
 export async function updateManufacturer(manufacturerId, manufacturerData) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
         method: 'PATCH',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(manufacturerData)
     });
 
@@ -33,9 +41,14 @@ export async function updateManufacturer(manufacturerId, manufacturerData) {
 }
 
 export async function getManufacturers() {
-    const res = await fetch(`${BASE_URL}${endpoint}`, {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+
+    const res = await fetch(`${BASE_URL}/manufacturers`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -46,9 +59,13 @@ export async function getManufacturers() {
 }
 
 export async function getManufacturer(manufacturerId) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -59,14 +76,18 @@ export async function getManufacturer(manufacturerId) {
 }
 
 export async function deleteManufacturer(manufacturerId) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     try {
         const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
             method: 'DELETE',
-            headers,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
         });
 
         const data = await res.json();
-        
+
         isError(res, data);
 
         return {
@@ -85,13 +106,13 @@ const isUnauthorized = (res, request) => {
     }
 };
 
-const isError = (res, data) => {
-    if (!res.ok || data.error) {
-        return {
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Something went wrong',
-            path: data.path
-        }
-    }
-};
+// const isError = (res, data) => {
+//     if (!res.ok || data.error) {
+//         return {
+//             statusCode: data.statusCode,
+//             message: data.message,
+//             error: data.error ?? 'Something went wrong',
+//             path: data.path
+//         }
+//     }
+// };
