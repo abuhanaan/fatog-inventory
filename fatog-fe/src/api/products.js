@@ -1,5 +1,5 @@
 import { redirect } from 'react-router-dom';
-import { headers } from '../utils';
+import { isError } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/products';

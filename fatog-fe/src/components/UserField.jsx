@@ -19,7 +19,7 @@ const UserField = ({ field }) => {
         if (key === 'amountPaid' || key === 'outstandingPayment') {
             outputValue = getMonetaryValue(value);
         } else {
-            outputValue = 'N/A';
+            outputValue = '-';
         }
     } else if (key.toLowerCase().includes('weight')) {
         outputValue = `${value} kg`

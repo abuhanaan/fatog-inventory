@@ -47,7 +47,7 @@ export async function loader({ request }) {
             totalAmount: order.totalAmount,
             totalNoOfBags: order.totalNoOfBags,
             totalWeight: order.totalWeight,
-            staff: (order.staff.firstName && order.staff.lastName) ? `${order.staff.firstName} ${order.staff.lastName}` : 'N/A',
+            staff: (order.staff.firstName && order.staff.lastName) ? `${order.staff.firstName} ${order.staff.lastName}` : '-',
             // customer: (order.customer.firstName && order.customer.lastName) ? `${order.customer.firstName} ${order.customer.lastName}` : 'N/A',
             phoneNumber: order.phoneNumber,
             ShippingAddress: order.ShippingAddress,

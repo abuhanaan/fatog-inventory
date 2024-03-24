@@ -93,7 +93,7 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
                 cell: info => <span>
                     {
                         typeof info.getValue() === 'number' ? info.getValue() :
-                            info.getValue() ? info.getValue() : 'N/A'
+                            info.getValue() ? info.getValue() : '-'
                     }
                 </span>,
                 header: col.header
