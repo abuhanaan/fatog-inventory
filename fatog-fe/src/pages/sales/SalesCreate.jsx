@@ -12,15 +12,18 @@ import { FaRegThumbsUp } from "react-icons/fa6";
 import { createSales } from '../../api/sales';
 import { getOrderList } from '../../api/orders';
 import TextArea from '../../components/form/TextArea';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getOrderList(request, params.id);
+    const response = await getOrderList(params.id);
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode,
         };
     }
 
@@ -57,7 +60,8 @@ const SalesCreate = () => {
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: orderItem.error ?? '',
-        message: orderItem.message ?? ''
+        message: orderItem.message ?? '',
+        statusCode: orderItem.statusCode ?? '',
     });
     const {
         handleSubmit,
@@ -91,6 +95,10 @@ const SalesCreate = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
@@ -105,11 +113,6 @@ const SalesCreate = () => {
         try {
             const response = await createSales(salesData);
 
-            if (response.unAuthorize) {
-                sessionStorage.removeItem('user');
-                navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-            }
-
             if (response.error || response.message) {
                 setToastState({
                     title: response.error,
@@ -117,6 +120,10 @@ const SalesCreate = () => {
                     status: 'error',
                     icon: <Icon as={BiError} />
                 });
+
+                setTimeout(() => {
+                    isUnauthorized(response, navigate);
+                }, 6000);
 
                 return response.error;
             }
@@ -139,11 +146,7 @@ const SalesCreate = () => {
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

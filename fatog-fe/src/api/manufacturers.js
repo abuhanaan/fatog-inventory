@@ -1,11 +1,7 @@
 import { redirect } from 'react-router-dom';
+import { headers } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-};
 const endpoint = '/manufacturers';
 
 export async function createManufacturer(manufacturerData) {
@@ -16,15 +12,6 @@ export async function createManufacturer(manufacturerData) {
     });
 
     const data = await res.json();
-
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
 
     isError(res, data);
 
@@ -40,21 +27,12 @@ export async function updateManufacturer(manufacturerId, manufacturerData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
-
     isError(res, data);
 
     return data;
 }
 
-export async function getManufacturers(request) {
+export async function getManufacturers() {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers,
@@ -62,13 +40,12 @@ export async function getManufacturers(request) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;
 }
 
-export async function getManufacturer(request, manufacturerId) {
+export async function getManufacturer(manufacturerId) {
     const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
         method: 'GET',
         headers,
@@ -76,7 +53,6 @@ export async function getManufacturer(request, manufacturerId) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;
@@ -89,26 +65,12 @@ export async function deleteManufacturer(manufacturerId) {
             headers,
         });
 
-        // const data = await res.json();
-        console.log(res)
-
-        if (res.status === 401) {
-            return {
-                unAuthorized: true,
-                statusCode: data.statusCode,
-                message: data.message,
-                error: data.error ?? 'Unauthorized',
-            }
-        }
-
-        if (!res.ok) {
-            return {
-                message: 'Unable to delete manufacturer.',
-                error: 'Error!'
-            }
-        }
+        const data = await res.json();
+        
+        isError(res, data);
 
         return {
+            ...data,
             ok: true
         };
     } catch (error) {

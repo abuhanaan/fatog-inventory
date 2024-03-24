@@ -1,5 +1,5 @@
 import { Box, Heading, Text } from '@chakra-ui/react';
-import { getMonetaryValue } from '../pages/stocks/StockCreate';
+import { getMonetaryValue } from '../utils';
 import { formatDate } from './Table';
 
 export const splitFieldName = (str) => {

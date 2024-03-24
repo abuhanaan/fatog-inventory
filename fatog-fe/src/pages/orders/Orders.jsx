@@ -11,6 +11,8 @@ import { EmptySearch } from '../../components/EmptySearch';
 import { getOrders } from '../../api/orders';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -28,12 +30,13 @@ const breadcrumbData = [
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const orders = await getOrders(request);
+    const orders = await getOrders();
 
     if (orders.error || orders.message) {
         return {
             error: orders.error,
-            message: orders.message
+            message: orders.message,
+            statusCode: orders.statusCode,
         }
     }
 
@@ -61,34 +64,36 @@ export async function loader({ request }) {
 }
 
 const Orders = () => {
+    const navigate = useNavigate();
     const orders = useLoaderData();
     const { invoice } = orders;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: orders.error ?? '',
-        message: orders.message ?? ''
+        message: orders.message ?? '',
+        statusCode: orders.statusCode ?? ''
     });
 
     // console.log(orders);
 
     useEffect(() => {
-        if (orders.error || orders.message) {
+        if (error.error || error.message) {
             setToastState({
-                title: orders.error,
-                description: orders.message,
+                title: error.error,
+                description: error.message,
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
@@ -135,10 +140,10 @@ const ActionButtons = ({ order }) => {
 
                 {
                     !order.invoice ?
-                    <MenuItem as={RouterLink} to={`/sales/create/${order.id}`} icon={<FaMoneyBill />}>
-                        Create Sales
-                    </MenuItem> :
-                    null
+                        <MenuItem as={RouterLink} to={`/sales/create/${order.id}`} icon={<FaMoneyBill />}>
+                            Create Sales
+                        </MenuItem> :
+                        null
                 }
             </MenuList>
         </Menu>

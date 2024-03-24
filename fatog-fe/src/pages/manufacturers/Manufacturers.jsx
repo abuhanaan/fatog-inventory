@@ -1,11 +1,11 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useNavigation, Link, useLoaderData, useLocation } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
-import { FaRegThumbsUp } from "react-icons/fa6";
+import { FaRegThumbsUp, FaEllipsisVertical } from "react-icons/fa6";
 import Modal from '../../components/Modal';
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
@@ -13,6 +13,8 @@ import AddButton from '../../components/AddButton';
 import { getManufacturers, deleteManufacturer } from '../../api/manufacturers';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -24,18 +26,27 @@ const columns = [
 
 export async function loader({ request }) {
     await requireAuth(request);
+    const response = await getManufacturers();
 
-    const response = await getManufacturers(request);
+    if (response.error || response.message) {
+        return {
+            error: response.error,
+            message: response.message,
+            statusCode: response.statusCode
+        }
+    }
 
     return response;
 }
 
 const Manufacturers = () => {
+    const navigate = useNavigate();
     const [toastState, setToastState] = useToastHook();
     const manufacturers = useLoaderData();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: manufacturers.error ?? '',
+        message: manufacturers.message ?? '',
+        statusCode: manufacturers.statusCode ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -51,19 +62,15 @@ const Manufacturers = () => {
                 icon: <Icon as={BiError} />
             });
 
-            setError({
-                error: manufacturers.error,
-                message: manufacturers.message
-            });
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
-        error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+        error.error || error.message ?
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
@@ -109,11 +116,6 @@ const ActionButtons = ({ manufacturer }) => {
         // TODO: Consume DELETE manufacturer endpoint
         const response = await deleteManufacturer(manufacturer.id);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -124,6 +126,11 @@ const ActionButtons = ({ manufacturer }) => {
 
             setIsDeleting(false);
             closeModalRef.current.click();
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
+
             return response.error;
         }
 
@@ -166,7 +173,7 @@ const ActionButtons = ({ manufacturer }) => {
 
     return (
         <>
-            <HStack spacing='1'>
+            {/* <HStack spacing='1'>
                 <Tooltip hasArrow label='Preview manufacturer' placement='bottom' borderRadius='md'>
                     <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-manufacturer-id={manufacturer.id} onClick={viewManufacturer} />
                 </Tooltip>
@@ -178,7 +185,29 @@ const ActionButtons = ({ manufacturer }) => {
                 <Tooltip hasArrow label='Delete manufacturer' placement='left' borderRadius='md'>
                     <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-manufacturer-id={manufacturer.id} onClick={onOpen} />
                 </Tooltip>
-            </HStack>
+            </HStack> */}
+
+            <Menu>
+                <MenuButton
+                    as={IconButton}
+                    aria-label='Options'
+                    icon={<FaEllipsisVertical />}
+                    variant='unstyled'
+                />
+                <MenuList py='0'>
+                    <MenuItem icon={<IoEyeOutline />} data-manufacturer-id={manufacturer.id} onClick={viewManufacturer}>
+                        Preview
+                    </MenuItem>
+
+                    <MenuItem as={Link} to='create' icon={<MdOutlineEdit />} state={{ currentManufacturer: manufacturer }}>
+                        Edit Manufacturer
+                    </MenuItem>
+
+                    <MenuItem icon={<MdDeleteOutline />} data-manufacturer-id={manufacturer.id} onClick={onOpen}>
+                        Delete Manufacturer
+                    </MenuItem>
+                </MenuList>
+            </Menu>
 
             <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Manufacturer'>
                 <Box>

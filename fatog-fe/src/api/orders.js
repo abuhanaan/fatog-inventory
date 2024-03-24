@@ -1,12 +1,8 @@
 import { redirect } from 'react-router-dom';
+import { headers } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
 const endpoint = '/orders';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-};
 
 export async function createOrder(orderData) {
     // console.log(headers);
@@ -19,21 +15,12 @@ export async function createOrder(orderData) {
     
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
-
     isError(res, data);
 
     return data;
 }
 
-export async function getOrders(request) {
+export async function getOrders() {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers,
@@ -43,13 +30,12 @@ export async function getOrders(request) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;
 }
 
-export async function getOrderItem(request, orderId) {
+export async function getOrderItem(orderId) {
     const res = await fetch(`${BASE_URL}/order-lists/${orderId}`, {
         method: 'GET',
         headers,
@@ -57,7 +43,6 @@ export async function getOrderItem(request, orderId) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;
@@ -72,21 +57,12 @@ export async function updateOrderItem(orderItemId, orderItemData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
-
     isError(res, data);
 
     return data;
 }
 
-export async function getOrderList(request, orderId) {
+export async function getOrderList(orderId) {
     const res = await fetch(`${BASE_URL}${endpoint}/${orderId}`, {
         method: 'GET',
         headers,
@@ -94,7 +70,6 @@ export async function getOrderList(request, orderId) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;

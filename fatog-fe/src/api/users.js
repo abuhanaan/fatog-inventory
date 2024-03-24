@@ -1,15 +1,8 @@
 import { jwtDecode } from 'jwt-decode';
 import { redirect } from 'react-router-dom';
+import { headers, authHeaders } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-};
-const authHeaders = {
-    'Content-Type': 'application/json'
-};
 
 export const authenticate = async (data) => {
     const body = JSON.stringify(data);
@@ -45,14 +38,14 @@ export async function createUser(userData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
+    // if (res.status === 401) {
+    //     return {
+    //         unAuthorized: true,
+    //         statusCode: data.statusCode,
+    //         message: data.message,
+    //         error: data.error ?? 'Unauthorized',
+    //     }
+    // }
 
     isError(res, data);
 
@@ -68,15 +61,6 @@ export async function updateUser(userId, userData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
-
     isError(res, data);
 
     return data;
@@ -91,21 +75,12 @@ export async function changePassword(userData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
-
     isError(res, data);
 
     return data;
 }
 
-export async function getUsers(request) {
+export async function getUsers() {
     const res = await fetch(`${BASE_URL}/users`, {
         method: 'GET',
         headers,
@@ -113,13 +88,13 @@ export async function getUsers(request) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    // isUnauthorized(res, request);
     isError(res, data);
 
     return data;
 }
 
-export async function getUser(request, userId) {
+export async function getUser(userId) {
     const res = await fetch(`${BASE_URL}/users/${userId}`, {
         method: 'GET',
         headers,
@@ -127,7 +102,7 @@ export async function getUser(request, userId) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    // isUnauthorized(res, request);
     isError(res, data);
 
     return data;
@@ -141,14 +116,14 @@ export async function deleteUser(userId) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
+    // if (res.status === 401) {
+    //     return {
+    //         unAuthorized: true,
+    //         statusCode: data.statusCode,
+    //         message: data.message,
+    //         error: data.error ?? 'Unauthorized',
+    //     }
+    // }
 
     isError(res, data);
 
@@ -163,14 +138,14 @@ export async function activateUser(userId) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
+    // if (res.status === 401) {
+    //     return {
+    //         unAuthorized: true,
+    //         statusCode: data.statusCode,
+    //         message: data.message,
+    //         error: data.error ?? 'Unauthorized',
+    //     }
+    // }
 
     isError(res, data);
 
@@ -185,14 +160,14 @@ export async function deactivateUser(userId) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
+    // if (res.status === 401) {
+    //     return {
+    //         unAuthorized: true,
+    //         statusCode: data.statusCode,
+    //         message: data.message,
+    //         error: data.error ?? 'Unauthorized',
+    //     }
+    // }
 
     isError(res, data);
 

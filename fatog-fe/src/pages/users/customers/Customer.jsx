@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
 import Breadcrumb from '../../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
-import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
@@ -14,15 +14,18 @@ import { requireAuth } from '../../../hooks/useAuth';
 import { getCustomer } from '../../../api/customers';
 import { deleteUser, activateUser, deactivateUser } from '../../../api/users';
 import { useToastHook } from '../../../hooks/useToast';
+import { isUnauthorized } from '../../../utils';
+import FetchError from '../../../components/FetchError';
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const response = await getCustomer(request);
+    const response = await getCustomer();
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode
         };
     }
 
@@ -44,6 +47,7 @@ export async function loader({ request }) {
 
 const Customer = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const customer = useLoaderData();
     const { orders } = customer;
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -53,7 +57,8 @@ const Customer = () => {
     const [isActivating, setIsActivating] = useState(false);
     const [error, setError] = useState({
         error: customer.error ?? '',
-        message: customer.message ?? ''
+        message: customer.message ?? '',
+        statusCode: customer.statusCode ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -75,6 +80,10 @@ const Customer = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
@@ -86,10 +95,10 @@ const Customer = () => {
         // TODO: Consume DELETE user endpoint
         const response = await deleteUser(customer.id);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
+        // if (response.unAuthorize) {
+        //     sessionStorage.removeItem('user');
+        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+        // }
 
         if (response.error || response.message) {
             setToastState({
@@ -101,6 +110,10 @@ const Customer = () => {
 
             setIsDeleting(false);
             closeModalRef.current.click();
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -129,10 +142,10 @@ const Customer = () => {
 
         const response = await activateUser(customerId);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
+        // if (response.unAuthorize) {
+        //     sessionStorage.removeItem('user');
+        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+        // }
 
         if (response.error || response.message) {
             setToastState({
@@ -143,6 +156,10 @@ const Customer = () => {
             });
 
             setIsActivating(false);
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -170,10 +187,10 @@ const Customer = () => {
 
         const response = await deactivateUser(customerId);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
+        // if (response.unAuthorize) {
+        //     sessionStorage.removeItem('user');
+        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+        // }
 
         if (response.error || response.message) {
             setToastState({
@@ -184,6 +201,10 @@ const Customer = () => {
             });
 
             setIsActivating(false);
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -225,11 +246,7 @@ const Customer = () => {
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

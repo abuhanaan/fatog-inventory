@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLoaderData } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, IconButton, Icon, Heading, Tooltip } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import Breadcrumb from '../../components/Breadcrumb';
@@ -9,6 +9,8 @@ import { EmptySearch } from '../../components/EmptySearch';
 import { getHistories } from '../../api/history';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -27,12 +29,13 @@ const breadcrumbData = [
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const histories = await getHistories(request);
+    const histories = await getHistories();
 
     if (histories.error || histories.message) {
         return {
             error: histories.error,
-            message: histories.message
+            message: histories.message,
+            statusCode: histories.statusCode
         }
     }
 
@@ -53,16 +56,17 @@ export async function loader({ request }) {
 }
 
 const Histories = () => {
+    const navigate = useNavigate();
     const histories = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: histories.error ?? '',
+        message: histories.message ?? '',
+        statusCode: histories.statusCode ?? ''
     });
 
     useEffect(() => {
         if (histories.error || histories.message) {
-            console.log('UseEffect If condition');
             setToastState({
                 title: histories.error,
                 description: histories.message,
@@ -70,19 +74,15 @@ const Histories = () => {
                 icon: <Icon as={BiError} />
             });
 
-            setError({
-                error: histories.error,
-                message: histories.message
-            });
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
         error.error || error.message ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

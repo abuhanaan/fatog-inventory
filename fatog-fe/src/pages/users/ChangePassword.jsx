@@ -12,6 +12,7 @@ import useAuth from '../../hooks/useAuth';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { MdOutlineSyncLock } from "react-icons/md";
+import { isUnauthorized } from '../../utils';
 
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
@@ -21,6 +22,7 @@ const breadcrumbData = [
 
 const ChangePassword = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const passwordRef = useRef(null);
     const { user } = useAuth();
     const confirmPasswordRef = useRef(null);
@@ -50,11 +52,6 @@ const ChangePassword = () => {
         try {
             const response = await changePassword(passwordData);
 
-            if (response.unAuthorize) {
-                sessionStorage.removeItem('user');
-                navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-            }
-
             if (response.error) {
                 setToastState({
                     title: response.error,
@@ -62,6 +59,10 @@ const ChangePassword = () => {
                     status: 'error',
                     icon: <Icon as={BiError} />
                 });
+
+                setTimeout(() => {
+                    isUnauthorized(response, navigate);
+                }, 6000);
 
                 return response.error;
             }

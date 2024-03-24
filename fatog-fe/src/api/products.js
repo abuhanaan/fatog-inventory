@@ -1,14 +1,11 @@
 import { redirect } from 'react-router-dom';
+import { headers } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-};
+const endpoint = '/products';
 
 export async function createProduct(productData) {
-    const res = await fetch(`${BASE_URL}/products`, {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers,
         body: JSON.stringify(productData)
@@ -16,22 +13,13 @@ export async function createProduct(productData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
-
     isError(res, data);
 
     return data;
 }
 
 export async function updateProduct(productId, productData) {
-    const res = await fetch(`${BASE_URL}/products/${productId}`, {
+    const res = await fetch(`${BASE_URL}${endpoint}/${productId}`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify(productData)
@@ -39,64 +27,44 @@ export async function updateProduct(productId, productData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
-
     isError(res, data);
 
     return data;
 }
 
-export async function getProducts(request) {
-    const res = await fetch(`${BASE_URL}/products`, {
+export async function getProducts() {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers,
     });
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;
 }
 
-export async function getProduct(request, productId) {
-    const res = await fetch(`${BASE_URL}/products/${productId}`, {
+export async function getProduct(productId) {
+    const res = await fetch(`${BASE_URL}${endpoint}/${productId}`, {
         method: 'GET',
         headers,
     });
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;
 }
 
 export async function deleteProduct(productId) {
-    const res = await fetch(`${BASE_URL}/products/${productId}`, {
+    const res = await fetch(`${BASE_URL}${endpoint}/${productId}`, {
         method: 'DELETE',
         headers,
     });
 
     const data = await res.json();
-
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
 
     isError(res, data);
 

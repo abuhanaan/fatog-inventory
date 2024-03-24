@@ -1,14 +1,10 @@
 import { redirect } from 'react-router-dom';
+import { headers } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
 const endpoint = '/inventory-history';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-};
 
-export async function getHistories(request) {
+export async function getHistories() {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers,
@@ -16,13 +12,13 @@ export async function getHistories(request) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    // isUnauthorized(res, request);
     isError(res, data);
 
     return data;
 }
 
-export async function getHistory(request, historyId) {
+export async function getHistory(historyId) {
     const res = await fetch(`${BASE_URL}${endpoint}/${historyId}`, {
         method: 'GET',
         headers,
@@ -30,7 +26,7 @@ export async function getHistory(request, historyId) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    // isUnauthorized(res, request);
     isError(res, data);
 
     return data;

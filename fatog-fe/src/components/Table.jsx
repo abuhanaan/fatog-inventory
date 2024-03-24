@@ -7,7 +7,7 @@ import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
 import UsersFilter from './UsersFilter';
-import { getMonetaryValue } from '../pages/stocks/StockCreate';
+import { getMonetaryValue } from '../utils';
 
 export const formatDate = (dateParam) => {
     const date = new Date(dateParam);

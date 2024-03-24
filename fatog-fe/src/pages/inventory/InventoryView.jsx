@@ -16,6 +16,8 @@ import { getInventory } from '../../api/inventories';
 import { getManufacturers } from '../../api/manufacturers';
 import { useToastHook } from '../../hooks/useToast';
 import ListingsTable from '../../components/Table';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -25,14 +27,16 @@ export async function loader({ params, request }) {
     if (inventory.error || inventory.message) {
         return {
             error: inventory.error,
-            message: inventory.message
+            message: inventory.message,
+            statusCode: inventory.statusCode
         }
     }
 
     if (manufacturers.error || manufacturers.message) {
         return {
             error: manufacturers.error,
-            message: manufacturers.message
+            message: manufacturers.message,
+            statusCode: manufacturers.statusCode
         }
     }
 
@@ -60,8 +64,9 @@ const InventoryView = () => {
     const { history } = inventory;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: inventory.error ?? '',
+        message: inventory.message ?? '',
+        statusCode: inventory.statusCode ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -81,22 +86,14 @@ const InventoryView = () => {
             });
 
             setTimeout(() => {
-                navigate('/inventories');
+                isUnauthorized(error, navigate);
             }, 6000);
-
-            setError({
-                error: inventory.error,
-                message: inventory.message
-            });
         }
     }, []);
 
     return (
-        error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+        error.error || error.message ?
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

@@ -14,19 +14,22 @@ import PaymentsTable from '../../components/PaymentsTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
 import { getOrderList } from '../../api/orders';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getOrderList(request, params.id);
+    const response = await getOrderList(params.id);
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode,
         };
     }
 
-    console.log(response);
+    // console.log(response);
 
     const data = {
         id: response.id,
@@ -60,7 +63,8 @@ const OrderList = () => {
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: order.error ?? '',
-        message: order.message ?? ''
+        message: order.message ?? '',
+        statusCode: order.statusCode ?? '',
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -128,16 +132,16 @@ const OrderList = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

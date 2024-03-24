@@ -13,15 +13,18 @@ import StocksTable from '../../components/StocksTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
 import { getHistory } from '../../api/history';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export const loader = async ({ params, request }) => {
     await requireAuth(request);
-    const history = await getHistory(request, params.id);
+    const history = await getHistory(params.id);
 
     if (history.error || history.message) {
         return {
             error: history.error,
-            message: history.message
+            message: history.message,
+            statusCode: history.statusCode
         };
     }
 
@@ -42,12 +45,14 @@ export const loader = async ({ params, request }) => {
 }
 
 const History = () => {
+    const navigate = useNavigate();
     const history = useLoaderData();
     const { inventory, operationData } = history;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: history.error ?? '',
-        message: history.message ?? ''
+        message: history.message ?? '',
+        statusCode: history.statusCode ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -89,16 +94,16 @@ const History = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

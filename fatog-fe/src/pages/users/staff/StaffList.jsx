@@ -14,6 +14,8 @@ import { activateUser, deactivateUser } from '../../../api/users';
 import { getStaff } from '../../../api/staff';
 import { useToastHook } from '../../../hooks/useToast';
 import { requireAuth } from '../../../hooks/useAuth';
+import { isUnauthorized } from '../../../utils';
+import FetchError from '../../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -28,12 +30,13 @@ const columns = [
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const response = await getStaff(request);
+    const response = await getStaff();
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode,
         };
     }
 
@@ -56,9 +59,12 @@ export async function loader({ request }) {
 const StaffList = () => {
     const [toastState, setToastState] = useToastHook();
     const staff = useLoaderData();
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
     const [error, setError] = useState({
         error: staff.error ?? '',
-        message: staff.message ?? ''
+        message: staff.message ?? '',
+        statusCode: staff.statusCode ?? '',
     });
     const [staffFilter, setStaffFilter] = useState(staff ?? null);
     const [buttonState, setButtonState] = useState('');
@@ -75,6 +81,10 @@ const StaffList = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
@@ -93,11 +103,7 @@ const StaffList = () => {
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
@@ -143,11 +149,6 @@ const ActionButtons = ({ staff }) => {
         // TODO: Consume DELETE staff endpoint
         const response = await deleteStaff(staff.id);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('staff');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -158,6 +159,11 @@ const ActionButtons = ({ staff }) => {
 
             setIsDeleting(false);
             closeModalRef.current.click();
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
+
             return response.error;
         }
 
@@ -186,11 +192,6 @@ const ActionButtons = ({ staff }) => {
 
         const response = await activateUser(staffId);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -200,6 +201,10 @@ const ActionButtons = ({ staff }) => {
             });
 
             setIsActivating(false);
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -227,11 +232,6 @@ const ActionButtons = ({ staff }) => {
 
         const response = await deactivateUser(staffId);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -241,6 +241,10 @@ const ActionButtons = ({ staff }) => {
             });
 
             setIsActivating(false);
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -304,7 +308,7 @@ const ActionButtons = ({ staff }) => {
                                 data-staff-id={staff.id}
                                 onClick={staffDeactivate}
                                 size='sm'
-                                _hover={{bg: 'gray.100'}}
+                                _hover={{ bg: 'gray.100' }}
                                 borderRadius='0'
                                 fontWeight='normal'
                                 closeOnSelect={false}
@@ -328,7 +332,7 @@ const ActionButtons = ({ staff }) => {
                                 size='sm'
                                 data-staff-id={staff.id}
                                 onClick={staffActivate}
-                                _hover={{bg: 'gray.100'}}
+                                _hover={{ bg: 'gray.100' }}
                                 borderRadius='0'
                                 fontWeight='normal'
                                 closeOnSelect={false}

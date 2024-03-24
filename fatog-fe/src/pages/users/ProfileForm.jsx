@@ -8,6 +8,7 @@ import SelectElement from '../../components/form/SelectElement';
 import { updateStaff } from '../../api/staff';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
+import { isUnauthorized } from '../../utils';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { MdOutlineSyncLock } from "react-icons/md";
@@ -55,12 +56,7 @@ const ProfileForm = () => {
         try {
             const response = await updateStaff(staffData);
 
-            console.log(response)
-
-            if (response.unAuthorize) {
-                sessionStorage.removeItem('user');
-                navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-            }
+            // console.log(response);
 
             if (response.error || response.message) {
                 setToastState({
@@ -69,6 +65,10 @@ const ProfileForm = () => {
                     status: 'error',
                     icon: <Icon as={BiError} />
                 });
+
+                setTimeout(() => {
+                    isUnauthorized(response, navigate);
+                }, 6000);
 
                 return response.error;
             }

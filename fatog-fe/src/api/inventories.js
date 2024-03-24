@@ -1,14 +1,10 @@
 import { redirect } from 'react-router-dom';
+import { headers } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
 const endpoint = '/inventory';
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-};
 
-export async function getInventories(request) {
+export async function getInventories() {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers,
@@ -16,13 +12,13 @@ export async function getInventories(request) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    // isUnauthorized(res, request);
     isError(res, data);
 
     return data;
 }
 
-export async function getInventory(request, inventoryId) {
+export async function getInventory(inventoryId) {
     const res = await fetch(`${BASE_URL}${endpoint}/${inventoryId}`, {
         method: 'GET',
         headers,
@@ -30,7 +26,7 @@ export async function getInventory(request, inventoryId) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
+    // isUnauthorized(res, request);
     isError(res, data);
 
     return data;

@@ -14,6 +14,8 @@ import { activateUser, deactivateUser } from '../../../api/users';
 import { getCustomers } from '../../../api/customers';
 import { useToastHook } from '../../../hooks/useToast';
 import { requireAuth } from '../../../hooks/useAuth';
+import { isUnauthorized } from '../../../utils';
+import FetchError from '../../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -28,12 +30,13 @@ const columns = [
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const response = await getCustomers(request);
+    const response = await getCustomers();
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode
         };
     }
 
@@ -52,11 +55,14 @@ export async function loader({ request }) {
 }
 
 const Customers = () => {
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
     const [toastState, setToastState] = useToastHook();
     const customers = useLoaderData();
     const [error, setError] = useState({
         error: customers.error ?? '',
-        message: customers.message ?? ''
+        message: customers.message ?? '',
+        statusCode: customers.statusCode ?? ''
     });
     const [customersFilter, setCustomersFilter] = useState(customers ?? null);
     const [buttonState, setButtonState] = useState('');
@@ -73,6 +79,10 @@ const Customers = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
@@ -91,11 +101,7 @@ const Customers = () => {
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
@@ -141,10 +147,10 @@ const ActionButtons = ({ customer }) => {
         // TODO: Consume DELETE customer endpoint
         const response = await deleteCustomer(customer.id);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('customer');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
+        // if (response.unAuthorize) {
+        //     localStorage.removeItem('customer');
+        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+        // }
 
         if (response.error || response.message) {
             setToastState({
@@ -156,6 +162,11 @@ const ActionButtons = ({ customer }) => {
 
             setIsDeleting(false);
             closeModalRef.current.click();
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
+
             return response.error;
         }
 
@@ -184,10 +195,10 @@ const ActionButtons = ({ customer }) => {
 
         const response = await activateUser(customerId);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
+        // if (response.unAuthorize) {
+        //     localStorage.removeItem('user');
+        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+        // }
 
         if (response.error || response.message) {
             setToastState({
@@ -198,6 +209,10 @@ const ActionButtons = ({ customer }) => {
             });
 
             setIsActivating(false);
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -225,10 +240,10 @@ const ActionButtons = ({ customer }) => {
 
         const response = await deactivateUser(customerId);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
+        // if (response.unAuthorize) {
+        //     localStorage.removeItem('user');
+        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+        // }
 
         if (response.error || response.message) {
             setToastState({
@@ -239,6 +254,10 @@ const ActionButtons = ({ customer }) => {
             });
 
             setIsActivating(false);
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -291,9 +310,11 @@ const ActionButtons = ({ customer }) => {
                     <MenuItem icon={<IoEyeOutline />} data-customer-id={customer.id} onClick={viewCustomer}>
                         Preview
                     </MenuItem>
+
                     <MenuItem as={Link} to='/users/create' icon={<MdOutlineEdit />} state={{ currentUser: customer, entity: 'customer' }}>
                         Edit Customer
                     </MenuItem>
+
                     {
                         customer.active ?
                             <MenuItem

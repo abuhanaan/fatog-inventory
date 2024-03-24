@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
-import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { BiError } from "react-icons/bi";
@@ -11,20 +11,23 @@ import Modal from '../../components/Modal';
 import { requireAuth } from '../../hooks/useAuth';
 import { getUser, deleteUser, activateUser, deactivateUser } from '../../api/users';
 import { useToastHook } from '../../hooks/useToast';
+import { isUnauthorized } from '../../utils';
 import { getStaffData } from '../../api/staff';
 import useAuth from '../../hooks/useAuth';
 import UserField from '../../components/UserField';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ request }) {
     await requireAuth(request);
     const staff = await getStaffData(request);
 
-    console.log(staff);
+    // console.log(staff);
 
     if (staff.error || staff.message) {
         return {
             error: staff.error,
-            message: staff.message
+            message: staff.message,
+            statusCode: staff.statusCode
         };
     }
 
@@ -35,10 +38,12 @@ const ProfileView = () => {
     const staff = useLoaderData();
     const { user, orders, sales, stocks } = staff;
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: staff.error ?? '',
-        message: staff.message ?? ''
+        message: staff.message ?? '',
+        statusCode: staff.statusCode ?? '',
     });
 
     const breadcrumbData = [
@@ -54,6 +59,10 @@ const ProfileView = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
@@ -77,7 +86,7 @@ const ProfileView = () => {
 
             if (find) {
                 if (key === 'status') {
-                    userInfoArray.push({key, value: value ? 'Active' : 'Inactive'})
+                    userInfoArray.push({ key, value: value ? 'Active' : 'Inactive' })
                 }
                 userInfoArray.push({ key, value });
             }
@@ -88,11 +97,7 @@ const ProfileView = () => {
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

@@ -10,6 +10,7 @@ import { createUser, updateUser } from '../../api/users';
 import { getUser } from '../../api/users';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
+import { isUnauthorized } from '../../utils';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { MdOutlineSyncLock } from "react-icons/md";
@@ -18,7 +19,6 @@ const userRoleOptions = ['ADMIN', 'CASHIER', 'CEO', 'CUSTOMER', 'DEALER', 'MANAG
 const userCategoryOptions = ['staff', 'customer'];
 
 const UserForm = () => {
-    const manufacturers = useLoaderData();
     const navigate = useNavigate();
     const { state, pathname } = useLocation();
     const currentUser = state && state.currentUser;
@@ -82,11 +82,6 @@ const UserForm = () => {
             try {
                 const response = await createUser(userData);
 
-                if (response.unAuthorize) {
-                    sessionStorage.removeItem('user');
-                    navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-                }
-
                 if (response.error || response.message) {
                     setToastState({
                         title: response.error,
@@ -94,6 +89,10 @@ const UserForm = () => {
                         status: 'error',
                         icon: <Icon as={BiError} />
                     });
+
+                    setTimeout(() => {
+                        isUnauthorized(response, navigate);
+                    }, 6000);
 
                     return response.error;
                 }
@@ -120,10 +119,10 @@ const UserForm = () => {
             try {
                 const response = await updateUser(userId, userData);
 
-                if (response.unAuthorize) {
-                    sessionStorage.removeItem('user');
-                    navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-                }
+                // if (response.unAuthorize) {
+                //     sessionStorage.removeItem('user');
+                //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+                // }
 
                 if (response.error || response.message) {
                     setToastState({
@@ -132,6 +131,10 @@ const UserForm = () => {
                         status: 'error',
                         icon: <Icon as={BiError} />
                     });
+
+                    setTimeout(() => {
+                        isUnauthorized(response, navigate);
+                    }, 6000);
 
                     return response.error;
                 }
