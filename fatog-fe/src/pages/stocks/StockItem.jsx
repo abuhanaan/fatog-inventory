@@ -13,15 +13,18 @@ import StocksTable from '../../components/StocksTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
 import { getStockItem } from '../../api/stocks';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getStockItem(request, params.id);
+    const response = await getStockItem(params.id);
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode,
         };
     }
 
@@ -48,7 +51,8 @@ const StockItem = () => {
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: stockItem.error ?? '',
-        message: stockItem.message ?? ''
+        message: stockItem.message ?? '',
+        statusCode: stockItem.statusCode ?? '',
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -99,16 +103,16 @@ const StockItem = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

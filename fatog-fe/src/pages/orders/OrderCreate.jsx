@@ -15,11 +15,21 @@ import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaRegTrashCan } from "react-icons/fa6";
 import { MdOutlineEdit } from "react-icons/md";
 import { HiOutlinePlus } from 'react-icons/hi';
-import { getMonetaryValue } from '../stocks/StockCreate';
+import { getMonetaryValue } from '../../utils';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export const loader = async ({ request }) => {
     await requireAuth(request);
-    const response = await getProducts(request);
+    const response = await getProducts();
+
+    if (response.error || response.message) {
+        return {
+            error: response.error,
+            message: response.message,
+            statusCode: response.statusCode,
+        };
+    }
 
     return response;
 };
@@ -54,9 +64,29 @@ const OrderCreate = () => {
         paymentStatus: '',
         deliveryStatus: '',
         note: ''
-    })
+    });
+    const [error, setError] = useState({
+        error: products.error ?? '',
+        message: products.message ?? '',
+        statusCode: products.statusCode ?? '',
+    });
 
     const productOptions = products.map(product => product.name);
+
+    useEffect(() => {
+        if (error.error || error.message) {
+            setToastState({
+                title: error.error,
+                description: error.message,
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
+        }
+    }, []);
 
     useEffect(() => {
         let totalAmountValue = 0;
@@ -98,7 +128,7 @@ const OrderCreate = () => {
         const newOrderItem = {
             productRefId: selectedProduct.refId,
             noOfBags: Number(noOfBags),
-            pricePerBag: Number(selectedProduct.pricePerBag),
+            // pricePerBag: Number(selectedProduct.pricePerBag),
             totalWeight,  // optional
             totalAmount //optional
         };
@@ -204,7 +234,7 @@ const OrderCreate = () => {
             return;
         }
 
-        if (!shippingForm.phoneNumber || !shippingForm.shippingAddress || !shippingForm.deliveryStatus || !shippingForm.paymentStatus) {
+        if (!shippingForm.phoneNumber || !shippingForm.shippingAddress) {
             setToastState({
                 title: 'Missing field(s)',
                 description: 'Please fill all required fields.',
@@ -225,18 +255,19 @@ const OrderCreate = () => {
             deliveryStatus: shippingForm.deliveryStatus,
             note: shippingForm.note,
         }
-        console.log(orderListData);
+
+        // console.log(orderListData)
 
         // TODO: Consume create order list API endpoint
         try {
             const response = await createOrder(orderListData);
 
-            if (response.unAuthorize) {
-                sessionStorage.removeItem('user');
-                navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-            }
+            // if (response.unAuthorize) {
+            //     sessionStorage.removeItem('user');
+            //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
+            // }
 
-            console.log(`Order creation response body: \n`, response);
+            // console.log(`Order creation response body: \n`, response);
 
             if (response.error || response.message) {
                 setIsSubmitting(false);
@@ -246,6 +277,10 @@ const OrderCreate = () => {
                     status: 'error',
                     icon: <Icon as={BiError} />
                 });
+
+                setTimeout(() => {
+                    isUnauthorized(response, navigate);
+                }, 6000);
 
                 return response.error;
             }
@@ -333,70 +368,72 @@ const OrderCreate = () => {
     ];
 
     return (
-        <Stack spacing='6'>
-            <Box>
-                <Breadcrumb linkList={breadcrumbData} />
-            </Box>
-            <HStack justifyContent='space-between'>
-                <Heading fontSize='3xl' color='blue.700'>Create Order</Heading>
-                <Button colorScheme='blue' leftIcon={<HiOutlinePlus />} onClick={openForm}>Add Order Item</Button>
-            </HStack>
-            {
-                orderList.length === 0 ?
-                    <VStack h='60vh' justifyContent='center'>
-                        <Heading fontSize='2xl'>Order list is empty.</Heading>
-                        <Text>Add orders to view a list of order items.</Text>
-                    </VStack> :
-                    <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />
-            }
+        error.error || error.message ?
+            <FetchError error={error} /> :
+            <Stack spacing='6'>
+                <Box>
+                    <Breadcrumb linkList={breadcrumbData} />
+                </Box>
+                <HStack justifyContent='space-between'>
+                    <Heading fontSize='3xl' color='blue.700'>Create Order</Heading>
+                    <Button colorScheme='blue' leftIcon={<HiOutlinePlus />} onClick={openForm}>Add Order Item</Button>
+                </HStack>
+                {
+                    orderList.length === 0 ?
+                        <VStack h='60vh' justifyContent='center'>
+                            <Heading fontSize='2xl'>Order list is empty.</Heading>
+                            <Text>Add orders to view a list of order items.</Text>
+                        </VStack> :
+                        <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />
+                }
 
-            {/* Order Creation Form */}
-            <Drawer isOpen={isOpen} onClose={closeDrawer} initialFocusRef={focusInput} closeOnOverlayClick={false}>
-                <DrawerOverlay />
-                <DrawerContent>
-                    <DrawerCloseButton />
-                    <DrawerHeader>{selectedOrderItem ? 'Update Order Item' : 'Add Order Item'}</DrawerHeader>
+                {/* Order Creation Form */}
+                <Drawer isOpen={isOpen} onClose={closeDrawer} initialFocusRef={focusInput} closeOnOverlayClick={false}>
+                    <DrawerOverlay />
+                    <DrawerContent>
+                        <DrawerCloseButton />
+                        <DrawerHeader>{selectedOrderItem ? 'Update Order Item' : 'Add Order Item'}</DrawerHeader>
 
-                    <DrawerBody>
-                        <Stack spacing='24px'>
-                            <FormControl>
-                                <FormLabel htmlFor='product'>Select Product</FormLabel>
-                                <Select
-                                    id='product'
-                                    value={selectedProduct ? selectedProduct.name : ''}
-                                    onChange={handleProductChange}
-                                    ref={focusInput}
-                                >
-                                    <option value=''>Select Product</option>
-                                    {productOptions.map((product, index) => (
-                                        <option key={index} value={product}>{product}</option>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        <DrawerBody>
+                            <Stack spacing='24px'>
+                                <FormControl>
+                                    <FormLabel htmlFor='product'>Select Product</FormLabel>
+                                    <Select
+                                        id='product'
+                                        value={selectedProduct ? selectedProduct.name : ''}
+                                        onChange={handleProductChange}
+                                        ref={focusInput}
+                                    >
+                                        <option value=''>Select Product</option>
+                                        {productOptions.map((product, index) => (
+                                            <option key={index} value={product}>{product}</option>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
-                            <FormControl>
-                                <FormLabel htmlFor='noOfBags'>No. of Bags</FormLabel>
-                                <Input
-                                    id='noOfBags'
-                                    name='noOfBags'
-                                    value={noOfBags ? noOfBags : ''}
-                                    onChange={(e) => setNoOfBags(e.target.value)}
-                                    type='number'
-                                    placeholder='No. of Bags'
-                                />
-                            </FormControl>
-                        </Stack>
-                    </DrawerBody>
+                                <FormControl>
+                                    <FormLabel htmlFor='noOfBags'>No. of Bags</FormLabel>
+                                    <Input
+                                        id='noOfBags'
+                                        name='noOfBags'
+                                        value={noOfBags ? noOfBags : ''}
+                                        onChange={(e) => setNoOfBags(e.target.value)}
+                                        type='number'
+                                        placeholder='No. of Bags'
+                                    />
+                                </FormControl>
+                            </Stack>
+                        </DrawerBody>
 
-                    <DrawerFooter>
-                        <Button variant='outline' mr={3} onClick={closeDrawer}>
-                            Cancel
-                        </Button>
-                        <Button onClick={selectedOrderItem ? updateOrderItem : addOrderItem} colorScheme='blue'>{selectedOrderItem ? 'Update' : 'Add'}</Button>
-                    </DrawerFooter>
-                </DrawerContent>
-            </Drawer>
-        </Stack >
+                        <DrawerFooter>
+                            <Button variant='outline' mr={3} onClick={closeDrawer}>
+                                Cancel
+                            </Button>
+                            <Button onClick={selectedOrderItem ? updateOrderItem : addOrderItem} colorScheme='blue'>{selectedOrderItem ? 'Update' : 'Add'}</Button>
+                        </DrawerFooter>
+                    </DrawerContent>
+                </Drawer>
+            </Stack >
     )
 }
 
@@ -439,7 +476,7 @@ const ShippingForm = ({ setShippingForm, shippingForm, submit, isSubmitting }) =
                 </FormControl>
             </Flex>
 
-            <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
+            {/* <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
                 <FormControl>
                     <FormLabel htmlFor='paymentStatus'>Payment Status</FormLabel>
                     <Select
@@ -469,7 +506,7 @@ const ShippingForm = ({ setShippingForm, shippingForm, submit, isSubmitting }) =
                         <option value='delivered'>Delivered</option>
                     </Select>
                 </FormControl>
-            </Flex>
+            </Flex> */}
 
             <FormControl>
                 <FormLabel htmlFor='note'>Note</FormLabel>

@@ -1,5 +1,5 @@
 import { Box, Heading, Text } from '@chakra-ui/react';
-import { getMonetaryValue } from '../pages/stocks/StockCreate';
+import { getMonetaryValue } from '../utils';
 import { formatDate } from './Table';
 
 export const splitFieldName = (str) => {
@@ -11,16 +11,18 @@ const UserField = ({ field }) => {
 
     let outputValue;
 
-    if ((key === 'totalAmount' || key === 'pricePerBag' || key === 'purchaseAmount' || key === 'purchasePricePerBag' || key === 'currentSellingPricePerBag' || key === 'outstandingPayment' || key === 'amountPaid') && (value)) {
+    if ((key === 'totalAmount' || key === 'pricePerBag' || key === 'purchaseAmount' || key === 'purchasePricePerBag' || key === 'currentSellingPricePerBag' || key === 'outstandingPayment' || key === 'amountPaid' || key === 'amountPayable') && (value)) {
         outputValue = getMonetaryValue(value)
     } else if (key === 'date') {
         outputValue = formatDate(value)
     } else if (!value) {
-        if (key === 'amountPaid') {
+        if (key === 'amountPaid' || key === 'outstandingPayment') {
             outputValue = getMonetaryValue(value);
         } else {
             outputValue = 'N/A';
         }
+    } else if (key.toLowerCase().includes('weight')) {
+        outputValue = `${value} kg`
     } else {
         outputValue = value
     }

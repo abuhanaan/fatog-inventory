@@ -12,6 +12,7 @@ import useAuth from '../../hooks/useAuth';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { MdOutlineSyncLock } from "react-icons/md";
+import { isUnauthorized } from '../../utils';
 
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
@@ -21,6 +22,7 @@ const breadcrumbData = [
 
 const ChangePassword = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const passwordRef = useRef(null);
     const { user } = useAuth();
     const confirmPasswordRef = useRef(null);
@@ -31,7 +33,7 @@ const ChangePassword = () => {
         formState: { isSubmitting },
     } = useForm();
 
-    const changePassword = async (data) => {
+    const passwordChange = async (data) => {
         if (passwordRef.current.value !== confirmPasswordRef.current.value) {
             setToastState({
                 title: 'Password Mismatch',
@@ -43,28 +45,24 @@ const ChangePassword = () => {
             return;
         }
 
-        const userId = user.user.userId;
-        const category = user.user.category;
         const passwordData = {
-            category: category,
             password: data.password
         };
 
         try {
-            const response = await changePassword(userId, passwordData);
+            const response = await changePassword(passwordData);
 
-            if (response.unAuthorize) {
-                sessionStorage.removeItem('user');
-                navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-            }
-
-            if (response.error || response.message) {
+            if (response.error) {
                 setToastState({
                     title: response.error,
                     description: response.message,
                     status: 'error',
                     icon: <Icon as={BiError} />
                 });
+
+                setTimeout(() => {
+                    isUnauthorized(response, navigate);
+                }, 6000);
 
                 return response.error;
             }
@@ -94,7 +92,7 @@ const ChangePassword = () => {
                 <Heading fontSize='3xl' color='blue.700'>Update Password</Heading>
             </HStack>
 
-            <form onSubmit={handleSubmit(changePassword)}>
+            <form onSubmit={handleSubmit(passwordChange)}>
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                     <TextInput name='password' label='New Password' control={control} type='password' fieldRef={passwordRef} />
 
@@ -106,6 +104,7 @@ const ChangePassword = () => {
                         isLoading={isSubmitting ? true : false}
                         loadingText='Updating...'
                         spinnerPlacement='end'
+                        mt='4'
                         spinner={<Spinner
                             thickness='4px'
                             speed='0.5s'
@@ -114,7 +113,7 @@ const ChangePassword = () => {
                             size='md'
                         />}
                     >
-                        Update Profile
+                        Change Password
                     </Button>
                 </Stack>
             </form>

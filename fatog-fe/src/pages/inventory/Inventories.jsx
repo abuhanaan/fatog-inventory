@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLoaderData, Link as RouterLink } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Tooltip } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import { LuHistory } from "react-icons/lu";
@@ -11,6 +11,8 @@ import { getManufacturers } from '../../api/manufacturers';
 import { getInventories } from '../../api/inventories';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -29,20 +31,22 @@ const breadcrumbData = [
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const inventories = await getInventories(request);
-    const manufacturers = await getManufacturers(request);
+    const inventories = await getInventories();
+    const manufacturers = await getManufacturers();
 
     if (inventories.error || inventories.message) {
         return {
             error: inventories.error,
-            message: inventories.message
+            message: inventories.message,
+            statusCode: inventories.statusCode
         }
     }
 
     if (manufacturers.error || manufacturers.message) {
         return {
             error: manufacturers.error,
-            message: manufacturers.message
+            message: manufacturers.message,
+            statusCode: manufacturers.statusCode
         }
     }
 
@@ -64,11 +68,13 @@ export async function loader({ request }) {
 }
 
 const Inventories = () => {
+    const navigate = useNavigate();
     const inventories = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: inventories.error ?? '',
+        message: inventories.message ?? '',
+        statusCode: inventories.statusCode ?? ''
     });
 
     useEffect(() => {
@@ -80,26 +86,22 @@ const Inventories = () => {
                 icon: <Icon as={BiError} />
             });
 
-            setError({
-                error: inventories.error,
-                message: inventories.message
-            });
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
-        error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+        error.error || error.message ?
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
                 </Box>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Inventories</Heading>
-                    <Button as={RouterLink} to='history' leftIcon={<LuHistory />} colorScheme='blue'>History</Button>
+                    <Button as={RouterLink} to='histories' leftIcon={<LuHistory />} colorScheme='blue'>History</Button>
                 </HStack>
                 <Box marginTop='8'>
                     {

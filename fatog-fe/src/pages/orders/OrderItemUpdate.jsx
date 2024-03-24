@@ -10,15 +10,18 @@ import { useToastHook } from '../../hooks/useToast';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { getOrderItem, updateOrderItem } from '../../api/orders';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getOrderItem(request, params.id);
+    const response = await getOrderItem(params.id);
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode,
         };
     }
 
@@ -45,7 +48,8 @@ const OrderItemUpdate = () => {
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: orderItem.error ?? '',
-        message: orderItem.message ?? ''
+        message: orderItem.message ?? '',
+        statusCode: orderItem.statusCode ?? '',
     });
     const {
         handleSubmit,
@@ -70,6 +74,10 @@ const OrderItemUpdate = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
@@ -83,7 +91,7 @@ const OrderItemUpdate = () => {
 
         const orderItemId = orderItem.id;
 
-        console.log(orderItemData);
+        // console.log(orderItemData);
 
         // TODO: Consume stock item update API endpoint
         try {
@@ -101,6 +109,10 @@ const OrderItemUpdate = () => {
                     status: 'error',
                     icon: <Icon as={BiError} />
                 });
+
+                setTimeout(() => {
+                    isUnauthorized(response, navigate);
+                }, 6000);
 
                 return response.error;
             }
@@ -123,11 +135,7 @@ const OrderItemUpdate = () => {
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

@@ -10,22 +10,26 @@ import Modal from '../../components/Modal';
 import UserField from '../../components/UserField';
 import Tabs from '../../components/Tabs';
 import OrdersTable from '../../components/OrdersTable';
+import PaymentsTable from '../../components/PaymentsTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
 import { getOrderList } from '../../api/orders';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getOrderList(request, params.id);
+    const response = await getOrderList(params.id);
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode,
         };
     }
 
-    console.log(response);
+    // console.log(response);
 
     const data = {
         id: response.id,
@@ -45,8 +49,8 @@ export async function loader({ params, request }) {
         staffId: response.staffId,
         customerId: response.customerId,
         staff: response.staff,
+        payments: response.payments,
         // customer: response.customer,
-
     };
 
     return data;
@@ -55,11 +59,12 @@ export async function loader({ params, request }) {
 const OrderList = () => {
     const navigate = useNavigate();
     const order = useLoaderData();
-    const { orderList, staff, customer } = order;
+    const { orderList, staff, payments } = order;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: order.error ?? '',
-        message: order.message ?? ''
+        message: order.message ?? '',
+        statusCode: order.statusCode ?? '',
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -75,19 +80,19 @@ const OrderList = () => {
         totalWeight: order.totalWeight,
         customerPhoneNumber: order.customerPhoneNumber,
         shippingAddress: order.shippingAddress,
-        amountPaid: order.amountPaid,
+        // amountPaid: order.amountPaid,
         outstandingPayment: order.outstandingPayment,
-        paymentStatus: order.paymentStatus,
-        deliveryStatus: order.deliveryStatus,
+        // paymentStatus: order.paymentStatus,
+        // deliveryStatus: order.deliveryStatus,
+        date: order.date,
         note: order.note,
-        date: order.date
     }
 
     const orderListColumns = [
         { id: 'S/N', header: 'S/N' },
         { id: 'pricePerBag', header: 'Price per Bag' },
         { id: 'noOfBags', header: 'No. of Bags' },
-        { id: 'totalPrice', header: 'Total Amount' },
+        { id: 'totalAmount', header: 'Total Amount' },
         { id: 'totalWeight', header: 'Total Weight' },
         { id: 'actions', header: '' },
     ];
@@ -97,10 +102,26 @@ const OrderList = () => {
         orderId: order.id
     }));
 
-    const tabTitles = ['Overview', 'Order List'];
+    const paymentsData = payments.map(payment => ({
+        amountPaid: payment.amountPaid,
+        outstandingPayment: payment.outstandingAfter,
+        previousPaymentTotal: payment.prevPaymentSum,
+        date: payment.date
+    }));
+
+    const paymentColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'amountPaid', header: 'Amount Paid' },
+        { id: 'outstandingPayment', header: 'Outstanding Payment' },
+        { id: 'previousPaymentTotal', header: 'Prev. Payment Total' },
+        { id: 'date', header: 'Date' },
+    ];
+
+    const tabTitles = ['Overview', 'Order List', 'Payments'];
     const tabPanels = [
         <GeneralInfo info={basicOrderInfo} />,
         <OrdersTable orders={orderListData} columns={orderListColumns} path={`/orders/${order.id}/orderlist`} />,
+        <PaymentsTable payments={paymentsData} columns={paymentColumns} />,
     ];
 
     useEffect(() => {
@@ -111,16 +132,16 @@ const OrderList = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

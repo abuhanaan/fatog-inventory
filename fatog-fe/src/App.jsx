@@ -67,6 +67,16 @@ import OrderItem from "./pages/orders/OrderItem";
 import { loader as OrderItemLoader } from "./pages/orders/OrderItem";
 import OrderItemUpdate from "./pages/orders/OrderItemUpdate";
 import { loader as OrderItemUpdateLoader } from "./pages/orders/OrderItemUpdate";
+import SalesCreate from "./pages/sales/SalesCreate";
+import { loader as SalesCreateLoader } from "./pages/sales/SalesCreate";
+import Sales from "./pages/sales/Sales";
+import { loader as SalesLoader } from "./pages/sales/Sales";
+import Sale from "./pages/sales/Sale";
+import { loader as SaleLoader } from "./pages/sales/Sale";
+import History from "./pages/history/History";
+import { loader as HistoryLoader } from "./pages/history/History";
+import AddPayment from "./pages/sales/AddPayment";
+import { loader as AddPaymentLoader } from "./pages/sales/AddPayment";
 
 async function loader({ request }) {
     await requireAuth(request);
@@ -105,7 +115,8 @@ const router = createBrowserRouter(createRoutesFromChildren(
 
                 <Route path='inventories' loader={InventoriesLoader} element={<Inventories />} />
                 <Route path='inventories/:id' loader={InventoryViewLoader} element={<InventoryView />} />
-                <Route path='inventories/history' loader={HistoriesLoader} element={<Histories />} />
+                <Route path='inventories/histories' loader={HistoriesLoader} element={<Histories />} />
+                <Route path='inventories/histories/:id' loader={HistoryLoader} element={<History />} />
 
                 {/* Stocks */}
                 <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
@@ -120,6 +131,12 @@ const router = createBrowserRouter(createRoutesFromChildren(
                 <Route path='orders/:id' loader={OrderListLoader} element={<OrderList />} />
                 <Route path='orders/:id/orderlist/:id' loader={OrderItemLoader} element={<OrderItem />} />
                 <Route path='orders/:id/orderlist/:id/edit' loader={OrderItemUpdateLoader} element={<OrderItemUpdate />} />
+
+                {/* Sales */}
+                <Route path='sales' loader={SalesLoader} element={<Sales />} />
+                <Route path='sales/create/:id' loader={SalesCreateLoader} element={<SalesCreate />} />
+                <Route path='sales/:id' loader={SaleLoader} element={<Sale />} />
+                <Route path='sales/:id/payments/add' loader={AddPaymentLoader} element={<AddPayment />} />
             </Route>
         </Route>
 

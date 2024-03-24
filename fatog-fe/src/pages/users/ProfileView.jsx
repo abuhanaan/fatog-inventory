@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
-import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { BiError } from "react-icons/bi";
@@ -11,28 +11,39 @@ import Modal from '../../components/Modal';
 import { requireAuth } from '../../hooks/useAuth';
 import { getUser, deleteUser, activateUser, deactivateUser } from '../../api/users';
 import { useToastHook } from '../../hooks/useToast';
+import { isUnauthorized } from '../../utils';
 import { getStaffData } from '../../api/staff';
 import useAuth from '../../hooks/useAuth';
 import UserField from '../../components/UserField';
+import FetchError from '../../components/FetchError';
 
-export async function loader({ params, request }) {
+export async function loader({ request }) {
     await requireAuth(request);
-    const { user } = JSON.parse(sessionStorage.getItem('user'));
-    const userId = user.userId;
-    const staff = await getStaffData(request, userId);
+    const staff = await getStaffData(request);
+
+    // console.log(staff);
+
+    if (staff.error || staff.message) {
+        return {
+            error: staff.error,
+            message: staff.message,
+            statusCode: staff.statusCode
+        };
+    }
 
     return staff;
 }
 
 const ProfileView = () => {
-    const { user } = useAuth();
-    const currentUser = user.user;
     const staff = useLoaderData();
+    const { user, orders, sales, stocks } = staff;
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: staff.error ?? '',
+        message: staff.message ?? '',
+        statusCode: staff.statusCode ?? '',
     });
 
     const breadcrumbData = [
@@ -50,13 +61,8 @@ const ProfileView = () => {
             });
 
             setTimeout(() => {
-                navigate('/users');
+                isUnauthorized(error, navigate);
             }, 6000);
-
-            setError({
-                error: staff.error,
-                message: staff.message
-            });
         }
     }, []);
 
@@ -64,20 +70,24 @@ const ProfileView = () => {
         const userData = {
             firstName: staff.firstName,
             lastName: staff.lastName,
-            gender: staff.gender,
+            email: user.email,
             phoneNumber: staff.phoneNumber,
+            gender: staff.gender,
             role: user.role,
             category: user.category,
             userId: user.userId,
-            status: user.status
+            status: user.active
         };
         const userInfoArray = [];
-        const fieldKeys = ['userId', 'firstName', 'lastName', 'gender', 'phoneNumber', 'category', 'role', 'status'];
+        const fieldKeys = ['firstName', 'lastName', 'email', 'gender', 'phoneNumber', 'category', 'role', 'status'];
 
         for (const [key, value] of Object.entries(userData)) {
             const find = fieldKeys.find(fieldKey => fieldKey === key);
 
             if (find) {
+                if (key === 'status') {
+                    userInfoArray.push({ key, value: value ? 'Active' : 'Inactive' })
+                }
                 userInfoArray.push({ key, value });
             }
         }
@@ -86,11 +96,8 @@ const ProfileView = () => {
     }
 
     return (
-        error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+        error.error || error.message ?
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
@@ -98,13 +105,13 @@ const ProfileView = () => {
                 <HStack justifyContent='space-between'>
                     <Heading fontSize={{ base: '2xl', md: '3xl' }} color='blue.700'>User</Heading>
                     <HStack>
-                    <Tooltip hasArrow label='Edit Profile' placement='bottom' borderRadius='md'>
-                        <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/profile/update' state={{ staff }} icon={<LiaUserEditSolid />} colorScheme='orange' />
-                    </Tooltip>
+                        <Tooltip hasArrow label='Edit Profile' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/profile/update' state={{ staff }} icon={<LiaUserEditSolid />} colorScheme='orange' />
+                        </Tooltip>
 
-                    <Tooltip hasArrow label='Change Password' placement='bottom' borderRadius='md'>
-                        <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/profile/change-password' icon={<MdOutlineEdit />} colorScheme='purple' />
-                    </Tooltip>
+                        <Tooltip hasArrow label='Change Password' placement='bottom' borderRadius='md'>
+                            <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to='/profile/change-password' icon={<MdOutlineEdit />} colorScheme='purple' />
+                        </Tooltip>
 
                     </HStack>
                 </HStack>
@@ -114,7 +121,7 @@ const ProfileView = () => {
                         <CardBody>
                             <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
                                 {
-                                    getUserInfoArray(currentUser, staff).map((field, index) => (
+                                    getUserInfoArray(user, staff).map((field, index) => (
                                         <UserField key={index} field={field} />
                                     ))
                                 }

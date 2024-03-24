@@ -9,83 +9,107 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Modal from '../../components/Modal';
 import UserField from '../../components/UserField';
 import Tabs from '../../components/Tabs';
+import PaymentsTable from '../../components/PaymentsTable';
 import StocksTable from '../../components/StocksTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
-import { getStockList } from '../../api/stocks';
+import { getSale } from '../../api/sales';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getStockList(params.id);
+    const sale = await getSale(params.id);
 
-    if (response.error || response.message) {
+    if (sale.error || sale.message) {
         return {
-            error: response.error,
-            message: response.message,
-            statusCode: response.statusCode,
+            error: sale.error,
+            message: sale.message,
+            statusCode: sale.statusCode,
         };
     }
-
+    
     const data = {
-        id: response.id,
-        refId: response.refId,
-        totalNoOfBags: response.totalNoOfBags,
-        totalWeight: response.totalWeight,
-        totalAmount: response.totalAmount,
-        date: response.createdAt,
-        stockList: response.stockLists,
-        staffId: response.staffId,
-        staff: response.staff,
-        invoice: response.invoice
+        id: sale.id,
+        amountPaid: sale.amountPaid,
+        amountPayable: sale.amountPayable,
+        outstandingPayment: sale.outStandingPayment,
+        paymentStatus: sale.paymentStatus,
+        orderRefId: sale.orderRefId,
+        cashierId: sale.cashierId,
+        staff: sale.staff,
+        order: sale.order,
+        payments: sale.payments,
+        note: sale.note,
+        date: sale.createdAt,
     };
 
     return data;
 }
 
-const StockList = () => {
+const Sale = () => {
     const navigate = useNavigate();
-    const stock = useLoaderData();
-    const { stockList, staff } = stock;
+    const sale = useLoaderData();
+    const { staff, order, payments } = sale;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: stockList.error ?? '',
-        message: stockList.message ?? '',
-        statusCode: stockList.statusCode ?? ''
+        error: sale.error ?? '',
+        message: sale.message ?? '',
+        statusCode: sale.statusCode ?? '',
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
-        { name: 'Stocks', ref: '/stocks' },
-        { name: 'Stock List', ref: `/stocks/${stock.id}` },
+        { name: 'Sales', ref: '/sales' },
+        { name: 'Sale', ref: `/sales/${sale.id}` },
     ];
 
-    const basicStockInfo = {
-        staff: (staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'N/A',
-        totalAmount: stock.totalAmount,
-        totalNoOfBags: stock.totalNoOfBags,
-        totalWeight: stock.totalWeight,
-        date: stock.date
-    }
+    const basicSaleInfo = {
+        amountPaid: sale.amountPaid,
+        amountPayable: sale.amountPayable,
+        outstandingPayment: sale.outstandingPayment,
+        paymentStatus: sale.paymentStatus,
+        date: sale.date,
+    };
 
-    const stockListColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'pricePerBag', header: 'Price per Bag' },
-        { id: 'noOfBags', header: 'No. of Bags' },
-        { id: 'totalAmount', header: 'Total Amount' },
-        { id: 'totalWeight', header: 'Total Weight' },
-        { id: 'actions', header: '' },
-    ];
+    const staffInfo = {
+        firstName: staff.firstName,
+        lastName: staff.lastName,
+        gender: staff.gender,
+        phoneNumber: staff.phoneNumber,
+    };
 
-    const stockListData = stockList.map(prev => ({
-        ...prev,
-        stockId: stock.id
+    const orderInfo = {
+        totalNoOfBags: order.totalNoOfBags,
+        totalAmount: order.totalAmount,
+        totalWeight: order.totalWeight,
+        customerPhoneNumber: order.phoneNumber,
+        shippingAddress: order.shippingAddress,
+        date: order.createdAt,
+        note: order.note,
+    };
+
+    const paymentsData = payments.map(payment => ({
+        amountPaid: payment.amountPaid,
+        outstandingPayment: payment.outstandingAfter,
+        previousPaymentTotal: payment.prevPaymentSum,
+        date: payment.date
     }));
 
-    const tabTitles = ['Overview', 'Stock List'];
+    const paymentColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'amountPaid', header: 'Amount Paid' },
+        { id: 'outstandingPayment', header: 'Outstanding Payment' },
+        { id: 'previousPaymentTotal', header: 'Prev. Payment Total' },
+        { id: 'date', header: 'Date' },
+    ];
+
+    const tabTitles = ['Overview', 'Order Details', 'Payments', 'Staff Details', ];
     const tabPanels = [
-        <GeneralInfo info={basicStockInfo} />,
-        <StocksTable stocks={stockListData} columns={stockListColumns} path={`/stocks/${stock.id}/stocklist`} />,
+        <TabPanel info={basicSaleInfo} />,
+        <TabPanel info={orderInfo} />,
+        <PaymentsTable payments={paymentsData} columns={paymentColumns} />,
+        <TabPanel info={staffInfo} />,
+        
     ];
 
     useEffect(() => {
@@ -111,16 +135,16 @@ const StockList = () => {
                     <Breadcrumb linkList={breadcrumbData} />
                 </Box>
                 <HStack justifyContent='space-between'>
-                    <Heading fontSize='3xl' color='blue.700'>Stock</Heading>
+                    <Heading fontSize='3xl' color='blue.700'>Sale</Heading>
                 </HStack>
-                <Box marginTop='8'>
+                <Box>
                     <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />
                 </Box>
             </Stack>
     )
 }
 
-const GeneralInfo = ({ info }) => {
+const TabPanel = ({ info }) => {
     const getInfoArray = (info) => {
         const infoArray = [];
         for (const [key, value] of Object.entries(info)) {
@@ -145,4 +169,4 @@ const GeneralInfo = ({ info }) => {
     )
 }
 
-export default StockList;
+export default Sale;

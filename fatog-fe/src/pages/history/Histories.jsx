@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLoaderData } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, IconButton, Icon, Heading, Tooltip } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import Breadcrumb from '../../components/Breadcrumb';
@@ -9,16 +9,16 @@ import { EmptySearch } from '../../components/EmptySearch';
 import { getHistories } from '../../api/history';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
-    { id: 'product', header: 'Product' },
-    { id: 'manufacturer', header: 'Manufacturer' },
-    { id: 'staff', header: 'Staff' },
-    { id: 'customer', header: 'Customer' },
-    { id: 'orderAmount', header: 'Order Amount(₦)' },
-    { id: 'orderQty', header: 'Order Quantity' },
-    { id: 'paymentStatus', header: 'Payment Status' },
+    { id: 'remainderBefore', header: 'Remainder Before' },
+    { id: 'effectQuantity', header: 'Effect Qty' },
+    { id: 'remainderAfter', header: 'Remainder After' },
+    { id: 'operationStatus', header: 'Status' },
+    { id: 'operationType', header: 'Type' },
     { id: 'date', header: 'Date' },
     { id: 'actions', header: '' },
 ];
@@ -29,47 +29,44 @@ const breadcrumbData = [
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const histories = await getHistories(request);
+    const histories = await getHistories();
 
     if (histories.error || histories.message) {
         return {
             error: histories.error,
-            message: histories.message
+            message: histories.message,
+            statusCode: histories.statusCode
         }
     }
 
-    const data = histories.map(history => {
-        return {
-            id: history.id,
-            productName: history.inventory.product.name,
-            manufacturer: history.inventory.product.manufacturer.brandName,
-            customer: `${history.orderItem.order.customer.firstName} ${history.orderItem.order.customer.lastName}`,
-            staff: `${history.orderItem.order.staff.firstName} ${history.orderItem.order.staff.lastName}`,
-            orderAmount: history.orderItem.order.totalAmount,
-            noOfBags: history.orderItem.order.totalNoOfBags,
-            paymentStatus: history.orderItem.order.paymentStatus,
-            deliveryStatus: history.orderItem.order.deliveryStatus,
-            date: history.createdAt,
-        }
-    });
+    const data = histories.map(history => ({
+        id: history.id,
+        operationStatus: history.decrement ? 'Decrement' : 'Increment',
+        operationType: history.orderItemId ? 'Order' : 'Stock',
+        effectQuantity: history.effectQuantity,
+        remainderAfter: history.remainderAfter,
+        remainderBefore: history.remainderBefore,
+        orderItemId: history.orderItemId,
+        note: history.note,
+        date: history.createdAt,
+        inventory: history.inventory,
+    }));
 
     return data;
 }
 
 const Histories = () => {
+    const navigate = useNavigate();
     const histories = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: histories.error ?? '',
+        message: histories.message ?? '',
+        statusCode: histories.statusCode ?? ''
     });
-    console.log(histories.error);
-    console.log(histories.message);
 
     useEffect(() => {
-        console.log('useEffect hit');
         if (histories.error || histories.message) {
-            console.log('UseEffect If condition');
             setToastState({
                 title: histories.error,
                 description: histories.message,
@@ -77,19 +74,15 @@ const Histories = () => {
                 icon: <Icon as={BiError} />
             });
 
-            setError({
-                error: histories.error,
-                message: histories.message
-            });
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
         error.error || error.message ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

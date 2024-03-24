@@ -16,6 +16,8 @@ import { getInventory } from '../../api/inventories';
 import { getManufacturers } from '../../api/manufacturers';
 import { useToastHook } from '../../hooks/useToast';
 import ListingsTable from '../../components/Table';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -25,14 +27,16 @@ export async function loader({ params, request }) {
     if (inventory.error || inventory.message) {
         return {
             error: inventory.error,
-            message: inventory.message
+            message: inventory.message,
+            statusCode: inventory.statusCode
         }
     }
 
     if (manufacturers.error || manufacturers.message) {
         return {
             error: manufacturers.error,
-            message: manufacturers.message
+            message: manufacturers.message,
+            statusCode: manufacturers.statusCode
         }
     }
 
@@ -47,6 +51,7 @@ export async function loader({ params, request }) {
         size: product.size,
         weight: product.weight,
         pricePerBag: product.pricePerBag,
+        remainingQty: inventory.remainingQty,
         manufacturer: brandName,
         manufacturerId: product.manufacturerId,
         history: inventory.history
@@ -59,8 +64,9 @@ const InventoryView = () => {
     const { history } = inventory;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: inventory.error ?? '',
+        message: inventory.message ?? '',
+        statusCode: inventory.statusCode ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -80,22 +86,14 @@ const InventoryView = () => {
             });
 
             setTimeout(() => {
-                navigate('/inventories');
+                isUnauthorized(error, navigate);
             }, 6000);
-
-            setError({
-                error: inventory.error,
-                message: inventory.message
-            });
         }
     }, []);
 
     return (
-        error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+        error.error || error.message ?
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
@@ -115,7 +113,7 @@ const InventoryView = () => {
 const GeneralInfo = ({ inventory }) => {
     const getInventoryInfoArray = (data) => {
         const inventoryInfoArray = [];
-        const fieldKeys = ['id', 'name', 'type', 'size', 'weight', 'pricePerBag', 'manufacturer'];
+        const fieldKeys = ['name', 'type', 'size', 'weight', 'remainingQty', 'pricePerBag', 'manufacturer'];
 
         for (const [key, value] of Object.entries(data)) {
             const find = fieldKeys.find(fieldKey => fieldKey === key);
@@ -142,15 +140,28 @@ const GeneralInfo = ({ inventory }) => {
 const RecentHistory = ({ history }) => {
     const columns = [
         { id: 'S/N', header: 'S/N' },
-        // ...
+        { id: 'remainderBefore', header: 'Remainder Before' },
+        { id: 'effectQuantity', header: 'Effect Qty' },
+        { id: 'remainderAfter', header: 'Remainder After' },
+        { id: 'operationStatus', header: 'Status' },
+        { id: 'operationType', header: 'Type' },
+        { id: 'date', header: 'Date' },
         { id: 'actions', header: '' },
     ];
+
+    const historyData = history.map(hist => ({
+        ...hist,
+        operationStatus: hist.decrement ? 'Decrement' : 'Increment',
+        operationType: hist.orderItemId ? 'Order' : 'Stock',
+        date: hist.createdAt
+    }));
+
     return (
         <Box marginTop='8'>
             {
                 history?.length === 0 ?
-                    <EmptySearch headers={['S/N', 'STAFF', 'ORDER', 'INVENTORY', 'REM. BEFORE', 'REM. AFTER', 'EFFECT QTY']} type='history' /> :
-                    <ListingsTable data={history} columns={columns} fileName='inventories-data.csv' render={(history) => (
+                    <EmptySearch headers={['S/N', 'REM. BEFORE', 'REM. AFTER', 'EFFECT QTY', 'STATUS']} type='history' /> :
+                    <ListingsTable data={historyData} columns={columns} fileName='inventories-data.csv' render={(history) => (
                         <ActionButtons history={history} />
                     )} />
             }
@@ -165,7 +176,7 @@ const ActionButtons = ({ history }) => {
         e.preventDefault();
 
         const dataHistoryId = e.currentTarget.getAttribute('data-history-id');
-        navigate(`/histories/${dataHistoryId}`);
+        navigate(`/inventories/histories/${dataHistoryId}`);
     }
 
     return (

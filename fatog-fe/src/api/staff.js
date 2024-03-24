@@ -1,15 +1,7 @@
-import { jwtDecode } from 'jwt-decode';
 import { redirect } from 'react-router-dom';
+import { headers } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-const user = JSON.parse(sessionStorage.getItem('user'));
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${user?.accessToken}`,
-};
-const authHeaders = {
-    'Content-Type': 'application/json'
-};
 const endpoint = '/staffs';
 
 export async function createStaff(staffData) {
@@ -21,22 +13,22 @@ export async function createStaff(staffData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
+    // if (res.status === 401) {
+    //     return {
+    //         unAuthorized: true,
+    //         statusCode: data.statusCode,
+    //         message: data.message,
+    //         error: data.error ?? 'Unauthorized',
+    //     }
+    // }
 
     isError(res, data);
 
     return data;
 }
 
-export async function updateStaff(staffId, staffData) {
-    const res = await fetch(`${BASE_URL}${endpoint}/${staffId}`, {
+export async function updateStaff(staffData) {
+    const res = await fetch(`${BASE_URL}${endpoint}/profile-update`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify(staffData)
@@ -44,35 +36,32 @@ export async function updateStaff(staffId, staffData) {
 
     const data = await res.json();
 
-    if (res.status === 401) {
+    if (!res.ok || data.error) {
         return {
-            unAuthorized: true,
             statusCode: data.statusCode,
             message: data.message,
-            error: data.error ?? 'Unauthorized',
+            error: data.error,
+            path: data.path
         }
     }
-
-    isError(res, data);
 
     return data;
 }
 
-export async function getStaff(request) {
+export async function getStaff() {
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers,
     });
 
     const data = await res.json();
-
-    isUnauthorized(res, request);
+    
     isError(res, data);
 
     return data;
 }
 
-export async function getStaffData(request) {
+export async function getStaffData() {
     const res = await fetch(`${BASE_URL}${endpoint}/profile`, {
         method: 'GET',
         headers,
@@ -80,10 +69,14 @@ export async function getStaffData(request) {
 
     const data = await res.json();
 
-    isUnauthorized(res, request);
     isError(res, data);
 
     return data;
+    // return {
+    //     statusCode: 401,
+    //     message: 'You do not have the right to view the resource',
+    //     error: 'Unauthorized',
+    // }
 }
 
 export async function deleteUser(userId) {
@@ -93,15 +86,6 @@ export async function deleteUser(userId) {
     });
 
     const data = await res.json();
-
-    if (res.status === 401) {
-        return {
-            unAuthorized: true,
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Unauthorized',
-        }
-    }
 
     isError(res, data);
 

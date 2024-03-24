@@ -9,19 +9,23 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Modal from '../../components/Modal';
 import UserField from '../../components/UserField';
 import Tabs from '../../components/Tabs';
+import PaymentsTable from '../../components/PaymentsTable';
 import StocksTable from '../../components/StocksTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
 import { getOrderItem } from '../../api/orders';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getOrderItem(request, params.id);
+    const response = await getOrderItem(params.id);
 
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode,
         };
     }
 
@@ -46,7 +50,8 @@ const OrderItem = () => {
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: orderItem.error ?? '',
-        message: orderItem.message ?? ''
+        message: orderItem.message ?? '',
+        statusCode: orderItem.statusCode ?? '',
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -87,7 +92,6 @@ const OrderItem = () => {
         <TabPanel info={basicOrderItemInfo} />,
         <TabPanel info={productInfo} />,
         <TabPanel info={orderInfo} />,
-        
     ];
 
     useEffect(() => {
@@ -98,16 +102,16 @@ const OrderItem = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
@@ -116,7 +120,7 @@ const OrderItem = () => {
                     <Heading fontSize='3xl' color='blue.700'>Order Item</Heading>
 
                     <HStack spacing='2'>
-                        <Tooltip hasArrow label='Edit stock item' placement='bottom' borderRadius='md'>
+                        <Tooltip hasArrow label='Edit order item' placement='bottom' borderRadius='md'>
                             <IconButton as={RouterLink} size={{ base: 'sm', md: 'md' }} to={`/orders/${order.id}/orderlist/${orderItem.id}/edit`} state={{ orderItem: orderItem }} icon={<MdOutlineEdit />} colorScheme='orange' />
                         </Tooltip>
                     </HStack>

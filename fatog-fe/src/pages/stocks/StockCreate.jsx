@@ -14,10 +14,20 @@ import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaRegTrashCan } from "react-icons/fa6";
 import { MdOutlineEdit } from "react-icons/md";
 import { HiOutlinePlus } from 'react-icons/hi';
+import { isUnauthorized, getMonetaryValue } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export const loader = async ({ request }) => {
     await requireAuth(request);
-    const response = await getProducts(request);
+    const response = await getProducts();
+
+    if (response.error || response.message) {
+        return {
+            error: response.error,
+            message: response.message,
+            statusCode: response.statusCode,
+        };
+    }
 
     return response;
 };
@@ -28,13 +38,6 @@ const breadcrumbData = [
     { name: 'Create Stock', ref: '/stocks/create' },
 ];
 
-export const getMonetaryValue = (value) => {
-    return new Intl.NumberFormat('en-NG', {
-        style: 'currency',
-        currency: 'NGN',
-    }).format(value);
-}
-
 const StockCreate = () => {
     const products = useLoaderData();
     const navigate = useNavigate();
@@ -43,6 +46,11 @@ const StockCreate = () => {
     const focusInput = useRef();
     const [toastState, setToastState] = useToastHook();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState({
+        error: products.error ?? '',
+        message: products.message ?? '',
+        statusCode: products.statusCode ?? '',
+    });
 
     const [stockList, setStockList] = useState([]);
     const [selectedStockItem, setSelectedStockItem] = useState(null);
@@ -55,6 +63,21 @@ const StockCreate = () => {
     const [file, setFile] = useState();
 
     const productOptions = products.map(product => product.name);
+
+    useEffect(() => {
+        if (error.error || error.message) {
+            setToastState({
+                title: error.error,
+                description: error.message,
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
+        }
+    }, []);
 
     useEffect(() => {
         let totalAmountValue = 0;
@@ -209,16 +232,11 @@ const StockCreate = () => {
         const stockListData = {
             data: [...stockList],
         }
-        console.log(stockListData);
+        // console.log(stockListData);
 
         // TODO: Consume create stock list API endpoint
         try {
             const response = await createStock(stockListData);
-
-            if (response.unAuthorize) {
-                sessionStorage.removeItem('user');
-                navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-            }
 
             if (response.error || response.message) {
                 setIsSubmitting(false);
@@ -228,6 +246,10 @@ const StockCreate = () => {
                     status: 'error',
                     icon: <Icon as={BiError} />
                 });
+
+                setTimeout(() => {
+                    isUnauthorized(response, navigate);
+                }, 6000);
 
                 return response.error;
             }
@@ -312,7 +334,7 @@ const StockCreate = () => {
                 </HStack>
             </Stack>
 
-            <Stack direction={{base: 'column', lg: 'row'}} spacing='4' mt='4'>
+            <Stack direction={{ base: 'column', lg: 'row' }} spacing='4' mt='4'>
                 <Button w='full' variant='outline' colorScheme='red' onClick={clearStockList}>Clear Stock List</Button>
                 <Button
                     w='full'
@@ -336,85 +358,87 @@ const StockCreate = () => {
     );
 
     return (
-        <Stack spacing='6'>
-            <Box>
-                <Breadcrumb linkList={breadcrumbData} />
-            </Box>
-            <HStack justifyContent='space-between'>
-                <Heading fontSize='3xl' color='blue.700'>Create Stock</Heading>
-                <Button colorScheme='blue' leftIcon={<HiOutlinePlus />} onClick={openForm}>Add Stock Item</Button>
-            </HStack>
-            {
-                stockList.length === 0 ?
-                    <VStack h='60vh' justifyContent='center'>
-                        <Heading fontSize='2xl'>Stock list is empty.</Heading>
-                        <Text>Add stocks to view a list of stock items.</Text>
-                    </VStack> :
-                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing='4' py='6' borderTopWidth='1px'>
-                        {stockListGrid}
-                        {stockSummary}
-                    </SimpleGrid>
-            }
+        error.error || error.message ?
+            <FetchError error={error} /> :
+            <Stack spacing='6'>
+                <Box>
+                    <Breadcrumb linkList={breadcrumbData} />
+                </Box>
+                <HStack justifyContent='space-between'>
+                    <Heading fontSize='3xl' color='blue.700'>Create Stock</Heading>
+                    <Button colorScheme='blue' leftIcon={<HiOutlinePlus />} onClick={openForm}>Add Stock Item</Button>
+                </HStack>
+                {
+                    stockList.length === 0 ?
+                        <VStack h='60vh' justifyContent='center'>
+                            <Heading fontSize='2xl'>Stock list is empty.</Heading>
+                            <Text>Add stocks to view a list of stock items.</Text>
+                        </VStack> :
+                        <SimpleGrid columns={{ base: 1, md: 2 }} spacing='4' py='6' borderTopWidth='1px'>
+                            {stockListGrid}
+                            {stockSummary}
+                        </SimpleGrid>
+                }
 
-            {/* Stock Creation Form */}
-            <Drawer isOpen={isOpen} onClose={closeDrawer} initialFocusRef={focusInput} closeOnOverlayClick={false}>
-                <DrawerOverlay />
-                <DrawerContent>
-                    <DrawerCloseButton />
-                    <DrawerHeader>{selectedStockItem ? 'Update Stock Item' : 'Add Stock Item'}</DrawerHeader>
+                {/* Stock Creation Form */}
+                <Drawer isOpen={isOpen} onClose={closeDrawer} initialFocusRef={focusInput} closeOnOverlayClick={false}>
+                    <DrawerOverlay />
+                    <DrawerContent>
+                        <DrawerCloseButton />
+                        <DrawerHeader>{selectedStockItem ? 'Update Stock Item' : 'Add Stock Item'}</DrawerHeader>
 
-                    <DrawerBody>
-                        <Stack spacing='24px'>
-                            <FormControl>
-                                <FormLabel htmlFor='product'>Select Product</FormLabel>
-                                <Select
-                                    id='product'
-                                    value={selectedProduct?.name}
-                                    onChange={handleProductChange}
-                                    ref={focusInput}
-                                >
-                                    <option value=''>Select Product</option>
-                                    {productOptions.map((product, index) => (
-                                        <option key={index} value={product}>{product}</option>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        <DrawerBody>
+                            <Stack spacing='24px'>
+                                <FormControl>
+                                    <FormLabel htmlFor='product'>Select Product</FormLabel>
+                                    <Select
+                                        id='product'
+                                        value={selectedProduct?.name}
+                                        onChange={handleProductChange}
+                                        ref={focusInput}
+                                    >
+                                        <option value=''>Select Product</option>
+                                        {productOptions.map((product, index) => (
+                                            <option key={index} value={product}>{product}</option>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
-                            <FormControl>
-                                <FormLabel htmlFor='pricePerBag'>Unit Price(₦)</FormLabel>
-                                <Input
-                                    id='pricePerBag'
-                                    name='pricePerBag'
-                                    value={pricePerBag ? pricePerBag : ''}
-                                    onChange={(e) => setPricePerBag(e.target.value)}
-                                    type='number'
-                                    placeholder='Unit Price Per Bag'
-                                />
-                            </FormControl>
+                                <FormControl>
+                                    <FormLabel htmlFor='pricePerBag'>Unit Price(₦)</FormLabel>
+                                    <Input
+                                        id='pricePerBag'
+                                        name='pricePerBag'
+                                        value={pricePerBag ? pricePerBag : ''}
+                                        onChange={(e) => setPricePerBag(e.target.value)}
+                                        type='number'
+                                        placeholder='Unit Price Per Bag'
+                                    />
+                                </FormControl>
 
-                            <FormControl>
-                                <FormLabel htmlFor='noOfBags'>No. of Bags</FormLabel>
-                                <Input
-                                    id='noOfBags'
-                                    name='noOfBags'
-                                    value={noOfBags ? noOfBags : ''}
-                                    onChange={(e) => setNoOfBags(e.target.value)}
-                                    type='number'
-                                    placeholder='No. of Bags'
-                                />
-                            </FormControl>
-                        </Stack>
-                    </DrawerBody>
+                                <FormControl>
+                                    <FormLabel htmlFor='noOfBags'>No. of Bags</FormLabel>
+                                    <Input
+                                        id='noOfBags'
+                                        name='noOfBags'
+                                        value={noOfBags ? noOfBags : ''}
+                                        onChange={(e) => setNoOfBags(e.target.value)}
+                                        type='number'
+                                        placeholder='No. of Bags'
+                                    />
+                                </FormControl>
+                            </Stack>
+                        </DrawerBody>
 
-                    <DrawerFooter>
-                        <Button variant='outline' mr={3} onClick={closeDrawer}>
-                            Cancel
-                        </Button>
-                        <Button onClick={selectedStockItem ? updateStockItem : addStockItem} colorScheme='blue'>{selectedStockItem ? 'Update' : 'Add'}</Button>
-                    </DrawerFooter>
-                </DrawerContent>
-            </Drawer>
-        </Stack >
+                        <DrawerFooter>
+                            <Button variant='outline' mr={3} onClick={closeDrawer}>
+                                Cancel
+                            </Button>
+                            <Button onClick={selectedStockItem ? updateStockItem : addStockItem} colorScheme='blue'>{selectedStockItem ? 'Update' : 'Add'}</Button>
+                        </DrawerFooter>
+                    </DrawerContent>
+                </Drawer>
+            </Stack >
     )
 }
 

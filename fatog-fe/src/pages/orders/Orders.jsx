@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLoaderData, Link as RouterLink } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Tooltip } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
-
+import { FaEllipsisVertical, FaMoneyBill } from "react-icons/fa6";
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
-import AddButton from '../../components/AddButton';
 import { getOrders } from '../../api/orders';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -29,18 +30,20 @@ const breadcrumbData = [
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const orders = await getOrders(request);
+    const orders = await getOrders();
 
     if (orders.error || orders.message) {
         return {
             error: orders.error,
-            message: orders.message
+            message: orders.message,
+            statusCode: orders.statusCode,
         }
     }
 
     const data = orders.map(order => {
         return {
             id: order.id,
+            refId: order.refId,
             totalAmount: order.totalAmount,
             totalNoOfBags: order.totalNoOfBags,
             totalWeight: order.totalWeight,
@@ -53,6 +56,7 @@ export async function loader({ request }) {
             amountPaid: order.amountPaid,
             outstandingPayment: order.outStandingPayment,
             date: order.createdAt,
+            invoice: order.invoice,
         }
     });
 
@@ -60,36 +64,36 @@ export async function loader({ request }) {
 }
 
 const Orders = () => {
+    const navigate = useNavigate();
     const orders = useLoaderData();
+    const { invoice } = orders;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: orders.error ?? '',
+        message: orders.message ?? '',
+        statusCode: orders.statusCode ?? ''
     });
 
+    // console.log(orders);
+
     useEffect(() => {
-        if (orders.error || orders.message) {
+        if (error.error || error.message) {
             setToastState({
-                title: orders.error,
-                description: orders.message,
+                title: error.error,
+                description: error.message,
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
 
-            setError({
-                error: orders.error,
-                message: orders.message
-            });
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
     return (
-        error.error ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+        error.error || error.message ?
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />
@@ -122,11 +126,27 @@ const ActionButtons = ({ order }) => {
     }
 
     return (
-        <HStack spacing='1'>
-            <Tooltip hasArrow label='Preview order' placement='bottom' borderRadius='md'>
-                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-order-id={order.id} onClick={viewOrder} />
-            </Tooltip>
-        </HStack>
+        <Menu>
+            <MenuButton
+                as={IconButton}
+                aria-label='Options'
+                icon={<FaEllipsisVertical />}
+                variant='unstyled'
+            />
+            <MenuList py='0'>
+                <MenuItem icon={<IoEyeOutline />} data-order-id={order.id} onClick={viewOrder}>
+                    Preview
+                </MenuItem>
+
+                {
+                    !order.invoice ?
+                        <MenuItem as={RouterLink} to={`/sales/create/${order.id}`} icon={<FaMoneyBill />}>
+                            Create Sales
+                        </MenuItem> :
+                        null
+                }
+            </MenuList>
+        </Menu>
     )
 }
 

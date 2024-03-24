@@ -1,5 +1,5 @@
 import { Box, Heading, Text, Button, Flex, Stack, Link, Icon } from "@chakra-ui/react";
-import { useNavigate, useLoaderData } from 'react-router-dom';
+import { useNavigate, useLoaderData, useLocation } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import bgImage from '../assets/fish-hero3.png';
 import bgImage2 from '../assets/inventoryImg.webp';
@@ -13,7 +13,7 @@ import useAuth from "../hooks/useAuth";
 
 export async function loader({ request }) {
     const error = new URL(request.url).searchParams.get('message')
-    return error;
+    return { error, request };
 }
 
 const Home = () => {
@@ -25,7 +25,10 @@ const Home = () => {
     const [toastState, setToastState] = useToastHook();
     const { login } = useAuth();
     const navigate = useNavigate();
-    const unAuthorizeError = useLoaderData();
+    const { errorMessage, request } = useLoaderData();
+    const { state } = useLocation();
+    const message = state && state.message;
+    const redirectTo = state && state.redirectTo;
 
     const submit = async (userData) => {
         const formData = new FormData();
@@ -47,7 +50,9 @@ const Home = () => {
         }
 
         login(response);
-        navigate('/dashboard', { replace: true });
+        // const redirectTo = new URL(request.url).searchParams.get('redirectTo') || '/dashboard';
+        const to = '/dashboard';
+        navigate(to, { replace: true });
     };
 
     return (
@@ -80,8 +85,8 @@ const Home = () => {
                     <Logo />
 
                     {
-                        unAuthorizeError &&
-                        <Text fontSize='md' fontWeight='medium' px='3' py='2' bg='red.100' color='red.600'>{unAuthorizeError}</Text>
+                        message &&
+                        <Text fontSize='md' fontWeight='medium' px='3' py='2' bg='red.100' color='red.600'>{message}</Text>
                     }
 
                     <Heading fontSize='2xl' >Login</Heading>

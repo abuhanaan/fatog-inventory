@@ -12,10 +12,12 @@ import Tabs from '../../components/Tabs';
 import { requireAuth } from '../../hooks/useAuth';
 import { getProduct, deleteProduct } from '../../api/products';
 import { useToastHook } from '../../hooks/useToast';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getProduct(request, params.id);
+    const response = await getProduct(params.id);
 
     if (response.error || response.message) {
         return {
@@ -37,8 +39,9 @@ const ProductView = () => {
     const [toastState, setToastState] = useToastHook();
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: product.error ?? '',
+        message: product.message ?? '',
+        statusCode: product.statusCode ?? '',
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -49,22 +52,17 @@ const ProductView = () => {
     const tabPanels = [<GeneralInfo product={product} />, <ManufacturerInfo product={product} />];
 
     useEffect(() => {
-        if (product.error || product.message) {
+        if (error.error || error.message) {
             setToastState({
-                title: product.error,
-                description: product.message,
+                title: error.error,
+                description: error.message,
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
 
             setTimeout(() => {
-                navigate('/products');
+                isUnauthorized(error, navigate);
             }, 6000);
-
-            setError({
-                error: product.error,
-                message: product.message
-            });
         }
     }, []);
 
@@ -76,11 +74,6 @@ const ProductView = () => {
         // TODO: Consume DELETE product endpoint
         const response = await deleteProduct(product.id);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -91,6 +84,10 @@ const ProductView = () => {
 
             setIsDeleting(false);
             closeModalRef.current.click();
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -132,11 +129,8 @@ const ProductView = () => {
         </HStack>
 
     return (
-        error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+        error.error || error.message ?
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

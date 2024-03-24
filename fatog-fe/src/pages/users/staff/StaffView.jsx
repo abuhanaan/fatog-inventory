@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
 import Breadcrumb from '../../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
-import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
@@ -16,6 +16,8 @@ import { requireAuth } from '../../../hooks/useAuth';
 import { getStaffData } from '../../../api/staff';
 import { deleteUser, activateUser, deactivateUser } from '../../../api/users';
 import { useToastHook } from '../../../hooks/useToast';
+import { isUnauthorized } from '../../../utils';
+import FetchError from '../../../components/FetchError';
 
 export async function loader({ request }) {
     await requireAuth(request);
@@ -24,11 +26,10 @@ export async function loader({ request }) {
     if (response.error || response.message) {
         return {
             error: response.error,
-            message: response.message
+            message: response.message,
+            statusCode: response.statusCode
         };
     }
-
-    // console.log(response);
 
     const data = {
         id: response.staffId,
@@ -50,6 +51,7 @@ export async function loader({ request }) {
 
 const StaffView = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const staff = useLoaderData();
     const { sales, stocks, orders } = staff;
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -59,7 +61,8 @@ const StaffView = () => {
     const [isActivating, setIsActivating] = useState(false);
     const [error, setError] = useState({
         error: staff.error ?? '',
-        message: staff.message ?? ''
+        message: staff.message ?? '',
+        statusCode: staff.statusCode ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -76,12 +79,22 @@ const StaffView = () => {
         { id: 'actions', header: '' },
     ];
 
+    const ordersColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'totalAmount', header: 'Amount' },
+        { id: 'totalNoOfBags', header: 'No. of Bags' },
+        { id: 'totalWeight', header: 'Total Weight' },
+        { id: 'phoneNumber', header: 'Customer Phone' },
+        { id: 'date', header: 'Date' },
+        { id: 'actions', header: '' },
+    ]
+
     const tabTitles = ['Bio Data', 'Sales', 'Stocks', 'Orders'];
     const tabPanels = [
         <GeneralInfo staff={staff} />,
         <SalesTable sales={sales} />,
         <StocksTable stocks={stocks} columns={stocksColumns} path='/stocks' />,
-        <OrdersTable orders={orders} />
+        <OrdersTable orders={orders} columns={ordersColumns} path='/orders' />
     ];
 
     useEffect(() => {
@@ -92,6 +105,10 @@ const StaffView = () => {
                 status: 'error',
                 icon: <Icon as={BiError} />
             });
+
+            setTimeout(() => {
+                isUnauthorized(error, navigate);
+            }, 6000);
         }
     }, []);
 
@@ -103,11 +120,6 @@ const StaffView = () => {
         // TODO: Consume DELETE user endpoint
         const response = await deleteUser(staff.id);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -118,6 +130,10 @@ const StaffView = () => {
 
             setIsDeleting(false);
             closeModalRef.current.click();
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -146,11 +162,6 @@ const StaffView = () => {
 
         const response = await activateUser(staffId);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -160,6 +171,10 @@ const StaffView = () => {
             });
 
             setIsActivating(false);
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -187,11 +202,6 @@ const StaffView = () => {
 
         const response = await deactivateUser(staffId);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -201,6 +211,10 @@ const StaffView = () => {
             });
 
             setIsActivating(false);
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -242,11 +256,7 @@ const StaffView = () => {
 
     return (
         error.error || error.message ?
-            <VStack h='30rem' justifyContent='center'>
-                <Heading>{error.error}</Heading>
-                <Text>{error.message}</Text>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-            </VStack> :
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

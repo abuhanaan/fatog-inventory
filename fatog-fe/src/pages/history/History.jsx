@@ -12,80 +12,78 @@ import Tabs from '../../components/Tabs';
 import StocksTable from '../../components/StocksTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
-import { getStockList } from '../../api/stocks';
+import { getHistory } from '../../api/history';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
 
-export async function loader({ params, request }) {
+export const loader = async ({ params, request }) => {
     await requireAuth(request);
-    const response = await getStockList(params.id);
+    const history = await getHistory(params.id);
 
-    if (response.error || response.message) {
+    if (history.error || history.message) {
         return {
-            error: response.error,
-            message: response.message,
-            statusCode: response.statusCode,
+            error: history.error,
+            message: history.message,
+            statusCode: history.statusCode
         };
     }
 
     const data = {
-        id: response.id,
-        refId: response.refId,
-        totalNoOfBags: response.totalNoOfBags,
-        totalWeight: response.totalWeight,
-        totalAmount: response.totalAmount,
-        date: response.createdAt,
-        stockList: response.stockLists,
-        staffId: response.staffId,
-        staff: response.staff,
-        invoice: response.invoice
+        id: history.id,
+        operationStatus: history.decrement ? 'Decrement' : 'Increment',
+        effectQuantity: history.effectQuantity,
+        remainderAfter: history.remainderAfter,
+        remainderBefore: history.remainderBefore,
+        orderItemId: history.orderItemId,
+        note: history.note,
+        date: history.createdAt,
+        inventory: history.inventory,
+        operationData: history.stockItem ?? history.orderItem,
     };
 
     return data;
 }
 
-const StockList = () => {
+const History = () => {
     const navigate = useNavigate();
-    const stock = useLoaderData();
-    const { stockList, staff } = stock;
+    const history = useLoaderData();
+    const { inventory, operationData } = history;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
-        error: stockList.error ?? '',
-        message: stockList.message ?? '',
-        statusCode: stockList.statusCode ?? ''
+        error: history.error ?? '',
+        message: history.message ?? '',
+        statusCode: history.statusCode ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
-        { name: 'Stocks', ref: '/stocks' },
-        { name: 'Stock List', ref: `/stocks/${stock.id}` },
+        { name: 'Inventories', ref: '/inventories' },
+        { name: 'Inventory', ref: `/inventories/${inventory.id}` },
+        { name: 'Inventory History', ref: `/inventories/histories/${history.id}` },
     ];
 
-    const basicStockInfo = {
-        staff: (staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'N/A',
-        totalAmount: stock.totalAmount,
-        totalNoOfBags: stock.totalNoOfBags,
-        totalWeight: stock.totalWeight,
-        date: stock.date
-    }
+    const basicHistoryInfo = {
+        remainderBefore: history.remainderBefore,
+        remainderAfter: history.remainderAfter,
+        effectQuantity: history.effectQuantity,
+        operationStatus: history.operationStatus,
+        remainingQuantityInStock: inventory.remainingQty,
+        note: history.note,
+        date: history.date,
+    };
 
-    const stockListColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'pricePerBag', header: 'Price per Bag' },
-        { id: 'noOfBags', header: 'No. of Bags' },
-        { id: 'totalAmount', header: 'Total Amount' },
-        { id: 'totalWeight', header: 'Total Weight' },
-        { id: 'actions', header: '' },
-    ];
+    const orderInfo = {
+        pricePerBag: operationData.pricePerBag,
+        noOfBags: operationData.noOfBags,
+        totalAmount: operationData.totalAmount,
+        totalWeight: operationData.totalWeight,
+        date: operationData.createdAt,
+    };
 
-    const stockListData = stockList.map(prev => ({
-        ...prev,
-        stockId: stock.id
-    }));
-
-    const tabTitles = ['Overview', 'Stock List'];
+    const tabTitles = ['Overview', history.orderItemId ? 'Order Details' : 'Stock Details'];
     const tabPanels = [
-        <GeneralInfo info={basicStockInfo} />,
-        <StocksTable stocks={stockListData} columns={stockListColumns} path={`/stocks/${stock.id}/stocklist`} />,
+        <TabPanel info={basicHistoryInfo} />,
+        <TabPanel info={orderInfo} />,
+
     ];
 
     useEffect(() => {
@@ -111,7 +109,7 @@ const StockList = () => {
                     <Breadcrumb linkList={breadcrumbData} />
                 </Box>
                 <HStack justifyContent='space-between'>
-                    <Heading fontSize='3xl' color='blue.700'>Stock</Heading>
+                    <Heading fontSize='3xl' color='blue.700'>History</Heading>
                 </HStack>
                 <Box marginTop='8'>
                     <Tabs titles={tabTitles} panels={tabPanels} variant='enclosed' />
@@ -120,7 +118,7 @@ const StockList = () => {
     )
 }
 
-const GeneralInfo = ({ info }) => {
+const TabPanel = ({ info }) => {
     const getInfoArray = (info) => {
         const infoArray = [];
         for (const [key, value] of Object.entries(info)) {
@@ -145,4 +143,4 @@ const GeneralInfo = ({ info }) => {
     )
 }
 
-export default StockList;
+export default History;

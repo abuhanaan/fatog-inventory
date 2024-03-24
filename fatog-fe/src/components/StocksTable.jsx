@@ -12,6 +12,8 @@ const StocksTable = ({ stocks, columns, path }) => {
         date: stock.createdAt
     }));
 
+    // console.log(stocksData);
+
     return (
         <Box>
             {

@@ -10,10 +10,12 @@ import Modal from '../../components/Modal';
 import { requireAuth } from '../../hooks/useAuth';
 import { getManufacturer, deleteManufacturer } from '../../api/manufacturers';
 import { useToastHook } from '../../hooks/useToast';
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const response = await getManufacturer(request, params.id);
+    const response = await getManufacturer(params.id);
 
     if (response.error || response.message) {
         return {
@@ -34,8 +36,9 @@ const ManufacturerView = () => {
     const [toastState, setToastState] = useToastHook();
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState({
-        error: '',
-        message: ''
+        error: manufacturer.error ?? '',
+        message: manufacturer.message ?? '',
+        statusCode: manufacturer.statusCode ?? ''
     });
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
@@ -53,13 +56,8 @@ const ManufacturerView = () => {
             });
 
             setTimeout(() => {
-                navigate('/manufacturers');
+                isUnauthorized(error, navigate);
             }, 6000);
-
-            setError({
-                error: manufacturer.error,
-                message: manufacturer.message
-            });
         }
     }, []);
 
@@ -71,11 +69,6 @@ const ManufacturerView = () => {
         // TODO: Consume DELETE manufacturer endpoint
         const response = await deleteManufacturer(manufacturer.id);
 
-        if (response.unAuthorize) {
-            sessionStorage.removeItem('user');
-            navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        }
-
         if (response.error || response.message) {
             setToastState({
                 title: response.error,
@@ -86,6 +79,10 @@ const ManufacturerView = () => {
 
             setIsDeleting(false);
             closeModalRef.current.click();
+
+            setTimeout(() => {
+                isUnauthorized(response, navigate);
+            }, 6000);
 
             return response.error;
         }
@@ -127,11 +124,8 @@ const ManufacturerView = () => {
         </HStack>
 
     return (
-        error.error ?
-            <VStack>
-                <Box>{error.error}</Box>
-                <Box>{error.message}</Box>
-            </VStack> :
+        error.error || error.message ?
+            <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
                     <Breadcrumb linkList={breadcrumbData} />

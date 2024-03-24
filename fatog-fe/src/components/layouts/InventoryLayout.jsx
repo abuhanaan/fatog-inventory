@@ -1,6 +1,6 @@
 // Layout.js
 import React, { useRef } from 'react';
-import { Box, Flex, Stack, Spacer, useColorMode, Button, Menu, MenuButton, MenuList, MenuItem, Avatar, IconButton, Icon, Spinner, useDisclosure } from '@chakra-ui/react';
+import { Box, Flex, Stack, Spacer, useColorMode, Button, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Avatar, IconButton, Icon, Spinner, useDisclosure } from '@chakra-ui/react';
 import { Link, Outlet, useNavigation } from 'react-router-dom';
 import SideNavLinks from '../SideNavLinks';
 import { HamburgerIcon } from '@chakra-ui/icons';
@@ -32,8 +32,9 @@ const InventoryLayout = () => {
                             <MenuButton>
                                 <Avatar size="sm" />
                             </MenuButton>
-                            <MenuList>
+                            <MenuList py='0'>
                                 <MenuItem as={Link} to='/profile'>Profile</MenuItem>
+                                <MenuDivider my='0' />
                                 <MenuItem onClick={() => { logout() }}>Logout</MenuItem>
                             </MenuList>
                         </Menu>

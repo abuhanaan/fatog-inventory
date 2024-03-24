@@ -7,7 +7,7 @@ import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
 import UsersFilter from './UsersFilter';
-import { getMonetaryValue } from '../pages/stocks/StockCreate';
+import { getMonetaryValue } from '../utils';
 
 export const formatDate = (dateParam) => {
     const date = new Date(dateParam);
@@ -17,7 +17,6 @@ export const formatDate = (dateParam) => {
 const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState, fileName, render }) => {
     const { pathname } = useLocation();
     const columnHelper = createColumnHelper();
-
 
     const columns = cols.map(col => {
         if (col.id === 'S/N') {
@@ -44,7 +43,7 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
             )
         }
 
-        if (col.id === 'totalAmount' || col.id === 'pricePerBag' || col.id === 'totalPrice') {
+        if (col.id === 'totalAmount' || col.id === 'pricePerBag' || col.id === 'totalPrice' || col.id === 'amountPaid' || col.id === 'outstandingPayment' || col.id === 'amountPayable' || col.id === 'previousPaymentTotal') {
             return (
                 columnHelper.accessor(col.id, {
                     id: col.id,

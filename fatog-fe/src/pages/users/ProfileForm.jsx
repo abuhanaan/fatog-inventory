@@ -8,6 +8,7 @@ import SelectElement from '../../components/form/SelectElement';
 import { updateStaff } from '../../api/staff';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
+import { isUnauthorized } from '../../utils';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { MdOutlineSyncLock } from "react-icons/md";
@@ -49,17 +50,13 @@ const ProfileForm = () => {
 
         const staffData = {
             ...data,
-            gender: genderRef.current.value,
-            staffId: staff.id
+            gender: genderRef.current.value
         };
 
         try {
-            const response = await updateStaff(staff.id, staffData);
+            const response = await updateStaff(staffData);
 
-            if (response.unAuthorize) {
-                sessionStorage.removeItem('user');
-                navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-            }
+            // console.log(response);
 
             if (response.error || response.message) {
                 setToastState({
@@ -68,6 +65,10 @@ const ProfileForm = () => {
                     status: 'error',
                     icon: <Icon as={BiError} />
                 });
+
+                setTimeout(() => {
+                    isUnauthorized(response, navigate);
+                }, 6000);
 
                 return response.error;
             }
@@ -101,7 +102,7 @@ const ProfileForm = () => {
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                     <TextInput name='firstName' label='First Name' control={control} type='text' fieldRef={firstNameRef} defaultVal={staff ? staff.firstName : ''} />
 
-                    <TextInput name='lastName' label='Last Name' control={control} type='text' fieldRef={lastNameRef} defaultVal={staff ? staff.firstName : ''} />
+                    <TextInput name='lastName' label='Last Name' control={control} type='text' fieldRef={lastNameRef} defaultVal={staff ? staff.lastName : ''} />
 
                     <SelectElement data={genderOptions} label='Gender' fieldRef={genderRef} defaultVal={staff ? staff.gender?.toUpperCase() : ''} placeholder='Select Gender' />
 
@@ -114,6 +115,7 @@ const ProfileForm = () => {
                         loadingText='Updating...'
                         spinnerPlacement='end'
                         ref={submitBtnRef}
+                        mt='4'
                         spinner={<Spinner
                             thickness='4px'
                             speed='0.5s'

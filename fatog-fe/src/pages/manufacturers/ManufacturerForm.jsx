@@ -8,6 +8,8 @@ import { createManufacturer, updateManufacturer } from '../../api/manufacturers'
 import { useToastHook } from '../../hooks/useToast';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
+import { isUnauthorized } from '../../utils';
+import FetchError from '../../components/FetchError';
 
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
@@ -38,11 +40,6 @@ const ManufacturerForm = () => {
             try {
                 const response = await createManufacturer(manufacturerData);
 
-                if (response.unAuthorize) {
-                    sessionStorage.removeItem('user');
-                    navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-                }
-
                 if (response.error || response.message) {
                     setToastState({
                         title: response.error,
@@ -50,6 +47,10 @@ const ManufacturerForm = () => {
                         status: 'error',
                         icon: <Icon as={BiError} />
                     });
+
+                    setTimeout(() => {
+                        isUnauthorized(response, navigate);
+                    }, 6000);
 
                     return response.error;
                 }
@@ -88,6 +89,10 @@ const ManufacturerForm = () => {
                         status: 'error',
                         icon: <Icon as={BiError} />
                     });
+
+                    setTimeout(() => {
+                        isUnauthorized(response, navigate);
+                    }, 6000);
 
                     return response.error;
                 }

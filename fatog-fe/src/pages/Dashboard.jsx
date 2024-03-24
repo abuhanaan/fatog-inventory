@@ -5,7 +5,7 @@ import { requireAuth } from '../hooks/useAuth';
 
 export const loader = async ({ request }) => {
     await requireAuth(request);
-    const loggedInUser = JSON.parse(sessionStorage.getItem('user')) ?? null;
+    const loggedInUser = JSON.parse(localStorage.getItem('user')) ?? null;
 
     return loggedInUser;
 }
