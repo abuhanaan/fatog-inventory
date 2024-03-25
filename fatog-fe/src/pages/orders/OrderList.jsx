@@ -81,10 +81,7 @@ const OrderList = () => {
         totalWeight: order.totalWeight,
         customerPhoneNumber: order.customerPhoneNumber,
         shippingAddress: order.shippingAddress,
-        // amountPaid: order.amountPaid,
         outstandingPayment: order.outstandingPayment,
-        // paymentStatus: order.paymentStatus,
-        // deliveryStatus: order.deliveryStatus,
         date: order.date,
         note: order.note,
     }
@@ -102,6 +99,8 @@ const OrderList = () => {
         ...prev,
         orderId: order.id
     }));
+
+    console.log(orderListData);
 
     const paymentsData = payments.map(payment => ({
         amountPaid: payment.amountPaid,

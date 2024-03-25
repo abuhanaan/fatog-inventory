@@ -26,7 +26,7 @@ const InventoryLayout = () => {
                     <SideNavLinks />
                     <SideDrawer isOpen={isOpen} onClose={onClose} btnRef={drawerBtnRef} />
                 </Flex>
-                <Flex direction='column' flex="1" minHeight='100vh'>
+                <Flex direction='column' flex="1" minHeight='100vh' overflowX='auto'>
                     {/* Main Content */}
                     <Flex p={4} alignItems="center" bg='white' borderBottomWidth='1px' borderColor='gray.200' h='65px'>
                         <Icon as={HamburgerIcon} fontSize='24px' color='gray.800' display={['block', 'block', 'none']} onClick={onOpen} ref={drawerBtnRef} />
