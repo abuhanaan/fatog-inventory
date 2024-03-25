@@ -40,6 +40,8 @@ export async function loader({ request }) {
         }
     }
 
+    // console.log(orders)
+
     const data = orders.map(order => {
         return {
             id: order.id,

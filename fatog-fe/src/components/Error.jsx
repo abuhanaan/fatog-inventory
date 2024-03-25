@@ -1,6 +1,7 @@
 import { useRouteError, useNavigate } from 'react-router-dom';
 import { VStack, HStack, Text, Heading, UnorderedList, ListItem, Button } from '@chakra-ui/react';
 import { GoHome } from "react-icons/go";
+import { TbRefresh } from "react-icons/tb";
 
 const Error = () => {
     const error = useRouteError();
@@ -35,7 +36,7 @@ const Error = () => {
                 <ListItem>Consult the developer for technical resolution if the issue persists.</ListItem>
             </UnorderedList>
             <HStack spacing='4'>
-                <Button colorScheme='blue' onClick={refresh} mt='6'>Refresh</Button>
+                <Button colorScheme='blue' leftIcon={<TbRefresh />} onClick={refresh} mt='6'>Refresh</Button>
                 <Button colorScheme='blue' leftIcon={<GoHome />} onClick={goHome} mt='6'>Return to homepage</Button>
             </HStack>
         </VStack>

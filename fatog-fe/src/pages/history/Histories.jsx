@@ -91,7 +91,7 @@ const Histories = () => {
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>History</Heading>
                 </HStack>
-                <Box marginTop='8'>
+                <Box marginTop='2'>
                     {
                         histories?.length === 0 ?
                             <EmptySearch headers={['S/N', 'PRODUCT', 'MANUFACTURER', 'STAFF', 'CUSTOMER', 'AMOUNT', 'QTY', 'PAYMENT STATUS', 'DELIVERY STATUS', 'DATE']} type='history' /> :

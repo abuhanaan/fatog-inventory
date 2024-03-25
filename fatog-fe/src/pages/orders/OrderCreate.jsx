@@ -18,6 +18,7 @@ import { HiOutlinePlus } from 'react-icons/hi';
 import { getMonetaryValue } from '../../utils';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export const loader = async ({ request }) => {
     await requireAuth(request);
@@ -371,9 +372,10 @@ const OrderCreate = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Create Order</Heading>
                     <Button colorScheme='blue' leftIcon={<HiOutlinePlus />} onClick={openForm}>Add Order Item</Button>

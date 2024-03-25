@@ -11,6 +11,7 @@ import { requireAuth } from '../../hooks/useAuth';
 import { getUser, deleteUser, activateUser, deactivateUser } from '../../api/users';
 import { useToastHook } from '../../hooks/useToast';
 import UserField from '../../components/UserField';
+import Back from '../../components/Back';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -226,9 +227,10 @@ const UserView = () => {
                 <Box>{error.message}</Box>
             </VStack> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize={{ base: '2xl', md: '3xl' }} color='blue.700'>User</Heading>
                     <HStack spacing='2'>

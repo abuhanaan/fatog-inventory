@@ -14,6 +14,7 @@ import { isUnauthorized } from '../../utils';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { MdOutlineSyncLock } from "react-icons/md";
+import Back from '../../components/Back';
 
 const userRoleOptions = ['ADMIN', 'CASHIER', 'CEO', 'CUSTOMER', 'DEALER', 'MANAGER'];
 const userCategoryOptions = ['staff', 'customer'];
@@ -53,7 +54,7 @@ const UserForm = () => {
 
             return;
         }
-        
+
         if (!categoryRef.current.value) {
             setToastState({
                 title: 'Category Required',
@@ -177,9 +178,10 @@ const UserForm = () => {
 
     return (
         <Stack spacing='6'>
-            <Box>
+            <Stack direction={{ base: 'column', sm: 'row' }} justifyContent='space-between' alignItems='center'>
                 <Breadcrumb linkList={breadcrumbData} />
-            </Box>
+                <Back />
+            </Stack>
             <HStack justifyContent='space-between'>
                 <Heading fontSize='3xl' color='blue.700'>{currentUser ? 'Update User' : 'Create User'}</Heading>
             </HStack>

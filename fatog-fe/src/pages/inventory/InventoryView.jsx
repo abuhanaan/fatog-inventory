@@ -18,6 +18,7 @@ import { useToastHook } from '../../hooks/useToast';
 import ListingsTable from '../../components/Table';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -96,9 +97,10 @@ const InventoryView = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
 
                 <HStack justifyContent='space-between'>
                     <Heading fontSize={{ base: '2xl', md: '3xl' }} color='blue.700'>{inventory.name}</Heading>

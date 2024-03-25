@@ -12,6 +12,7 @@ import { FaRegThumbsUp } from "react-icons/fa6";
 import { getStockItem, updateStockItem } from '../../api/stocks';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -135,9 +136,10 @@ const StockItemUpdate = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Update Stock Item</Heading>
                 </HStack>
