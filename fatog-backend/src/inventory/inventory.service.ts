@@ -50,6 +50,7 @@ export class InventoryService {
       where: { id },
       include: { product: true, history: true },
     });
+    console.log({ id, inventory });
     await this.checkIfInventoryExists(inventory, id);
     return inventory;
   }
