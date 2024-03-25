@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
@@ -46,13 +47,21 @@ export class InventoryService {
   }
 
   async findOne(id: number) {
-    const inventory = await this.prisma.inventory.findUnique({
-      where: { id },
-      include: { product: true, history: true },
-    });
-    console.log({ id, inventory });
-    await this.checkIfInventoryExists(inventory, id);
-    return inventory;
+    try {
+      const inventory = await this.prisma.inventory.findUnique({
+        where: { id },
+        include: { product: true, history: true },
+      });
+      console.log({ id, inventory });
+      await this.checkIfInventoryExists(inventory, id);
+      return inventory;
+    } catch (error) {
+      console.log({ error });
+      throw new InternalServerErrorException({
+        message: 'Something went wrong',
+        error: 'Internal Server Error',
+      });
+    }
   }
 
   async history(id: number) {
