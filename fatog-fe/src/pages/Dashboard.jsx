@@ -5,7 +5,7 @@ import { requireAuth } from '../hooks/useAuth';
 
 export const loader = async ({ request }) => {
     await requireAuth(request);
-    const loggedInUser = JSON.parse(localStorage.getItem('user')) ?? null;
+    const loggedInUser = JSON.parse(sessionStorage.getItem('user')) ?? null;
 
     return loggedInUser;
 }
@@ -15,7 +15,7 @@ const Dashboard = () => {
     const [dashboard, setDashboard] = useState(null);
     
     useEffect(() => {
-        const { role } = loggedInUser.user;
+        const { role } = loggedInUser?.user;
 
         if (role === 'admin' || role === 'ceo') {
             setDashboard(<AdminDashboard />);

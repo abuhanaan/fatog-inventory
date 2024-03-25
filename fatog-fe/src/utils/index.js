@@ -1,6 +1,6 @@
 import { redirect } from 'react-router-dom';
 
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
 
 export const headers = {
     'Content-Type': 'application/json',
@@ -14,7 +14,7 @@ export const authHeaders = {
 export const isUnauthorized = (res, navigate) => {
     if (res.statusCode === 401) {
         const message = `${res.message}. Please login to continue.`;
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
         navigate(`/`, { state: { message } });
     }
 };

@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/payments';
 
 export async function addPayment(paymentsData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -23,7 +23,7 @@ export async function addPayment(paymentsData) {
 }
 
 export async function getPayments() {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers: {
@@ -40,7 +40,7 @@ export async function getPayments() {
 }
 
 export async function getPayment(paymentId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${paymentId}`, {
         method: 'GET',
         headers: {
@@ -57,7 +57,7 @@ export async function getPayment(paymentId) {
 }
 
 export async function updatePayment(paymentId, paymentData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${paymentId}`, {
         method: 'PATCH',
         headers: {

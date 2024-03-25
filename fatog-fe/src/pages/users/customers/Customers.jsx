@@ -148,7 +148,7 @@ const ActionButtons = ({ customer }) => {
         const response = await deleteCustomer(customer.id);
 
         // if (response.unAuthorize) {
-        //     localStorage.removeItem('customer');
+        //     sessionStorage.removeItem('customer');
         //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
         // }
 
@@ -196,7 +196,7 @@ const ActionButtons = ({ customer }) => {
         const response = await activateUser(customerId);
 
         // if (response.unAuthorize) {
-        //     localStorage.removeItem('user');
+        //     sessionStorage.removeItem('user');
         //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
         // }
 
@@ -241,7 +241,7 @@ const ActionButtons = ({ customer }) => {
         const response = await deactivateUser(customerId);
 
         // if (response.unAuthorize) {
-        //     localStorage.removeItem('user');
+        //     sessionStorage.removeItem('user');
         //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
         // }
 

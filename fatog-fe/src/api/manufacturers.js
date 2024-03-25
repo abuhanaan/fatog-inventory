@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/manufacturers';
 
 export async function createManufacturer(manufacturerData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -23,7 +23,7 @@ export async function createManufacturer(manufacturerData) {
 }
 
 export async function updateManufacturer(manufacturerId, manufacturerData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
         method: 'PATCH',
         headers: {
@@ -41,7 +41,7 @@ export async function updateManufacturer(manufacturerId, manufacturerData) {
 }
 
 export async function getManufacturers() {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
 
     const res = await fetch(`${BASE_URL}/manufacturers`, {
         method: 'GET',
@@ -59,7 +59,7 @@ export async function getManufacturers() {
 }
 
 export async function getManufacturer(manufacturerId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
         method: 'GET',
         headers: {
@@ -76,7 +76,7 @@ export async function getManufacturer(manufacturerId) {
 }
 
 export async function deleteManufacturer(manufacturerId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     try {
         const res = await fetch(`${BASE_URL}${endpoint}/${manufacturerId}`, {
             method: 'DELETE',
