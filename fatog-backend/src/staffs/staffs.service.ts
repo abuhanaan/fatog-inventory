@@ -61,6 +61,7 @@ export class StaffsService {
     const staff = await this.prisma.staff.findUnique({
       where: { id: user.id },
     });
+    console.log({ staff });
     this.checkIfStaffExists(staff, staff.id);
     return this.prisma.staff.update({
       where: { staffId: staff.id },
