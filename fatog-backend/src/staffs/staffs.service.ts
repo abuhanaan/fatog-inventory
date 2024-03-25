@@ -64,7 +64,7 @@ export class StaffsService {
     console.log({ staff, userID: user.id });
     this.checkIfStaffExists(staff, staff.staffId);
     return this.prisma.staff.update({
-      where: { staffId: staff.id },
+      where: { id: staff.id },
       data: updateStaffDto,
     });
   }
