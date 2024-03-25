@@ -175,7 +175,11 @@ export class SalesService {
   async findOne(id: number) {
     const sales = await this.prisma.sales.findUnique({
       where: { id },
-      include: { order: true, staff: true, payments: true },
+      include: {
+        order: { include: { orderLists: { include: { product: true } } } },
+        staff: true,
+        payments: true,
+      },
     });
     this.checkIfSalesExists;
     return sales;

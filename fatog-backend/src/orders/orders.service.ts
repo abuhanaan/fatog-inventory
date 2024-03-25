@@ -40,7 +40,7 @@ export class OrdersService {
       include: {
         customer: true,
         staff: true,
-        orderLists: true,
+        orderLists: { include: { product: true } },
         payments: true,
         invoice: true,
       },
