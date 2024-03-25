@@ -25,10 +25,10 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  // app.useGlobalFilters(
-  //   new GlobalExceptionFilter(),
-  //   new BadRequestExceptionFilter(),
-  // );
+  app.useGlobalFilters(
+    new GlobalExceptionFilter(),
+    new BadRequestExceptionFilter(),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('FATOG Inventory System')
