@@ -91,7 +91,7 @@ const UserForm = () => {
                     });
 
                     setTimeout(() => {
-                        isUnauthorized(response, navigate);
+                        isUnauthorized(response, navigate, pathname);
                     }, 6000);
 
                     return response.error;
@@ -133,7 +133,7 @@ const UserForm = () => {
                     });
 
                     setTimeout(() => {
-                        isUnauthorized(response, navigate);
+                        isUnauthorized(response, navigate, pathname);
                     }, 6000);
 
                     return response.error;

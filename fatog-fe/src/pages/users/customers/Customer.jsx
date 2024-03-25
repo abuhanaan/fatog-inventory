@@ -82,7 +82,7 @@ const Customer = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -112,7 +112,7 @@ const Customer = () => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -158,7 +158,7 @@ const Customer = () => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -203,7 +203,7 @@ const Customer = () => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;

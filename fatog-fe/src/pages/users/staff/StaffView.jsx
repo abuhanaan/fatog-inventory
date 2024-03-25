@@ -107,7 +107,7 @@ const StaffView = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -132,7 +132,7 @@ const StaffView = () => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -173,7 +173,7 @@ const StaffView = () => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -213,7 +213,7 @@ const StaffView = () => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;

@@ -41,6 +41,7 @@ export async function loader({ request }) {
 
 const Manufacturers = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const [toastState, setToastState] = useToastHook();
     const manufacturers = useLoaderData();
     const [error, setError] = useState({
@@ -63,7 +64,7 @@ const Manufacturers = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -128,7 +129,7 @@ const ActionButtons = ({ manufacturer }) => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;

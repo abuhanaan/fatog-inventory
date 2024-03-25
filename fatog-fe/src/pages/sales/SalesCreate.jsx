@@ -55,6 +55,7 @@ export async function loader({ params, request }) {
 
 const SalesCreate = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const orderItem = useLoaderData();
     const { staff, orderList } = orderItem;
     const [toastState, setToastState] = useToastHook();
@@ -97,7 +98,7 @@ const SalesCreate = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -122,7 +123,7 @@ const SalesCreate = () => {
                 });
 
                 setTimeout(() => {
-                    isUnauthorized(response, navigate);
+                    isUnauthorized(response, navigate, pathname);
                 }, 6000);
 
                 return response.error;

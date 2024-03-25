@@ -27,7 +27,7 @@ const Home = () => {
     const navigate = useNavigate();
     const { errorMessage, request } = useLoaderData();
     const { state } = useLocation();
-    const message = state && state.message;
+    const message = (state && state.message) || errorMessage;
     const redirectTo = state && state.redirectTo;
 
     const submit = async (userData) => {
@@ -50,8 +50,8 @@ const Home = () => {
         }
 
         login(response);
-        // const redirectTo = new URL(request.url).searchParams.get('redirectTo') || '/dashboard';
-        const to = '/dashboard';
+        const to = redirectTo || new URL(request.url).searchParams.get('redirectTo') || '/dashboard';
+        // const to = '/dashboard';
         navigate(to, { replace: true });
     };
 

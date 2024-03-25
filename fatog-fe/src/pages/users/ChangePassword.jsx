@@ -61,7 +61,7 @@ const ChangePassword = () => {
                 });
 
                 setTimeout(() => {
-                    isUnauthorized(response, navigate);
+                    isUnauthorized(response, navigate, pathname);
                 }, 6000);
 
                 return response.error;

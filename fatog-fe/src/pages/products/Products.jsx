@@ -57,6 +57,7 @@ export async function loader({ request }) {
 
 const Products = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const [toastState, setToastState] = useToastHook();
     const products = useLoaderData();
     const [error, setError] = useState({
@@ -79,7 +80,7 @@ const Products = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -110,9 +111,9 @@ const Products = () => {
 
 const ActionButtons = ({ product }) => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const { isOpen, onOpen, onClose } = useDisclosure();
     const closeModalRef = useRef(null);
-    const { pathname } = useLocation();
     const [toastState, setToastState] = useToastHook();
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -143,7 +144,7 @@ const ActionButtons = ({ product }) => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;

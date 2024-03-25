@@ -161,7 +161,7 @@ const ActionButtons = ({ staff }) => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -203,7 +203,7 @@ const ActionButtons = ({ staff }) => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -243,7 +243,7 @@ const ActionButtons = ({ staff }) => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;

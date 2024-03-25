@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLoaderData } from 'react-router-dom';
+import { useNavigate, useLoaderData, useLocation } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
 import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
@@ -57,6 +57,7 @@ export async function loader({ request }) {
 
 const Histories = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const histories = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
@@ -75,7 +76,7 @@ const Histories = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);

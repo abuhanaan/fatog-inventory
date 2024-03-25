@@ -43,6 +43,7 @@ export async function loader({ params, request }) {
 
 const AddPayment = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const sale = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
@@ -80,7 +81,7 @@ const AddPayment = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -108,7 +109,7 @@ const AddPayment = () => {
                 });
 
                 setTimeout(() => {
-                    isUnauthorized(response, navigate);
+                    isUnauthorized(response, navigate, pathname);
                 }, 6000);
 
                 return response.error;

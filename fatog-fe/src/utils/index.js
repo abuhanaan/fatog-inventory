@@ -11,11 +11,11 @@ export const authHeaders = {
     'Content-Type': 'application/json'
 };
 
-export const isUnauthorized = (res, navigate) => {
+export const isUnauthorized = (res, navigate, pathname) => {
     if (res.statusCode === 401) {
         const message = `${res.message}. Please login to continue.`;
         sessionStorage.removeItem('user');
-        navigate(`/`, { state: { message } });
+        navigate(`/`, { state: { message, redirectTo: pathname } });
     }
 };
 

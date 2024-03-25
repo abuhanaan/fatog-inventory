@@ -42,7 +42,7 @@ export async function loader({ params, request }) {
 const OrderItemUpdate = () => {
     const navigate = useNavigate();
     const orderItem = useLoaderData();
-    const { state } = useLocation();
+    const { state, pathname } = useLocation();
     const currentOrderItem = state && state.orderItem;
     const { product, order } = orderItem;
     const [toastState, setToastState] = useToastHook();
@@ -76,7 +76,7 @@ const OrderItemUpdate = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -111,7 +111,7 @@ const OrderItemUpdate = () => {
                 });
 
                 setTimeout(() => {
-                    isUnauthorized(response, navigate);
+                    isUnauthorized(response, navigate, pathname);
                 }, 6000);
 
                 return response.error;

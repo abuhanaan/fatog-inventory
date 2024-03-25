@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, useDisclosure } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
-import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
@@ -32,6 +32,7 @@ export async function loader({ params, request }) {
 
 const ProductView = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const product = useLoaderData();
     const { manufacturer } = product;
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -61,7 +62,7 @@ const ProductView = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -86,7 +87,7 @@ const ProductView = () => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;

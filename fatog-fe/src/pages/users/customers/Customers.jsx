@@ -81,7 +81,7 @@ const Customers = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -164,7 +164,7 @@ const ActionButtons = ({ customer }) => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -211,7 +211,7 @@ const ActionButtons = ({ customer }) => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -256,7 +256,7 @@ const ActionButtons = ({ customer }) => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;

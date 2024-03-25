@@ -69,7 +69,7 @@ const ProductForm = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -99,7 +99,7 @@ const ProductForm = () => {
                     });
 
                     setTimeout(() => {
-                        isUnauthorized(response, navigate);
+                        isUnauthorized(response, navigate, pathname);
                     }, 6000);
 
                     return response.error;
@@ -136,7 +136,7 @@ const ProductForm = () => {
                     });
 
                     setTimeout(() => {
-                        isUnauthorized(response, navigate);
+                        isUnauthorized(response, navigate, pathname);
                     }, 6000);
 
                     return response.error;

@@ -1,9 +1,12 @@
 // Layout.js
 import React, { useRef } from 'react';
-import { Box, Flex, Stack, Spacer, useColorMode, Button, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Avatar, IconButton, Icon, Spinner, useDisclosure } from '@chakra-ui/react';
+import { Box, Flex, Stack, Spacer, useColorMode, Button, Menu, MenuButton, MenuList, MenuItem, MenuDivider, Avatar, IconButton, Icon, Spinner, useDisclosure, Link as ChakraLink } from '@chakra-ui/react';
 import { Link, Outlet, useNavigation } from 'react-router-dom';
 import SideNavLinks from '../SideNavLinks';
 import { HamburgerIcon } from '@chakra-ui/icons';
+import { RxAvatar } from "react-icons/rx";
+import { RiLogoutCircleRLine } from 'react-icons/ri';
+import LogoutBtn from '../LogoutBtn';
 import SideDrawer from '../SideDrawer';
 import Logo from '../Logo';
 import useAuth from '../../hooks/useAuth';
@@ -33,9 +36,9 @@ const InventoryLayout = () => {
                                 <Avatar size="sm" />
                             </MenuButton>
                             <MenuList py='0'>
-                                <MenuItem as={Link} to='/profile'>Profile</MenuItem>
+                                <MenuItem as={Link} icon={<RxAvatar />} to='/profile'>Profile</MenuItem>
                                 <MenuDivider my='0' />
-                                <MenuItem onClick={() => { logout() }}>Logout</MenuItem>
+                                <MenuItem as={Link} icon={<RiLogoutCircleRLine />} onClick={() => logout()}>Logout</MenuItem>
                             </MenuList>
                         </Menu>
                     </Flex>

@@ -49,7 +49,7 @@ const ManufacturerForm = () => {
                     });
 
                     setTimeout(() => {
-                        isUnauthorized(response, navigate);
+                        isUnauthorized(response, navigate, pathname);
                     }, 6000);
 
                     return response.error;
@@ -91,7 +91,7 @@ const ManufacturerForm = () => {
                     });
 
                     setTimeout(() => {
-                        isUnauthorized(response, navigate);
+                        isUnauthorized(response, navigate, pathname);
                     }, 6000);
 
                     return response.error;

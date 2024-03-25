@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
 import { HiOutlinePlus } from "react-icons/hi";
-import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
@@ -49,6 +49,7 @@ export async function loader({ params, request }) {
 
 const Sale = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const sale = useLoaderData();
     const { staff, order, payments } = sale;
     const [toastState, setToastState] = useToastHook();
@@ -122,7 +123,7 @@ const Sale = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
