@@ -28,6 +28,8 @@ export async function loader({ params, request }) {
             statusCode: sale.statusCode,
         };
     }
+
+    console.log(sale)
     
     const data = {
         id: sale.id,

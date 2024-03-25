@@ -71,6 +71,7 @@ const StockList = () => {
 
     const stockListColumns = [
         { id: 'S/N', header: 'S/N' },
+        { id: 'productName', header: 'Product' },
         { id: 'pricePerBag', header: 'Price per Bag' },
         { id: 'noOfBags', header: 'No. of Bags' },
         { id: 'totalAmount', header: 'Total Amount' },
@@ -78,10 +79,13 @@ const StockList = () => {
         { id: 'actions', header: '' },
     ];
 
-    const stockListData = stockList.map(prev => ({
-        ...prev,
-        stockId: stock.id
+    const stockListData = stockList.map(stockItem => ({
+        ...stockItem,
+        stockId: stock.id,
+        productName: stockItem.product.name
     }));
+
+    console.log(stockListData);
 
     const tabTitles = ['Overview', 'Stock List'];
     const tabPanels = [

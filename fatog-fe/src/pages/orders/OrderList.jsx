@@ -88,6 +88,7 @@ const OrderList = () => {
 
     const orderListColumns = [
         { id: 'S/N', header: 'S/N' },
+        // { id: 'productName', header: 'Product' },
         { id: 'pricePerBag', header: 'Price per Bag' },
         { id: 'noOfBags', header: 'No. of Bags' },
         { id: 'totalAmount', header: 'Total Amount' },
@@ -95,12 +96,13 @@ const OrderList = () => {
         { id: 'actions', header: '' },
     ];
 
-    const orderListData = orderList.map(prev => ({
-        ...prev,
-        orderId: order.id
+    const orderListData = orderList.map(orderItem => ({
+        ...orderItem,
+        orderId: order.id,
+        // productName: orderItem.product.name
     }));
 
-    console.log(orderListData);
+    // console.log(orderListData);
 
     const paymentsData = payments.map(payment => ({
         amountPaid: payment.amountPaid,
