@@ -1,26 +1,21 @@
 import { redirect } from 'react-router-dom';
-import { headers } from '../utils';
+import { isError } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/staffs';
 
 export async function createStaff(staffData) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(staffData)
     });
 
     const data = await res.json();
-
-    // if (res.status === 401) {
-    //     return {
-    //         unAuthorized: true,
-    //         statusCode: data.statusCode,
-    //         message: data.message,
-    //         error: data.error ?? 'Unauthorized',
-    //     }
-    // }
 
     isError(res, data);
 
@@ -28,9 +23,13 @@ export async function createStaff(staffData) {
 }
 
 export async function updateStaff(staffData) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/profile-update`, {
         method: 'PATCH',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(staffData)
     });
 
@@ -49,9 +48,13 @@ export async function updateStaff(staffData) {
 }
 
 export async function getStaff() {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -62,9 +65,13 @@ export async function getStaff() {
 }
 
 export async function getStaffData() {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/profile`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -80,9 +87,13 @@ export async function getStaffData() {
 }
 
 export async function deleteUser(userId) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users/${userId}`, {
         method: 'DELETE',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -99,13 +110,13 @@ const isUnauthorized = (res, request) => {
     }
 };
 
-const isError = (res, data) => {
-    if (!res.ok || data.error) {
-        return {
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Something went wrong',
-            path: data.path
-        }
-    }
-};
+// const isError = (res, data) => {
+//     if (!res.ok || data.error) {
+//         return {
+//             statusCode: data.statusCode,
+//             message: data.message,
+//             error: data.error ?? 'Something went wrong',
+//             path: data.path
+//         }
+//     }
+// };

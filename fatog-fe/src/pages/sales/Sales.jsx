@@ -54,7 +54,7 @@ export const loader = async ({ request }) => {
             outstandingPayment: sale.outStandingPayment,
             paymentStatus: sale.paymentStatus,
             totalNoOfBags: sale.order.totalNoOfBags,
-            staff: (sale.staff.firstName && sale.staff.lastName) ? `${sale.staff.firstName} ${sale.staff.lastName}` : 'N/A',
+            staff: (sale.staff.firstName && sale.staff.lastName) ? `${sale.staff.firstName} ${sale.staff.lastName}` : '-',
             customerPhone: sale.order.phoneNumber,
             shippingAddress: sale.order.shippingAddress,
             deliveryStatus: sale.order.deliveryStatus,

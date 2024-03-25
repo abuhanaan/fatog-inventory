@@ -2,15 +2,19 @@ import { headers, isError } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/sales';
+
 export async function createSales(salesData) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(salesData)
     });
 
     const data = await res.json();
-    // console.log(data);
 
     isError(res, data);
 
@@ -18,9 +22,13 @@ export async function createSales(salesData) {
 }
 
 export async function getSales() {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -31,9 +39,13 @@ export async function getSales() {
 }
 
 export async function getSale(saleId) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${saleId}`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -44,9 +56,13 @@ export async function getSale(saleId) {
 }
 
 export async function updateSale(saleId, saleData) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${saleId}`, {
         method: 'PATCH',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(saleData)
     });
 

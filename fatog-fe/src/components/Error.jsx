@@ -1,13 +1,17 @@
-import React from 'react';
+import { useRouteError } from 'react-router-dom';
 import { VStack, Text, Heading, UnorderedList, ListItem, Button } from '@chakra-ui/react';
 
 const Error = () => {
+    const error = useRouteError();
+    console.log(error);
     const refresh = () => {
         window.location.reload();
     };
 
     return (
         <VStack minH='100vh' spacing='3' justifyContent='center'>
+            <Heading>{error.statusCode}</Heading>
+            <Text>{error.message}</Text>
             <Heading>This site can't be reached!</Heading>
             <Text>The site's server IP address could not not be found.</Text>
             <UnorderedList>
