@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, useDisclosure } from '@chakra-ui/react';
+import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, useDisclosure, Card, CardBody } from '@chakra-ui/react';
 import Breadcrumb from '../../components/Breadcrumb';
 import { HiOutlinePlus } from "react-icons/hi";
 import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
@@ -14,6 +14,8 @@ import { getProduct, deleteProduct } from '../../api/products';
 import { useToastHook } from '../../hooks/useToast';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import UserField from '../../components/UserField';
+import { getInfoArray } from '../../utils';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -166,61 +168,56 @@ const ProductView = () => {
 }
 
 const GeneralInfo = ({ product }) => {
+    const productData = {
+        name: product.name,
+        pricePerBag: product.pricePerBag,
+        type: product.type,
+        size: product.size,
+        weight: product.weight,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+    };
+
     return (
-        <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>ID</Heading>
-                <Text>{product.id}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Name</Heading>
-                <Text>{product.name}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Type</Heading>
-                <Text>{product.type}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Price per bag (₦)</Heading>
-                <Text>{product.pricePerBag}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Weight (kg)</Heading>
-                <Text>{product.weight}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Size</Heading>
-                <Text>{product.size}</Text>
-            </Stack>
-        </SimpleGrid>
+        <Card variant='elevated'>
+            <CardBody>
+                <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
+                    {
+                        getInfoArray(productData).map((field, index) => (
+                            <UserField key={index} field={field} />
+                        ))
+                    }
+                </SimpleGrid>
+            </CardBody>
+        </Card>
     )
 };
 
 const ManufacturerInfo = ({ product }) => {
     const { manufacturer } = product;
 
+    const manufacturerData = {
+        brandName: manufacturer.brandName,
+        representativeName: manufacturer.repName,
+        representativePhone: manufacturer.repPhoneNumber
+    }
+
     return (
-        <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>ID</Heading>
-                <Text>{product.manufacturerId}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Brand Name</Heading>
-                <Text>{manufacturer.brandName}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Representative Name</Heading>
-                <Text>{manufacturer.repName}</Text>
-            </Stack>
-            <Stack direction='column'>
-                <Heading fontSize='sm' fontWeight='semibold'>Representative Phone</Heading>
-                <Text>{manufacturer.repPhoneNumber}</Text>
-            </Stack>
-            <Stack direction='column' colSpan={2} mt='2'>
-                <Button as={RouterLink} to={`/manufacturers/${1}`} leftIcon={<IoEyeOutline />} colorScheme='blue' size='md'>Preview Manufacturer</Button>
-            </Stack>
-        </SimpleGrid>
+        <Card variant='elevated'>
+            <CardBody>
+                <SimpleGrid columns={{ base: 1, sm: 2 }} spacing={5}>
+                    {
+                        getInfoArray(manufacturerData).map((field, index) => (
+                            <UserField key={index} field={field} />
+                        ))
+                    }
+                </SimpleGrid>
+
+                <VStack direction='column'>
+                    <Button as={RouterLink} to={`/manufacturers/${manufacturer.id}`} leftIcon={<IoEyeOutline size='26px' />} colorScheme='blue' variant='outline' size='md' mt='6'>Preview Manufacturer</Button>
+                </VStack>
+            </CardBody>
+        </Card>
     )
 };
 

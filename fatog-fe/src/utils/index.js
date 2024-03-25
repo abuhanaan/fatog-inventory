@@ -30,6 +30,16 @@ export const isError = (res, data) => {
     }
 };
 
+export const getInfoArray = (obj) => {
+    const infoArray = [];
+
+    for (const [key, value] of Object.entries(obj)) {
+        infoArray.push({ key, value });
+    }
+
+    return infoArray;
+}
+
 export const getMonetaryValue = (value) => {
     return new Intl.NumberFormat('en-NG', {
         style: 'currency',

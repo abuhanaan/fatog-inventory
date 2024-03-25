@@ -10,10 +10,13 @@ const FetchError = ({ error }) => {
             <Text fontSize='4xl' fontWeight='medium'>{error.error}</Text>
             <Text>{error.message}</Text>
 
-            <HStack spacing='3'>
-                <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
-                <Button colorScheme='blue' onClick={() => navigate(-1)} mt='6'>Back</Button>
-            </HStack>
+            {
+                error.statusCode !== 401 &&
+                <HStack spacing='3'>
+                    <Button colorScheme='blue' onClick={() => window.location.reload()} mt='6'>Refresh</Button>
+                    <Button colorScheme='blue' onClick={() => navigate(-1)} mt='6'>Back</Button>
+                </HStack>
+            }
         </VStack>
     )
 }
