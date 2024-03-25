@@ -47,7 +47,14 @@ export class StocksService {
   async findOne(id: number) {
     const stock = await this.prisma.stock.findUnique({
       where: { id },
-      include: { staff: true, stockLists: true },
+      include: {
+        staff: true,
+        stockLists: {
+          include: {
+            product: true,
+          },
+        },
+      },
     });
     await this.checkIfStockExists(stock, id);
     return stock;
@@ -61,7 +68,14 @@ export class StocksService {
     return this.prisma.stock.update({
       where: { id },
       data: updateStockDto,
-      include: { staff: true, stockLists: true },
+      include: {
+        staff: true,
+        stockLists: {
+          include: {
+            product: true,
+          },
+        },
+      },
     });
   }
 
