@@ -1,23 +1,27 @@
 import React from 'react';
-import { VStack, Link, Text, Heading } from '@chakra-ui/react';
-import { Link as RouterLink } from 'react-router-dom';
+import { VStack, Link, Text, Heading, Button } from '@chakra-ui/react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { GoHome } from "react-icons/go";
+
 
 const Page404 = () => {
+    const navigate = useNavigate();
+
+    const goHome = () => {
+        const user = JSON.parse(sessionStorage.getItem('user')) || false;
+
+        if (user) {
+            navigate('/dashboard')
+        } else {
+            navigate('/', { replace: true });
+        }
+    }
+
     return (
         <VStack minH='100vh' spacing='3' justifyContent='center'>
             <Heading>404 Error!</Heading>
             <Text>The page you requested for does not exist.</Text>
-            <Link
-                as={RouterLink}
-                to='..'
-                bg='#2B6CB0'
-                color='white'
-                padding='4'
-                borderRadius='md'
-                textDecoration='none'
-            >
-                Return to home page
-            </Link>
+            <Button colorScheme='blue' leftIcon={<GoHome />} onClick={goHome} mt='6'>Return to homepage</Button>
         </VStack>
     )
 }

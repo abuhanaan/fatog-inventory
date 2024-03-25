@@ -311,7 +311,7 @@ const ActionButtons = ({ customer }) => {
                         Preview
                     </MenuItem>
 
-                    <MenuItem as={Link} to='/users/create' icon={<MdOutlineEdit />} state={{ currentUser: customer, entity: 'customer' }}>
+                    <MenuItem as={Link} to='/users/create' icon={<MdOutlineEdit />} state={{ currentUser: customer, entity: 'customers' }}>
                         Edit Customer
                     </MenuItem>
 
