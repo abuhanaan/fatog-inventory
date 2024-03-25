@@ -541,13 +541,15 @@ const ShippingForm = ({ setShippingForm, shippingForm, submit, isSubmitting }) =
 }
 
 const OrderItem = ({ orderItem, products, deleteOrderItem, showUpdateOrderItemForm }) => {
+    const product = products.filter(prod => prod.refId === orderItem.productRefId)[0];
+    
     return (
         <Card >
             <CardHeader borderBottomWidth='1px' px='3' py='2'>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='sm'>
                         {
-                            products.filter(product => product.refId === orderItem.productRefId)[0].name
+                            product.name
                         }
                     </Heading>
                     <HStack>
@@ -564,7 +566,7 @@ const OrderItem = ({ orderItem, products, deleteOrderItem, showUpdateOrderItemFo
                             Unit Price
                         </Heading>
                         <Text fontSize='sm'>
-                            {getMonetaryValue(orderItem.pricePerBag)}
+                            {getMonetaryValue(product.pricePerBag)}
                         </Text>
                     </Box>
                     <Box>

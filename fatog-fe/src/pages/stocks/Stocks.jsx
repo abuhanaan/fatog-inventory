@@ -81,7 +81,7 @@ const Stocks = () => {
     }, []);
 
     return (
-        error.error ?
+        error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
                 <Box>
