@@ -59,7 +59,7 @@ export class StaffsService {
       });
     }
     const staff = await this.prisma.staff.findUnique({
-      where: { id: user.id },
+      where: { staffId: user.id },
     });
     console.log({ staff, userID: user.id });
     this.checkIfStaffExists(staff, staff.staffId);
