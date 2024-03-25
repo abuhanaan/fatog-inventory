@@ -1,15 +1,17 @@
 import { redirect } from 'react-router-dom';
-import { headers } from '../utils';
+import { isError } from '../utils';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/orders';
 
 export async function createOrder(orderData) {
-    // console.log(headers);
-    // console.log(orderData);
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/order-lists`, {
         method: 'POST',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(orderData)
     });
     
@@ -21,12 +23,14 @@ export async function createOrder(orderData) {
 }
 
 export async function getOrders() {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
-
-    // console.log(res);
 
     const data = await res.json();
 
@@ -36,9 +40,13 @@ export async function getOrders() {
 }
 
 export async function getOrderItem(orderId) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/order-lists/${orderId}`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -49,9 +57,13 @@ export async function getOrderItem(orderId) {
 }
 
 export async function updateOrderItem(orderItemId, orderItemData) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/order-lists/${orderItemId}`, {
         method: 'PATCH',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(orderItemData)
     });
 
@@ -63,9 +75,13 @@ export async function updateOrderItem(orderItemId, orderItemData) {
 }
 
 export async function getOrderList(orderId) {
+    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${orderId}`, {
         method: 'GET',
-        headers,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
     });
 
     const data = await res.json();
@@ -82,13 +98,13 @@ const isUnauthorized = (res, request) => {
     }
 };
 
-const isError = (res, data) => {
-    if (!res.ok || data.error) {
-        return {
-            statusCode: data.statusCode,
-            message: data.message,
-            error: data.error ?? 'Something went wrong',
-            path: data.path
-        }
-    }
-};
+// const isError = (res, data) => {
+//     if (!res.ok || data.error) {
+//         return {
+//             statusCode: data.statusCode,
+//             message: data.message,
+//             error: data.error ?? 'Something went wrong',
+//             path: data.path
+//         }
+//     }
+// };

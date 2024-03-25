@@ -18,7 +18,8 @@ import FetchError from '../../components/FetchError';
 export const loader = async ({ request }) => {
     await requireAuth(request);
     const response = await getManufacturers();
-
+    
+    // console.log(response)
     if (response.error || response.message) {
         return {
             error: response.error,
@@ -33,18 +34,18 @@ export const loader = async ({ request }) => {
 const ProductForm = () => {
     const manufacturers = useLoaderData();
     const navigate = useNavigate();
-    const { state, pathname } = useLocation();
-    const currentProduct = state && state.currentProduct;
-    const manufacturerIdRef = useRef(null);
-    const submitBtnRef = useRef(null);
-    const [brandName, setBrandName] = useState(currentProduct?.manufacturer.replace(/\s+/g, '').toUpperCase() || '');
-    const [feedSize, setFeedSize] = useState('');
-    const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: manufacturers.error ?? '',
         message: manufacturers.message ?? '',
         statusCode: manufacturers.statusCode ?? '',
     });
+    const { state, pathname } = useLocation();
+    const currentProduct = state && state.currentProduct;
+    const manufacturerIdRef = useRef(null);
+    const submitBtnRef = useRef(null);
+    const [brandName, setBrandName] = useState(currentProduct ? String(currentProduct?.manufacturer).replace(/\s+/g, '').toUpperCase() : '');
+    const [feedSize, setFeedSize] = useState('');
+    const [toastState, setToastState] = useToastHook();
     const {
         handleSubmit,
         control,
@@ -57,8 +58,6 @@ const ProductForm = () => {
         { name: 'Product Form', ref: '/products/create' },
     ];
     const manufacturersOptions = manufacturers.map(manufacturer => manufacturer.brandName);
-
-    // console.log(currentProduct)
 
     useEffect(() => {
         if (error.error || error.message) {
@@ -197,7 +196,7 @@ const ProductForm = () => {
                     <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
                         <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
                             <SelectElement data={manufacturersOptions} label='Manufacturer' setManufacturerId={setManufacturerId} defaultVal={setManufacturerOption()} placeholder='Select Manufacturer' />
-                            <SizeInput name='size' label='Size' control={control} type='number' getFeedSize={getFeedSize} defaultVal={currentProduct ? Number(currentProduct.size) : ''} />
+                            <SizeInput name='size' label='Size' control={control} type='number' getFeedSize={getFeedSize} defaultVal={currentProduct ? currentProduct.size : ''} />
                         </Flex>
                         <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
                             <TextInput name='weight' label='Weight (kg)' control={control} type='number' defaultVal={currentProduct?.weight} />
