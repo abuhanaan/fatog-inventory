@@ -60,11 +60,11 @@ export class CustomerService {
       });
     }
     const customer = await this.prisma.customer.findUnique({
-      where: { id: user.id },
+      where: { customerId: user.id },
     });
-    this.checkIfCustomerExists(customer, customer.id);
+    this.checkIfCustomerExists(customer, customer.customerId);
     return this.prisma.customer.update({
-      where: { customerId: customer.id },
+      where: { id: customer.id },
       data: updateCustomerDto,
     });
   }
