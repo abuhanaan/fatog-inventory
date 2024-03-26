@@ -16,11 +16,12 @@ import FetchError from '../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
+    { id: 'refId', header: 'Reference Id' },
     { id: 'staff', header: 'Staff' },
     { id: 'customer', header: 'Customer' },
     { id: 'totalAmount', header: 'Amount(₦)' },
     { id: 'totalNoOfBags', header: 'No. of Bags' },
-    { id: 'totalWeight', header: 'Total Weight(kg)' },
+    // { id: 'totalWeight', header: 'Total Weight(kg)' },
     { id: 'date', header: 'Date' },
     { id: 'actions', header: '' },
 ];
@@ -41,7 +42,7 @@ export async function loader({ request }) {
         }
     }
 
-    // console.log(orders)
+    console.log(orders)
 
     const data = orders.map(order => {
         return {

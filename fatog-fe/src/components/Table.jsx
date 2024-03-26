@@ -75,6 +75,22 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
             )
         }
 
+        if (col.id === 'refId') {
+            return (
+                columnHelper.accessor(col.id, {
+                    id: col.id,
+                    cell: info => (
+                        <span>
+                            {
+                                `${info.getValue().slice(0, 20)}...`
+                            }
+                        </span>
+                    ),
+                    header: col.header
+                })
+            )
+        }
+
         if (col.id === 'actions') {
             return (
                 columnHelper.accessor('', {
