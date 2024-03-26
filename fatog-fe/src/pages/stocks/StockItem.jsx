@@ -29,6 +29,8 @@ export async function loader({ params, request }) {
         };
     }
 
+    // console.log(response)
+
     const data = {
         id: response.id,
         refId: response.refId,
@@ -49,13 +51,14 @@ const StockItem = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
     const stockItem = useLoaderData();
-    const { product, stock } = stockItem;
-    const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: stockItem.error ?? '',
         message: stockItem.message ?? '',
         statusCode: stockItem.statusCode ?? '',
     });
+    const { product, stock } = stockItem;
+    const [toastState, setToastState] = useToastHook();
+    console.log(stock)
     const breadcrumbData = [
         { name: 'Home', ref: '/dashboard' },
         { name: 'Stocks', ref: '/stocks' },
@@ -69,8 +72,6 @@ const StockItem = () => {
         noOfBags: stockItem.noOfBags,
         purchaseAmount: stockItem.totalAmount,
         totalWeight: stockItem.totalWeight,
-        currentSellingPricePerBag: product.pricePerBag,
-        totalNoOfBagsInStock: stock.totalNoOfBags,
         date: stockItem.date,
         // staff: (staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'N/A',
     };
