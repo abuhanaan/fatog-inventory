@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
 import { HiOutlinePlus } from "react-icons/hi";
-import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
@@ -15,6 +15,7 @@ import { useToastHook } from '../../hooks/useToast';
 import { getStockItem } from '../../api/stocks';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -46,6 +47,7 @@ export async function loader({ params, request }) {
 
 const StockItem = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const stockItem = useLoaderData();
     const { product, stock } = stockItem;
     const [toastState, setToastState] = useToastHook();
@@ -92,7 +94,7 @@ const StockItem = () => {
         <TabPanel info={basicStockItemInfo} />,
         <TabPanel info={productInfo} />,
         <TabPanel info={stockInfo} />,
-        
+
     ];
 
     useEffect(() => {
@@ -105,7 +107,7 @@ const StockItem = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -114,9 +116,10 @@ const StockItem = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Stock Item</Heading>
 

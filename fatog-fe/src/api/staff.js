@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/staffs';
 
 export async function createStaff(staffData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -23,7 +23,7 @@ export async function createStaff(staffData) {
 }
 
 export async function updateStaff(staffData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/profile-update`, {
         method: 'PATCH',
         headers: {
@@ -48,7 +48,7 @@ export async function updateStaff(staffData) {
 }
 
 export async function getStaff() {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers: {
@@ -65,7 +65,7 @@ export async function getStaff() {
 }
 
 export async function getStaffData() {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/profile`, {
         method: 'GET',
         headers: {
@@ -87,7 +87,7 @@ export async function getStaffData() {
 }
 
 export async function deleteUser(userId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users/${userId}`, {
         method: 'DELETE',
         headers: {

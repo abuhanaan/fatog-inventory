@@ -81,7 +81,7 @@ const Customers = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -148,7 +148,7 @@ const ActionButtons = ({ customer }) => {
         const response = await deleteCustomer(customer.id);
 
         // if (response.unAuthorize) {
-        //     localStorage.removeItem('customer');
+        //     sessionStorage.removeItem('customer');
         //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
         // }
 
@@ -164,7 +164,7 @@ const ActionButtons = ({ customer }) => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -196,7 +196,7 @@ const ActionButtons = ({ customer }) => {
         const response = await activateUser(customerId);
 
         // if (response.unAuthorize) {
-        //     localStorage.removeItem('user');
+        //     sessionStorage.removeItem('user');
         //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
         // }
 
@@ -211,7 +211,7 @@ const ActionButtons = ({ customer }) => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -241,7 +241,7 @@ const ActionButtons = ({ customer }) => {
         const response = await deactivateUser(customerId);
 
         // if (response.unAuthorize) {
-        //     localStorage.removeItem('user');
+        //     sessionStorage.removeItem('user');
         //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
         // }
 
@@ -256,7 +256,7 @@ const ActionButtons = ({ customer }) => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -311,7 +311,7 @@ const ActionButtons = ({ customer }) => {
                         Preview
                     </MenuItem>
 
-                    <MenuItem as={Link} to='/users/create' icon={<MdOutlineEdit />} state={{ currentUser: customer, entity: 'customer' }}>
+                    <MenuItem as={Link} to='/users/create' icon={<MdOutlineEdit />} state={{ currentUser: customer, entity: 'customers' }}>
                         Edit Customer
                     </MenuItem>
 

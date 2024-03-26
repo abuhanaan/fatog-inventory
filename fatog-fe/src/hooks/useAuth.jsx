@@ -7,7 +7,7 @@ const useAuth = () => {
 };
 
 export async function requireAuth(request) {
-    const isLoggedIn = JSON.parse(localStorage.getItem('user')) || false;
+    const isLoggedIn = JSON.parse(sessionStorage.getItem('user')) || false;
     const pathname = new URL(request.url).pathname;
 
     if (!isLoggedIn) {

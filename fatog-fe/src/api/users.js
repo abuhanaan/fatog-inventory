@@ -36,7 +36,7 @@ export const authenticate = async (data) => {
 };
 
 export async function createUser(userData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users`, {
         method: 'POST',
         headers: {
@@ -54,7 +54,7 @@ export async function createUser(userData) {
 }
 
 export async function updateUser(userId, userData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users/${userId}`, {
         method: 'PATCH',
         headers: {
@@ -72,7 +72,7 @@ export async function updateUser(userId, userData) {
 }
 
 export async function changePassword(userData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users/profile/change-password`, {
         method: 'PATCH',
         headers: {
@@ -90,7 +90,7 @@ export async function changePassword(userData) {
 }
 
 export async function getUsers() {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users`, {
         method: 'GET',
         headers: {
@@ -107,7 +107,7 @@ export async function getUsers() {
 }
 
 export async function getUser(userId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users/${userId}`, {
         method: 'GET',
         headers: {
@@ -124,7 +124,7 @@ export async function getUser(userId) {
 }
 
 export async function deleteUser(userId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users/${userId}`, {
         method: 'DELETE',
         headers: {
@@ -141,7 +141,7 @@ export async function deleteUser(userId) {
 }
 
 export async function activateUser(userId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users/activate/${userId}`, {
         method: 'PATCH',
         headers: {
@@ -158,7 +158,7 @@ export async function activateUser(userId) {
 }
 
 export async function deactivateUser(userId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/users/deactivate/${userId}`, {
         method: 'PATCH',
         headers: {

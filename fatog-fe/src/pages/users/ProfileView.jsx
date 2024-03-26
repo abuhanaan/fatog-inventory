@@ -16,6 +16,7 @@ import { getStaffData } from '../../api/staff';
 import useAuth from '../../hooks/useAuth';
 import UserField from '../../components/UserField';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export async function loader({ request }) {
     await requireAuth(request);
@@ -61,7 +62,7 @@ const ProfileView = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -99,9 +100,10 @@ const ProfileView = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize={{ base: '2xl', md: '3xl' }} color='blue.700'>User</Heading>
                     <HStack>

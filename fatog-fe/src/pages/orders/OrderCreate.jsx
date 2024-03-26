@@ -18,6 +18,7 @@ import { HiOutlinePlus } from 'react-icons/hi';
 import { getMonetaryValue } from '../../utils';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export const loader = async ({ request }) => {
     await requireAuth(request);
@@ -83,7 +84,7 @@ const OrderCreate = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -279,7 +280,7 @@ const OrderCreate = () => {
                 });
 
                 setTimeout(() => {
-                    isUnauthorized(response, navigate);
+                    isUnauthorized(response, navigate, pathname);
                 }, 6000);
 
                 return response.error;
@@ -371,9 +372,10 @@ const OrderCreate = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Create Order</Heading>
                     <Button colorScheme='blue' leftIcon={<HiOutlinePlus />} onClick={openForm}>Add Order Item</Button>
@@ -541,13 +543,15 @@ const ShippingForm = ({ setShippingForm, shippingForm, submit, isSubmitting }) =
 }
 
 const OrderItem = ({ orderItem, products, deleteOrderItem, showUpdateOrderItemForm }) => {
+    const product = products.filter(prod => prod.refId === orderItem.productRefId)[0];
+    
     return (
         <Card >
             <CardHeader borderBottomWidth='1px' px='3' py='2'>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='sm'>
                         {
-                            products.filter(product => product.refId === orderItem.productRefId)[0].name
+                            product.name
                         }
                     </Heading>
                     <HStack>
@@ -564,7 +568,7 @@ const OrderItem = ({ orderItem, products, deleteOrderItem, showUpdateOrderItemFo
                             Unit Price
                         </Heading>
                         <Text fontSize='sm'>
-                            {getMonetaryValue(orderItem.pricePerBag)}
+                            {getMonetaryValue(product.pricePerBag)}
                         </Text>
                     </Box>
                     <Box>

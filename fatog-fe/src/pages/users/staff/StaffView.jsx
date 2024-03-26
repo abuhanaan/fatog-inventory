@@ -18,6 +18,7 @@ import { deleteUser, activateUser, deactivateUser } from '../../../api/users';
 import { useToastHook } from '../../../hooks/useToast';
 import { isUnauthorized } from '../../../utils';
 import FetchError from '../../../components/FetchError';
+import Back from '../../../components/Back';
 
 export async function loader({ request }) {
     await requireAuth(request);
@@ -35,12 +36,12 @@ export async function loader({ request }) {
         id: response.staffId,
         firstName: response.firstName,
         lastName: response.lastName,
-        gender: response.gender,
         phone: response.phoneNumber,
         email: response.user.email,
+        gender: response.gender,
+        active: response.user.active,
         category: response.user.category,
         role: response.user.role,
-        active: response.user.active,
         orders: response.orders,
         sales: response.sales,
         stocks: response.stocks
@@ -107,7 +108,7 @@ const StaffView = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -132,7 +133,7 @@ const StaffView = () => {
             closeModalRef.current.click();
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -173,7 +174,7 @@ const StaffView = () => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -213,7 +214,7 @@ const StaffView = () => {
             setIsActivating(false);
 
             setTimeout(() => {
-                isUnauthorized(response, navigate);
+                isUnauthorized(response, navigate, pathname);
             }, 6000);
 
             return response.error;
@@ -258,9 +259,10 @@ const StaffView = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize={{ base: '2xl', md: '3xl' }} color='blue.700'>{(staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'Staff'}</Heading>
                     <HStack spacing='2'>

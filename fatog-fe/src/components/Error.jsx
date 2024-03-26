@@ -1,12 +1,25 @@
-import { useRouteError } from 'react-router-dom';
-import { VStack, Text, Heading, UnorderedList, ListItem, Button } from '@chakra-ui/react';
+import { useRouteError, useNavigate } from 'react-router-dom';
+import { VStack, HStack, Text, Heading, UnorderedList, ListItem, Button } from '@chakra-ui/react';
+import { GoHome } from "react-icons/go";
+import { TbRefresh } from "react-icons/tb";
 
 const Error = () => {
     const error = useRouteError();
-    console.log(error);
+    const navigate = useNavigate();
+
     const refresh = () => {
         window.location.reload();
     };
+
+    const goHome = () => {
+        const user = JSON.parse(sessionStorage.getItem('user')) || false;
+
+        if (user) {
+            navigate('/dashboard')
+        } else {
+            navigate('/', { replace: true });
+        }
+    }
 
     return (
         <VStack minH='100vh' spacing='3' justifyContent='center'>
@@ -22,7 +35,10 @@ const Error = () => {
                 <ListItem>Refresh the page and retry previous action.</ListItem>
                 <ListItem>Consult the developer for technical resolution if the issue persists.</ListItem>
             </UnorderedList>
-            <Button colorScheme='blue' onClick={refresh} mt='6'>Refresh</Button>
+            <HStack spacing='4'>
+                <Button colorScheme='blue' leftIcon={<TbRefresh />} onClick={refresh} mt='6'>Refresh</Button>
+                <Button colorScheme='blue' leftIcon={<GoHome />} onClick={goHome} mt='6'>Return to homepage</Button>
+            </HStack>
         </VStack>
     )
 }

@@ -13,6 +13,7 @@ import AddButton from '../../components/AddButton';
 import { deleteUser, getUsers, activateUser, deactivateUser } from '../../api/users';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
+import Back from '../../components/Back';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
@@ -82,9 +83,10 @@ const Users = () => {
                 <Box>{error.message}</Box>
             </VStack> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Users</Heading>
                     <AddButton navigateTo='create'>Add User</AddButton>

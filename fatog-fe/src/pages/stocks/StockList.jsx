@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
 import { HiOutlinePlus } from "react-icons/hi";
-import { Link as RouterLink, useLoaderData, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaUserCheck, FaUserXmark } from "react-icons/fa6";
@@ -15,6 +15,7 @@ import { useToastHook } from '../../hooks/useToast';
 import { getStockList } from '../../api/stocks';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -46,6 +47,7 @@ export async function loader({ params, request }) {
 
 const StockList = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const stock = useLoaderData();
     const { stockList, staff } = stock;
     const [toastState, setToastState] = useToastHook();
@@ -70,6 +72,7 @@ const StockList = () => {
 
     const stockListColumns = [
         { id: 'S/N', header: 'S/N' },
+        { id: 'productName', header: 'Product' },
         { id: 'pricePerBag', header: 'Price per Bag' },
         { id: 'noOfBags', header: 'No. of Bags' },
         { id: 'totalAmount', header: 'Total Amount' },
@@ -77,10 +80,13 @@ const StockList = () => {
         { id: 'actions', header: '' },
     ];
 
-    const stockListData = stockList.map(prev => ({
-        ...prev,
-        stockId: stock.id
+    const stockListData = stockList.map(stockItem => ({
+        ...stockItem,
+        stockId: stock.id,
+        productName: stockItem.product.name
     }));
+
+    console.log(stockListData);
 
     const tabTitles = ['Overview', 'Stock List'];
     const tabPanels = [
@@ -98,7 +104,7 @@ const StockList = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -107,9 +113,10 @@ const StockList = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Stock</Heading>
                 </HStack>
