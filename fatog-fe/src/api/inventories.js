@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/inventory';
 
 export async function getInventories() {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers: {
@@ -22,7 +22,7 @@ export async function getInventories() {
 }
 
 export async function getInventory(inventoryId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${inventoryId}`, {
         method: 'GET',
         headers: {

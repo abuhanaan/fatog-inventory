@@ -14,6 +14,7 @@ import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export const loader = async ({ request }) => {
     await requireAuth(request);
@@ -69,7 +70,7 @@ const ProductForm = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -99,7 +100,7 @@ const ProductForm = () => {
                     });
 
                     setTimeout(() => {
-                        isUnauthorized(response, navigate);
+                        isUnauthorized(response, navigate, pathname);
                     }, 6000);
 
                     return response.error;
@@ -136,7 +137,7 @@ const ProductForm = () => {
                     });
 
                     setTimeout(() => {
-                        isUnauthorized(response, navigate);
+                        isUnauthorized(response, navigate, pathname);
                     }, 6000);
 
                     return response.error;
@@ -186,9 +187,10 @@ const ProductForm = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>{currentProduct ? `Update ${currentProduct.name}` : 'Add Product'}</Heading>
                 </HStack>

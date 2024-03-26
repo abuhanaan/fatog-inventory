@@ -87,57 +87,55 @@ const router = createBrowserRouter(createRoutesFromChildren(
     <Route path='/' element={<Layout />}>
         <Route index loader={HomeLoader} element={<Home />} />
 
-        <Route element={<RequireAuth />}>
-            <Route element={<InventoryLayout />} errorElement={<Error />}>
-                <Route path='dashboard' loader={DashboardLoader} element={<Dashboard />} />
+        <Route element={<InventoryLayout />} errorElement={<Error />} loader={loader}>
+            <Route path='dashboard' loader={DashboardLoader} element={<Dashboard />} />
 
-                <Route path='users' loader={UsersLoader} element={<Users />} />
-                <Route path='users/create' element={<UserForm />} />
-                <Route path='users/:id' loader={UserViewLoader} element={<UserView />} />
+            <Route path='users' loader={UsersLoader} element={<Users />} />
+            <Route path='users/create' element={<UserForm />} loader={loader} />
+            <Route path='users/:id' loader={UserViewLoader} element={<UserView />} />
 
-                <Route path='staff' loader={StaffListLoader} element={<StaffList />} />
-                <Route path='staff/:id' loader={StaffViewLoader} element={<StaffView />} />
+            <Route path='staff' loader={StaffListLoader} element={<StaffList />} />
+            <Route path='staff/:id' loader={StaffViewLoader} element={<StaffView />} />
 
-                <Route path='customers' loader={CustomersLoader} element={<Customers />} />
-                <Route path='customers/:id' loader={CustomerLoader} element={<Customer />} />
+            <Route path='customers' loader={CustomersLoader} element={<Customers />} />
+            <Route path='customers/:id' loader={CustomerLoader} element={<Customer />} />
 
-                <Route path='profile' element={<ProfileView />} loader={ProfileViewLoader} />
-                <Route path='profile/update' element={<ProfileForm />} />
-                <Route path='profile/change-password' element={<ChangePassword />} />
+            <Route path='profile' element={<ProfileView />} loader={ProfileViewLoader} />
+            <Route path='profile/update' element={<ProfileForm />} loader={loader} />
+            <Route path='profile/change-password' element={<ChangePassword />} loader={loader} />
 
-                <Route path='products' loader={ProductsLoader} element={<Products />} />
-                <Route path='products/create' loader={ProductFormLoader} element={<ProductForm />} />
-                <Route path='products/:id' loader={ProductViewLoader} element={<ProductView />} />
+            <Route path='products' loader={ProductsLoader} element={<Products />} />
+            <Route path='products/create' loader={ProductFormLoader} element={<ProductForm />} />
+            <Route path='products/:id' loader={ProductViewLoader} element={<ProductView />} />
 
-                <Route path='manufacturers' loader={ManufacturersLoader} element={<Manufacturers />} />
-                <Route path='manufacturers/create' loader={loader} element={<ManufacturerForm />} />
-                <Route path='manufacturers/:id' loader={ManufacturerViewLoader} element={<ManufacturerView />} />
+            <Route path='manufacturers' loader={ManufacturersLoader} element={<Manufacturers />} />
+            <Route path='manufacturers/create' loader={loader} element={<ManufacturerForm />} />
+            <Route path='manufacturers/:id' loader={ManufacturerViewLoader} element={<ManufacturerView />} />
 
-                <Route path='inventories' loader={InventoriesLoader} element={<Inventories />} />
-                <Route path='inventories/:id' loader={InventoryViewLoader} element={<InventoryView />} />
-                <Route path='inventories/histories' loader={HistoriesLoader} element={<Histories />} />
-                <Route path='inventories/histories/:id' loader={HistoryLoader} element={<History />} />
+            <Route path='inventories' loader={InventoriesLoader} element={<Inventories />} />
+            <Route path='inventories/:id' loader={InventoryViewLoader} element={<InventoryView />} />
+            <Route path='inventories/histories' loader={HistoriesLoader} element={<Histories />} />
+            <Route path='inventories/histories/:id' loader={HistoryLoader} element={<History />} />
 
-                {/* Stocks */}
-                <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
-                <Route path='stocks/create' loader={StockCreateLoader} element={<StockCreate />} />
-                <Route path='stocks/:id' loader={StockListLoader} element={<StockList />} />
-                <Route path='stocks/:id/stocklist/:id' loader={StockItemLoader} element={<StockItem />} />
-                <Route path='stocks/:id/stocklist/:id/edit' loader={StockItemUpdateLoader} element={<StockItemUpdate />} />
+            {/* Stocks */}
+            <Route path='stocks' loader={StocksLoader} element={<Stocks />} />
+            <Route path='stocks/create' loader={StockCreateLoader} element={<StockCreate />} />
+            <Route path='stocks/:id' loader={StockListLoader} element={<StockList />} />
+            <Route path='stocks/:id/stocklist/:id' loader={StockItemLoader} element={<StockItem />} />
+            <Route path='stocks/:id/stocklist/:id/edit' loader={StockItemUpdateLoader} element={<StockItemUpdate />} />
 
-                {/* Orders */}
-                <Route path='orders' loader={OrdersLoader} element={<Orders />} />
-                <Route path='orders/create' loader={OrderCreateLoader} element={<OrderCreate />} />
-                <Route path='orders/:id' loader={OrderListLoader} element={<OrderList />} />
-                <Route path='orders/:id/orderlist/:id' loader={OrderItemLoader} element={<OrderItem />} />
-                <Route path='orders/:id/orderlist/:id/edit' loader={OrderItemUpdateLoader} element={<OrderItemUpdate />} />
+            {/* Orders */}
+            <Route path='orders' loader={OrdersLoader} element={<Orders />} />
+            <Route path='orders/create' loader={OrderCreateLoader} element={<OrderCreate />} />
+            <Route path='orders/:id' loader={OrderListLoader} element={<OrderList />} />
+            <Route path='orders/:id/orderlist/:id' loader={OrderItemLoader} element={<OrderItem />} />
+            <Route path='orders/:id/orderlist/:id/edit' loader={OrderItemUpdateLoader} element={<OrderItemUpdate />} />
 
-                {/* Sales */}
-                <Route path='sales' loader={SalesLoader} element={<Sales />} />
-                <Route path='sales/create/:id' loader={SalesCreateLoader} element={<SalesCreate />} />
-                <Route path='sales/:id' loader={SaleLoader} element={<Sale />} />
-                <Route path='sales/:id/payments/add' loader={AddPaymentLoader} element={<AddPayment />} />
-            </Route>
+            {/* Sales */}
+            <Route path='sales' loader={SalesLoader} element={<Sales />} />
+            <Route path='sales/create/:id' loader={SalesCreateLoader} element={<SalesCreate />} />
+            <Route path='sales/:id' loader={SaleLoader} element={<Sale />} />
+            <Route path='sales/:id/payments/add' loader={AddPaymentLoader} element={<AddPayment />} />
         </Route>
 
         <Route path="*" element={<Page404 />} />

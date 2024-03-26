@@ -5,7 +5,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/stocks';
 
 export async function createStock(stockData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/stock-lists`, {
         method: 'POST',
         headers: {
@@ -23,7 +23,7 @@ export async function createStock(stockData) {
 }
 
 export async function getStocks() {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers: {
@@ -40,7 +40,7 @@ export async function getStocks() {
 }
 
 export async function getStockItem(stockId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/stock-lists/${stockId}`, {
         method: 'GET',
         headers: {
@@ -57,7 +57,7 @@ export async function getStockItem(stockId) {
 }
 
 export async function updateStockItem(stockItemId, stockItemData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}/stock-lists/${stockItemId}`, {
         method: 'PATCH',
         headers: {
@@ -75,7 +75,7 @@ export async function updateStockItem(stockItemId, stockItemData) {
 }
 
 export async function getStockList(stockId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${stockId}`, {
         method: 'GET',
         headers: {

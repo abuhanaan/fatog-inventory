@@ -13,7 +13,7 @@ const UserField = ({ field }) => {
 
     if ((key === 'totalAmount' || key === 'pricePerBag' || key === 'purchaseAmount' || key === 'purchasePricePerBag' || key === 'currentSellingPricePerBag' || key === 'outstandingPayment' || key === 'amountPaid' || key === 'amountPayable') && (value)) {
         outputValue = getMonetaryValue(value)
-    } else if (key === 'date') {
+    } else if (key === 'date' || key === 'createdAt' || key === 'updatedAt') {
         outputValue = formatDate(value)
     } else if (!value) {
         if (key === 'amountPaid' || key === 'outstandingPayment') {

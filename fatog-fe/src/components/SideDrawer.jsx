@@ -37,9 +37,9 @@ const SideDrawer = ({ isOpen, onClose, btnRef }) => {
                     </Flex>
                 </DrawerBody>
 
-                <DrawerFooter borderTopWidth='1px' p='0' justifyContent='flex-start'>
+                {/* <DrawerFooter borderTopWidth='1px' p='0' justifyContent='flex-start'>
                     <LogoutBtn display={{ base: 'block', md: 'none' }} />
-                </DrawerFooter>
+                </DrawerFooter> */}
             </DrawerContent>
         </Drawer>
     )

@@ -1,6 +1,6 @@
 import { redirect } from 'react-router-dom';
 
-const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
 
 export const headers = {
     'Content-Type': 'application/json',
@@ -11,11 +11,11 @@ export const authHeaders = {
     'Content-Type': 'application/json'
 };
 
-export const isUnauthorized = (res, navigate) => {
+export const isUnauthorized = (res, navigate, pathname) => {
     if (res.statusCode === 401) {
         const message = `${res.message}. Please login to continue.`;
-        localStorage.removeItem('user');
-        navigate(`/`, { state: { message } });
+        sessionStorage.removeItem('user');
+        navigate(`/`, { state: { message, redirectTo: pathname } });
     }
 };
 
@@ -29,6 +29,16 @@ export const isError = (res, data) => {
         }
     }
 };
+
+export const getInfoArray = (obj) => {
+    const infoArray = [];
+
+    for (const [key, value] of Object.entries(obj)) {
+        infoArray.push({ key, value });
+    }
+
+    return infoArray;
+}
 
 export const getMonetaryValue = (value) => {
     return new Intl.NumberFormat('en-NG', {

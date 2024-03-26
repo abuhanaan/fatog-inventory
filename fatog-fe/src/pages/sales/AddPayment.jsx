@@ -14,6 +14,7 @@ import { getSale } from '../../api/sales';
 import TextArea from '../../components/form/TextArea';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -43,6 +44,7 @@ export async function loader({ params, request }) {
 
 const AddPayment = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const sale = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
@@ -80,7 +82,7 @@ const AddPayment = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -108,7 +110,7 @@ const AddPayment = () => {
                 });
 
                 setTimeout(() => {
-                    isUnauthorized(response, navigate);
+                    isUnauthorized(response, navigate, pathname);
                 }, 6000);
 
                 return response.error;
@@ -134,9 +136,10 @@ const AddPayment = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Add Payment</Heading>
                 </HStack>

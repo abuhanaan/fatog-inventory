@@ -12,6 +12,7 @@ import { isUnauthorized } from '../../utils';
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp } from "react-icons/fa6";
 import { MdOutlineSyncLock } from "react-icons/md";
+import Back from '../../components/Back';
 
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
@@ -67,7 +68,7 @@ const ProfileForm = () => {
                 });
 
                 setTimeout(() => {
-                    isUnauthorized(response, navigate);
+                    isUnauthorized(response, navigate, pathname);
                 }, 6000);
 
                 return response.error;
@@ -91,9 +92,10 @@ const ProfileForm = () => {
 
     return (
         <Stack spacing='6'>
-            <Box>
+            <Stack direction={{ base: 'column', sm: 'row' }} justifyContent='space-between' alignItems='center'>
                 <Breadcrumb linkList={breadcrumbData} />
-            </Box>
+                <Back />
+            </Stack>
             <HStack justifyContent='space-between'>
                 <Heading fontSize='3xl' color='blue.700'>Update Profile</Heading>
             </HStack>

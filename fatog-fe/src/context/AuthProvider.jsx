@@ -3,21 +3,21 @@ import { useState, useEffect, createContext } from "react";
 const AuthContext = createContext({});
 
 export const AuthProvider = ({ children }) => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(sessionStorage.getItem('user'));
     const [user, setUser] = useState(storedUser ?? {});
 
     useEffect(() => {
-        const storedUser = JSON.parse(localStorage.getItem('user'));
+        const storedUser = JSON.parse(sessionStorage.getItem('user'));
         setUser(storedUser);
     }, []);
 
     const login = (currentUser) => {
-        localStorage.setItem('user', JSON.stringify(currentUser));
+        sessionStorage.setItem('user', JSON.stringify(currentUser));
         setUser(currentUser);
     };
 
     const logout = () => {
-        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
         setUser({});
     };
 

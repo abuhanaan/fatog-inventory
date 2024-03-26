@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLoaderData, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, useLocation, useLoaderData, Link as RouterLink } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
 import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
@@ -40,6 +40,8 @@ export async function loader({ request }) {
         }
     }
 
+    // console.log(orders)
+
     const data = orders.map(order => {
         return {
             id: order.id,
@@ -65,6 +67,7 @@ export async function loader({ request }) {
 
 const Orders = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const orders = useLoaderData();
     const { invoice } = orders;
     const [toastState, setToastState] = useToastHook();
@@ -86,7 +89,7 @@ const Orders = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);

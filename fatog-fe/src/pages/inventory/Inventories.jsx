@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLoaderData, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, useLocation, useLoaderData, Link as RouterLink } from 'react-router-dom';
 import ListingsTable from '../../components/Table';
 import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
@@ -69,6 +69,7 @@ export async function loader({ request }) {
 
 const Inventories = () => {
     const navigate = useNavigate();
+    const { pathname } = useLocation();
     const inventories = useLoaderData();
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
@@ -87,7 +88,7 @@ const Inventories = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);

@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_BASE_URL;
 const endpoint = '/sales';
 
 export async function createSales(salesData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -22,7 +22,7 @@ export async function createSales(salesData) {
 }
 
 export async function getSales() {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'GET',
         headers: {
@@ -39,7 +39,7 @@ export async function getSales() {
 }
 
 export async function getSale(saleId) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${saleId}`, {
         method: 'GET',
         headers: {
@@ -56,7 +56,7 @@ export async function getSale(saleId) {
 }
 
 export async function updateSale(saleId, saleData) {
-    const token = JSON.parse(localStorage.getItem('user'))?.accessToken;
+    const token = JSON.parse(sessionStorage.getItem('user'))?.accessToken;
     const res = await fetch(`${BASE_URL}${endpoint}/${saleId}`, {
         method: 'PATCH',
         headers: {

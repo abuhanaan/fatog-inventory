@@ -12,6 +12,7 @@ import { FaRegThumbsUp } from "react-icons/fa6";
 import { getOrderItem, updateOrderItem } from '../../api/orders';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import Back from '../../components/Back';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -42,7 +43,7 @@ export async function loader({ params, request }) {
 const OrderItemUpdate = () => {
     const navigate = useNavigate();
     const orderItem = useLoaderData();
-    const { state } = useLocation();
+    const { state, pathname } = useLocation();
     const currentOrderItem = state && state.orderItem;
     const { product, order } = orderItem;
     const [toastState, setToastState] = useToastHook();
@@ -76,7 +77,7 @@ const OrderItemUpdate = () => {
             });
 
             setTimeout(() => {
-                isUnauthorized(error, navigate);
+                isUnauthorized(error, navigate, pathname);
             }, 6000);
         }
     }, []);
@@ -111,7 +112,7 @@ const OrderItemUpdate = () => {
                 });
 
                 setTimeout(() => {
-                    isUnauthorized(response, navigate);
+                    isUnauthorized(response, navigate, pathname);
                 }, 6000);
 
                 return response.error;
@@ -137,9 +138,10 @@ const OrderItemUpdate = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Box>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
-                </Box>
+                    <Back />
+                </Stack>
                 <HStack justifyContent='space-between'>
                     <Heading fontSize='3xl' color='blue.700'>Update Order Item</Heading>
                 </HStack>
