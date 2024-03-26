@@ -17,6 +17,7 @@ import FetchError from '../../components/FetchError';
 const columns = [
     { id: 'S/N', header: 'S/N' },
     { id: 'staff', header: 'Staff' },
+    { id: 'customer', header: 'Customer' },
     { id: 'totalAmount', header: 'Amount(₦)' },
     { id: 'totalNoOfBags', header: 'No. of Bags' },
     { id: 'totalWeight', header: 'Total Weight(kg)' },
@@ -40,7 +41,7 @@ export async function loader({ request }) {
         }
     }
 
-    // console.log(orders)
+    console.log(orders)
 
     const data = orders.map(order => {
         return {
@@ -50,7 +51,10 @@ export async function loader({ request }) {
             totalNoOfBags: order.totalNoOfBags,
             totalWeight: order.totalWeight,
             staff: (order.staff.firstName && order.staff.lastName) ? `${order.staff.firstName} ${order.staff.lastName}` : '-',
-            // customer: (order.customer.firstName && order.customer.lastName) ? `${order.customer.firstName} ${order.customer.lastName}` : 'N/A',
+            customer: order.customerId ?
+                (order.customer.firstName && order.customer.lastName) ?
+                    `${order.customer.firstName} ${order.customer.lastName}` : order.phoneNumber
+                : '-',
             phoneNumber: order.phoneNumber,
             ShippingAddress: order.ShippingAddress,
             paymentStatus: order.paymentStatus,
