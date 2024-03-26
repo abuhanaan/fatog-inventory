@@ -41,7 +41,7 @@ export async function loader({ request }) {
         }
     }
 
-    console.log(orders)
+    // console.log(orders)
 
     const data = orders.map(order => {
         return {
