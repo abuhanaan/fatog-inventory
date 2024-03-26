@@ -50,7 +50,10 @@ export class InventoryService {
     try {
       const inventory = await this.prisma.inventory.findUnique({
         where: { id },
-        include: { product: true, history: true },
+        include: {
+          product: true,
+          history: { include: { orderItem: true, stockItem: true } },
+        },
       });
       console.log({ id, inventory });
       await this.checkIfInventoryExists(inventory, id);
