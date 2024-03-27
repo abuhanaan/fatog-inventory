@@ -46,6 +46,17 @@ export class OrderListsController {
     return orderLists.map((orderList) => new OrderListEntity(orderList));
   }
 
+  @Post('anonymous')
+  @ApiCreatedResponse({ type: OrderListEntity, isArray: true })
+  async createAnonymous(
+    @Body() createOrderListArrayDto: CreateOrderListArrayDto,
+  ) {
+    const orderLists = await this.orderListsService.createAnonymousOrder(
+      createOrderListArrayDto,
+    );
+    return orderLists.map((orderList) => new OrderListEntity(orderList));
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

@@ -16,6 +16,7 @@ import { SalesModule } from './sales/sales.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { InventoryHistoryModule } from './inventory-history/inventory-history.module';
 import { PaymentsModule } from './payments/payments.module';
+import { AnonymousCustomersModule } from './anonymous-customers/anonymous-customers.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { PaymentsModule } from './payments/payments.module';
     InventoryModule,
     InventoryHistoryModule,
     PaymentsModule,
+    AnonymousCustomersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

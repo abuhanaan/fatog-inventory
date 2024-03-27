@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Order } from '@prisma/client';
+import { AnonymousCustomerEntity } from 'src/anonymous-customers/entities/anonymous-customer.entity';
 import { CustomerEntity } from 'src/customer/entities/customer.entity';
 import { OrderListEntity } from 'src/order-lists/entities/order-list.entity';
 import { PaymentEntity } from 'src/payments/entities/payment.entity';
@@ -23,6 +24,9 @@ export class OrderEntity implements Order {
 
   @ApiProperty()
   customerId: number;
+
+  @ApiProperty()
+  anonymousCustomerId: number;
 
   @ApiProperty()
   staffId: number;
@@ -51,6 +55,9 @@ export class OrderEntity implements Order {
   @ApiProperty({ required: false, type: () => CustomerEntity })
   customer?: CustomerEntity;
 
+  @ApiProperty({ required: false, type: () => AnonymousCustomerEntity })
+  anonymousCustomer?: AnonymousCustomerEntity;
+
   @ApiProperty({ required: false, type: StaffEntity })
   staff?: StaffEntity;
 
@@ -62,6 +69,7 @@ export class OrderEntity implements Order {
 
   constructor({
     customer,
+    anonymousCustomer,
     staff,
     orderLists,
     payments,
@@ -71,6 +79,10 @@ export class OrderEntity implements Order {
 
     if (customer) {
       this.customer = new CustomerEntity(customer);
+    }
+
+    if (anonymousCustomer) {
+      this.anonymousCustomer = new AnonymousCustomerEntity(anonymousCustomer);
     }
 
     if (staff) {

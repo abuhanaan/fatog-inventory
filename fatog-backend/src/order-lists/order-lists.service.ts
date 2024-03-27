@@ -79,6 +79,8 @@ export class OrderListsService {
       refId: referenceId,
       staffId: userCategory === 'staff' ? user.id : null,
       customerId: userCategory === 'customer' ? user.id : null,
+
+      anonymousCustomerId: null,
       totalAmount: orderTotalAmount,
       totalWeight: orderTotalWeight,
 
@@ -122,6 +124,116 @@ export class OrderListsService {
     const order: OrderEntity = transaction[0];
     // const orderItems = transaction[1];
     return orderItems;
+  }
+
+  async createAnonymousOrder(createOrderListArrayDto: CreateOrderListArrayDto) {
+    let orderTotalAmount = 0;
+    let orderTotalWeight = 0;
+    let orderTotalNoOfBags = 0;
+    const referenceId = generateReferenceId();
+
+    const existingOrder = await this.prisma.order.findUnique({
+      where: { refId: referenceId },
+    });
+
+    if (existingOrder) {
+      throw new ConflictException({
+        message: `Order with reference id ${referenceId} already exist`,
+      });
+    }
+
+    const orderListData = await Promise.all(
+      createOrderListArrayDto.data.map(async (orderItem) => {
+        const product = await this.prisma.product.findFirst({
+          where: { refId: orderItem.productRefId },
+        });
+        orderItem.totalAmount = product.pricePerBag * orderItem.noOfBags;
+        orderItem.totalWeight = product.weight * orderItem.noOfBags;
+        orderTotalAmount += orderItem.totalAmount;
+        orderTotalWeight += orderItem.totalWeight;
+        orderTotalNoOfBags += orderItem.noOfBags;
+        return {
+          orderRefId: referenceId,
+          productRefId: orderItem.productRefId,
+          noOfBags: orderItem.noOfBags,
+          pricePerBag: product.pricePerBag,
+          totalWeight: orderItem.totalWeight,
+          totalAmount: orderItem.totalAmount,
+        };
+      }),
+    );
+
+    const orderDTO: CreateOrderDto = {
+      refId: referenceId,
+      staffId: null,
+      customerId: null,
+
+      anonymousCustomerId: null,
+      totalAmount: orderTotalAmount,
+      totalWeight: orderTotalWeight,
+
+      amountPaid: null,
+      outStandingPayment: null,
+
+      paymentStatus: 'pending',
+
+      deliveryStatus: 'pending',
+
+      totalNoOfBags: orderTotalNoOfBags,
+      phoneNumber: createOrderListArrayDto.phoneNumber,
+      shippingAddress: createOrderListArrayDto.shippingAddress
+        ? createOrderListArrayDto.shippingAddress
+        : '',
+    };
+
+    const anonymousUser = await this.prisma.anonymousCustomer.findUnique({
+      where: { phoneNumber: createOrderListArrayDto.phoneNumber },
+    });
+
+    if (anonymousUser) {
+      orderDTO.anonymousCustomerId = anonymousUser.id;
+      const transaction = await this.prisma.$transaction([
+        this.prisma.order.create({ data: orderDTO }),
+        this.prisma.orderList.createMany({
+          data: orderListData,
+        }),
+      ]);
+
+      const orderItems = await this.prisma.orderList.findMany({
+        where: { orderRefId: referenceId },
+        include: { order: true, product: true },
+      });
+
+      const order: OrderEntity = transaction[0];
+      // const orderItems = transaction[1];
+      return orderItems;
+    } else {
+      //
+      const transaction = await this.prisma.$transaction(async (prisma) => {
+        const newAnonymousCustomer = await prisma.anonymousCustomer.create({
+          data: {
+            firstName: createOrderListArrayDto.firstName,
+            lastName: createOrderListArrayDto.lastName,
+            phoneNumber: createOrderListArrayDto.phoneNumber,
+            shippingAddress: createOrderListArrayDto.shippingAddress,
+            gender: createOrderListArrayDto.gender,
+          },
+        });
+        orderDTO.anonymousCustomerId = newAnonymousCustomer.id;
+        const order = await prisma.order.create({ data: orderDTO });
+        const orderLists = prisma.orderList.createMany({
+          data: orderListData,
+        });
+
+        // create everything in the previous if block
+        return { newAnonymousCustomer, order, orderLists };
+      });
+      const orderItems = await this.prisma.orderList.findMany({
+        where: { orderRefId: transaction.order.refId },
+        include: { order: true, product: true },
+      });
+      return orderItems;
+    }
   }
 
   findAll() {

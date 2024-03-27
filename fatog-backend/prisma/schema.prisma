@@ -10,6 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model AnonymousCustomer {
+  id              Int      @id @default(autoincrement())
+  firstName       String?
+  lastName        String?
+  phoneNumber     String?  @unique
+  shippingAddress String?
+  gender          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  orders Order[]
+}
+
 model Customer {
   id              Int      @id @default(autoincrement())
   firstName       String?
@@ -143,6 +156,7 @@ model Order {
   totalWeight        Int
   totalNoOfBags      Int
   customerId         Int?
+  anonymousCustomerId  Int?
   staffId            Int?     
   phoneNumber        String
   shippingAddress    String?
@@ -155,6 +169,7 @@ model Order {
   updatedAt          DateTime @updatedAt
 
   customer           Customer?    @relation(fields: [customerId], references: [customerId])
+  anonymousCustomer  AnonymousCustomer?    @relation(fields: [anonymousCustomerId], references: [id])
   staff              Staff?    @relation(fields: [staffId], references: [staffId])
   orderLists         OrderList[]
   invoice            Sales?

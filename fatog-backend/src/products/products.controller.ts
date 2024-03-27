@@ -30,8 +30,8 @@ export class ProductsController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
   @ApiCreatedResponse({ type: ProductEntity, isArray: true })
   async findAll() {
     const products = await this.productsService.findAll();
@@ -39,8 +39,8 @@ export class ProductsController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
   @ApiCreatedResponse({ type: ProductEntity })
   async findOne(@Param('id') id: string) {
     const product = await this.productsService.findOne(+id);

@@ -30,6 +30,8 @@ export class CreateOrderDto {
   @ApiProperty()
   staffId?: number;
 
+  anonymousCustomerId: number;
+
   @IsNumber()
   @ApiProperty()
   @IsNotEmpty()

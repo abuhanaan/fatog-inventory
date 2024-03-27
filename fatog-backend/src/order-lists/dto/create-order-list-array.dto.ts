@@ -17,6 +17,18 @@ export class CreateOrderListArrayDto {
   data: CreateOrderListDto[];
 
   @IsString()
+  @ApiProperty({ required: false })
+  firstName?: string;
+
+  @IsString()
+  @ApiProperty({ required: false })
+  lastName?: string;
+
+  @IsString()
+  @ApiProperty({ required: false })
+  gender?: string;
+
+  @IsString()
   @IsNotEmpty()
   @ApiProperty()
   phoneNumber: string;
