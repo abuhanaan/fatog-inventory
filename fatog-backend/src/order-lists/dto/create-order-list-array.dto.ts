@@ -26,14 +26,14 @@ export class CreateOrderListArrayDto {
   @ApiProperty()
   shippingAddress?: string;
 
-  @IsNumber()
-  @ApiProperty({ required: false })
+  // @IsNumber()
+  // @ApiProperty({ required: false })
   amountPaid?: number;
 
-  @ApiProperty({ required: false })
+  // @ApiProperty({ required: false })
   paymentStatus?: string;
 
-  @ApiProperty({ required: false })
+  // @ApiProperty({ required: false })
   deliveryStatus?: string;
 
   outStandingPayment?: number;
