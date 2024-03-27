@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
+import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, CardHeader, CardFooter, useDisclosure } from '@chakra-ui/react';
 import { HiOutlinePlus } from "react-icons/hi";
 import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
@@ -10,7 +10,7 @@ import Modal from '../../components/Modal';
 import UserField from '../../components/UserField';
 import Tabs from '../../components/Tabs';
 import PaymentsTable from '../../components/PaymentsTable';
-import StocksTable from '../../components/StocksTable';
+import OrdersTable from '../../components/OrdersTable';
 import { requireAuth } from '../../hooks/useAuth';
 import { useToastHook } from '../../hooks/useToast';
 import { getSale } from '../../api/sales';
@@ -31,7 +31,7 @@ export async function loader({ params, request }) {
     }
 
     console.log(sale)
-    
+
     const data = {
         id: sale.id,
         amountPaid: sale.amountPaid,
@@ -55,6 +55,7 @@ const Sale = () => {
     const { pathname } = useLocation();
     const sale = useLoaderData();
     const { staff, order, payments } = sale;
+    const { orderLists } = order;
     const [toastState, setToastState] = useToastHook();
     const [error, setError] = useState({
         error: sale.error ?? '',
@@ -75,6 +76,8 @@ const Sale = () => {
         date: sale.date,
     };
 
+    // console.log(orderLists)
+
     const staffInfo = {
         firstName: staff.firstName,
         lastName: staff.lastName,
@@ -83,6 +86,7 @@ const Sale = () => {
     };
 
     const orderInfo = {
+        referenceId: order.refId,
         totalNoOfBags: order.totalNoOfBags,
         totalAmount: order.totalAmount,
         totalWeight: order.totalWeight,
@@ -107,13 +111,14 @@ const Sale = () => {
         { id: 'date', header: 'Date' },
     ];
 
-    const tabTitles = ['Overview', 'Order Details', 'Payments', 'Staff Details', ];
+    const tabTitles = ['Overview', 'Order Details', 'Order List', 'Payments', 'Staff Details',];
     const tabPanels = [
         <TabPanel info={basicSaleInfo} />,
         <TabPanel info={orderInfo} />,
+        <OrderList info={orderInfo} orderList={orderLists} orderId={order.id} />,
         <PaymentsTable payments={paymentsData} columns={paymentColumns} />,
         <TabPanel info={staffInfo} />,
-        
+
     ];
 
     useEffect(() => {
@@ -135,7 +140,7 @@ const Sale = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
+                <Stack direction={{ base: 'column', sm: 'row' }} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
                     <Back />
                 </Stack>
@@ -149,16 +154,16 @@ const Sale = () => {
     )
 }
 
-const TabPanel = ({ info }) => {
-    const getInfoArray = (info) => {
-        const infoArray = [];
-        for (const [key, value] of Object.entries(info)) {
-            infoArray.push({ key, value });
-        }
-
-        return infoArray;
+const getInfoArray = (info) => {
+    const infoArray = [];
+    for (const [key, value] of Object.entries(info)) {
+        infoArray.push({ key, value });
     }
 
+    return infoArray;
+}
+
+const TabPanel = ({ info }) => {
     return (
         <Card variant='elevated'>
             <CardBody>
@@ -171,6 +176,28 @@ const TabPanel = ({ info }) => {
                 </SimpleGrid>
             </CardBody>
         </Card>
+    )
+}
+
+const OrderList = ({ info, orderList, orderId }) => {
+    const orderListColumns = [
+        { id: 'S/N', header: 'S/N' },
+        { id: 'productName', header: 'Product' },
+        { id: 'pricePerBag', header: 'Price per Bag' },
+        { id: 'noOfBags', header: 'No. of Bags' },
+        { id: 'totalAmount', header: 'Total Amount' },
+        { id: 'totalWeight', header: 'Total Weight' },
+        { id: 'actions', header: '' },
+    ];
+
+    const orderListData = orderList.map(orderItem => ({
+        ...orderItem,
+        orderId: orderId,
+        productName: orderItem.product.name
+    }));
+
+    return (
+        <OrdersTable orders={orderListData} columns={orderListColumns} path={`/orders/${orderId}/orderlist`} />
     )
 }
 
