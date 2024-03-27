@@ -78,6 +78,43 @@ export class UsersService {
     }
   }
 
+  async createCustomer(createUserDto: CreateUserDto) {
+    try {
+      const existingUser = await this.prisma.user.findUnique({
+        where: { email: createUserDto.email },
+      });
+      if (existingUser) {
+        throw new ConflictException({
+          message: 'Conflict Operation',
+          error: `User with email ${createUserDto.email} already exist`,
+        });
+      }
+      const hashedPassword = await bcrypt.hash(
+        createUserDto.password,
+        roundsOfHashing,
+      );
+
+      createUserDto.password = hashedPassword;
+      // const newUser = await this.prisma.user.create({ data: createUserDto });
+
+      const transaction = await this.prisma.$transaction(async (prisma) => {
+        createUserDto.category = 'customer';
+        const newUser = await prisma.user.create({
+          data: createUserDto,
+        });
+        const newCustomer = await prisma.customer.create({
+          data: { customerId: newUser.id },
+        });
+
+        return [newUser];
+      });
+      return transaction[0];
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
   async findAll() {
     const users = await this.prisma.user.findMany();
     return users;

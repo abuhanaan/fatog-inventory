@@ -39,6 +39,13 @@ export class UsersController {
     return new UserEntity(user);
   }
 
+  @Post('customer/create')
+  @ApiCreatedResponse({ type: UserEntity })
+  async createCustomer(@Body() createUserDto: CreateUserDto) {
+    const user = await this.usersService.createCustomer(createUserDto);
+    return new UserEntity(user);
+  }
+
   @Get()
   @UseGuards(AdminJwtAuthGuard)
   @ApiBearerAuth()
