@@ -81,7 +81,7 @@ export class PaymentsService {
         const payment = await prisma.paymentHistory.create({
           data: createPaymentDto,
         });
-        const salesUpdate = await this.prisma.sales.update({
+        const salesUpdate = await prisma.sales.update({
           where: { id: sales.id },
           data: {
             paymentStatus: 'FULLY_PAID',
