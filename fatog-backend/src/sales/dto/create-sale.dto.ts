@@ -27,10 +27,10 @@ export class CreateSaleDto {
   // @ApiProperty()
   outStandingPayment: number;
 
-  @IsNotEmpty()
+  // @IsNotEmpty()
   @IsString()
-  @ApiProperty()
-  note: string;
+  @ApiProperty({ required: false, default: '' })
+  note?: string;
 
   // @IsNotEmpty()
   // @IsNumber()
