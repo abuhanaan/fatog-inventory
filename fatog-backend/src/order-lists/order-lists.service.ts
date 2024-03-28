@@ -14,6 +14,7 @@ import { UserEntity } from 'src/users/entities/user.entity';
 import { CreateOrderDto } from 'src/orders/dto/create-order.dto';
 import { generateReferenceId } from 'src/utils/referenceIdGenerator';
 import { OrderEntity } from 'src/orders/entities/order.entity';
+import { CreateAnonymousOrderListArrayDto } from './dto/create-anonymous-order-list-array.dto';
 
 @Injectable()
 export class OrderListsService {
@@ -126,7 +127,9 @@ export class OrderListsService {
     return orderItems;
   }
 
-  async createAnonymousOrder(createOrderListArrayDto: CreateOrderListArrayDto) {
+  async createAnonymousOrder(
+    createOrderListArrayDto: CreateAnonymousOrderListArrayDto,
+  ) {
     let orderTotalAmount = 0;
     let orderTotalWeight = 0;
     let orderTotalNoOfBags = 0;
