@@ -1,19 +1,22 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateOrderListArrayDto } from './create-order-list-array.dto';
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateAnonymousOrderListArrayDto extends PartialType(
   CreateOrderListArrayDto,
 ) {
   @IsString()
-  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  @ApiProperty()
   firstName?: string;
 
   @IsString()
-  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  @ApiProperty()
   lastName?: string;
 
   @IsString()
-  @ApiProperty({ required: false })
+  @IsNotEmpty()
+  @ApiProperty()
   gender?: string;
 }
