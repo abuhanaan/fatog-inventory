@@ -128,7 +128,7 @@ export class OrderListsService {
   }
 
   async createAnonymousOrder(
-    createOrderListArrayDto: CreateAnonymousOrderListArrayDto,
+    createAnonymousOrderListArrayDto: CreateAnonymousOrderListArrayDto,
   ) {
     let orderTotalAmount = 0;
     let orderTotalWeight = 0;
@@ -146,7 +146,7 @@ export class OrderListsService {
     }
 
     const orderListData = await Promise.all(
-      createOrderListArrayDto.data.map(async (orderItem) => {
+      createAnonymousOrderListArrayDto.data.map(async (orderItem) => {
         const product = await this.prisma.product.findFirst({
           where: { refId: orderItem.productRefId },
         });
@@ -183,14 +183,14 @@ export class OrderListsService {
       deliveryStatus: 'pending',
 
       totalNoOfBags: orderTotalNoOfBags,
-      phoneNumber: createOrderListArrayDto.phoneNumber,
-      shippingAddress: createOrderListArrayDto.shippingAddress
-        ? createOrderListArrayDto.shippingAddress
+      phoneNumber: createAnonymousOrderListArrayDto.phoneNumber,
+      shippingAddress: createAnonymousOrderListArrayDto.shippingAddress
+        ? createAnonymousOrderListArrayDto.shippingAddress
         : '',
     };
 
     const anonymousUser = await this.prisma.anonymousCustomer.findUnique({
-      where: { phoneNumber: createOrderListArrayDto.phoneNumber },
+      where: { phoneNumber: createAnonymousOrderListArrayDto.phoneNumber },
     });
 
     if (anonymousUser) {
@@ -215,11 +215,11 @@ export class OrderListsService {
       const transaction = await this.prisma.$transaction(async (prisma) => {
         const newAnonymousCustomer = await prisma.anonymousCustomer.create({
           data: {
-            firstName: createOrderListArrayDto.firstName,
-            lastName: createOrderListArrayDto.lastName,
-            phoneNumber: createOrderListArrayDto.phoneNumber,
-            shippingAddress: createOrderListArrayDto.shippingAddress,
-            gender: createOrderListArrayDto.gender,
+            firstName: createAnonymousOrderListArrayDto.firstName,
+            lastName: createAnonymousOrderListArrayDto.lastName,
+            phoneNumber: createAnonymousOrderListArrayDto.phoneNumber,
+            shippingAddress: createAnonymousOrderListArrayDto.shippingAddress,
+            gender: createAnonymousOrderListArrayDto.gender,
           },
         });
         orderDTO.anonymousCustomerId = newAnonymousCustomer.id;

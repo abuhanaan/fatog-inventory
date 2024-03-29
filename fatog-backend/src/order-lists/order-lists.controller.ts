@@ -24,6 +24,7 @@ import { CreateOrderListArrayDto } from './dto/create-order-list-array.dto';
 import { AuthenticatedRequest } from 'src/utils/interfaces/authRequest.interface';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CreateAnonymousOrderListArrayDto } from './dto/create-anonymous-order-list-array.dto';
 
 @Controller('order-lists')
 @ApiTags('order-lists')
@@ -49,10 +50,10 @@ export class OrderListsController {
   @Post('anonymous')
   @ApiCreatedResponse({ type: OrderListEntity, isArray: true })
   async createAnonymous(
-    @Body() createOrderListArrayDto: CreateOrderListArrayDto,
+    @Body() createAnonymousOrderListArrayDto: CreateAnonymousOrderListArrayDto,
   ) {
     const orderLists = await this.orderListsService.createAnonymousOrder(
-      createOrderListArrayDto,
+      createAnonymousOrderListArrayDto,
     );
     return orderLists.map((orderList) => new OrderListEntity(orderList));
   }
