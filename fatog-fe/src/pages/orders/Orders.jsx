@@ -25,6 +25,14 @@ const columns = [
     { id: 'date', header: 'Date' },
     { id: 'actions', header: '' },
 ];
+
+const columnFilters = [
+    {
+        id: 'refId',
+        value: 'John', // filter the name column by 'John' by default
+    },
+];
+
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
     { name: 'Orders', ref: '/orders' },
@@ -51,11 +59,11 @@ export async function loader({ request }) {
             totalAmount: order.totalAmount,
             totalNoOfBags: order.totalNoOfBags,
             totalWeight: order.totalWeight,
-            staff: (order.staff.firstName && order.staff.lastName) ? `${order.staff.firstName} ${order.staff.lastName}` : '-',
-            customer: order.customerId ?
+            staff: order.staffId ? `${order.staff.firstName} ${order.staff.lastName}` : '-',
+            customer: (order.customerId) ?
                 (order.customer.firstName && order.customer.lastName) ?
-                    `${order.customer.firstName} ${order.customer.lastName}` : order.phoneNumber
-                : '-',
+                    `${order.customer.firstName} ${order.customer.lastName}` :
+                    order.phoneNumber : '-',
             phoneNumber: order.phoneNumber,
             ShippingAddress: order.ShippingAddress,
             paymentStatus: order.paymentStatus,

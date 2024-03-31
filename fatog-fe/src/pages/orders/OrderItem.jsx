@@ -35,7 +35,7 @@ export async function loader({ params, request }) {
         noOfBags: response.noOfBags,
         pricePerBag: response.pricePerBag,
         totalWeight: response.totalWeight,
-        totalAmount: response.totalPrice,
+        totalAmount: response.totalAmount,
         date: response.createdAt,
         product: response.product,
         order: response.order,
