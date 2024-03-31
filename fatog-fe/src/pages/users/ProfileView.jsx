@@ -20,7 +20,7 @@ import Back from '../../components/Back';
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const staff = await getStaffData(request);
+    const staff = await getStaffData();
 
     // console.log(staff);
 
