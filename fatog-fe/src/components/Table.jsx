@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { createColumnHelper, getCoreRowModel, useReactTable, flexRender, getPaginationRowModel, getFilteredRowModel } from '@tanstack/react-table';
-import { TableContainer, Table, Tbody, Td, Th, Thead, Tr, Button, Flex, HStack, Input, Box, Select, Icon, Spacer, Badge } from '@chakra-ui/react';
+import { TableContainer, Table, Tbody, Td, Th, Thead, Tr, Button, IconButton, Flex, HStack, Input, Box, Select, Icon, Spacer, Badge } from '@chakra-ui/react';
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
@@ -24,7 +24,8 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
                 columnHelper.accessor('', {
                     id: col.id,
                     cell: info => <span>{info.row.index + 1}</span>,
-                    header: col.header
+                    header: col.header,
+                    // enableColumnFilter: false
                 })
             )
         }
@@ -38,7 +39,8 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
                             {info.getValue() === true ? 'Active' : 'Inactive'}
                         </Badge>
                     ),
-                    header: col.header
+                    header: col.header,
+                    // enableColumnFilter: false
                 })
             )
         }
@@ -54,7 +56,8 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
                             }
                         </span>
                     ),
-                    header: col.header
+                    header: col.header,
+                    // enableColumnFilter: false
                 })
             )
         }
@@ -70,7 +73,7 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
                             }
                         </span>
                     ),
-                    header: col.header
+                    header: col.header,
                 })
             )
         }
@@ -112,10 +115,13 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
                             info.getValue() ? info.getValue() : '-'
                     }
                 </span>,
-                header: col.header
+                header: col.header,
+                // enableColumnFilter: (col.id === 'refId' || col.id === 'staff' || col.id === 'customer') ? true : false
             })
         )
     });
+
+    // const [columnFilters, setColumnFilters] = useState(colFilters || []);
 
     const [data, setData] = useState(tableData);
 
@@ -128,6 +134,7 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
         data,
         columns,
         state: {
+            // columnFilters,
             globalFilter,
         },
         getFilteredRowModel: getFilteredRowModel(),
@@ -253,23 +260,17 @@ const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState
                 <Spacer />
 
                 <HStack spacing='2'>
-                    <HStack
-                        as={Button}
+                    <IconButton
+                        icon={<FaArrowLeftLong />}
                         onClick={() => table.previousPage()}
-                        disabled={!table.getCanPreviousPage()}
-                        spacing='1'
-                    >
-                        <Icon as={FaArrowLeftLong} />
-                    </HStack>
+                        isDisabled={!table.getCanPreviousPage()}
+                    />
 
-                    <HStack
-                        as={Button}
+                    <IconButton
+                        icon={<FaArrowRightLong />}
                         onClick={() => nextPage()}
-                        disabled={!table.getCanNextPage()}
-                        spacing='1'
-                    >
-                        <Icon as={FaArrowRightLong} />
-                    </HStack>
+                        isDisabled={!table.getCanNextPage()}
+                    />
                 </HStack>
             </HStack>
         </>
