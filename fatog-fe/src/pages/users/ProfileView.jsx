@@ -101,7 +101,7 @@ const ProfileView = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems={{base: 'start', sm: 'center'}}>
                     <Breadcrumb linkList={breadcrumbData} />
                     <Back />
                 </Stack>
