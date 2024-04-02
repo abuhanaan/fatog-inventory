@@ -44,6 +44,7 @@ const ProductForm = () => {
     const currentProduct = state && state.currentProduct;
     const manufacturerIdRef = useRef(null);
     const submitBtnRef = useRef(null);
+    const productTypeRef = useRef(null);
     const [brandName, setBrandName] = useState(currentProduct ? String(currentProduct?.manufacturer).replace(/\s+/g, '').toUpperCase() : '');
     const [feedSize, setFeedSize] = useState('');
     const [toastState, setToastState] = useToastHook();
@@ -59,6 +60,7 @@ const ProductForm = () => {
         { name: 'Product Form', ref: '/products/create' },
     ];
     const manufacturersOptions = manufacturers.map(manufacturer => manufacturer.brandName);
+    const productTypeOptions = ['sinking', 'floating'];
 
     useEffect(() => {
         if (error.error || error.message) {
@@ -82,6 +84,7 @@ const ProductForm = () => {
             size: Number(feedSize[0]),
             pricePerBag: Number(data.pricePerBag),
             name: getProductName(),
+            type: productTypeRef.current.value.toLowerCase()
         };
 
         const buttonIntent = submitBtnRef.current.getAttribute('data-intent');
@@ -202,7 +205,8 @@ const ProductForm = () => {
                         </Flex>
                         <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>
                             <TextInput name='weight' label='Weight (kg)' control={control} type='number' defaultVal={currentProduct?.weight} />
-                            <TextInput name='type' label='Type' control={control} type='text' defaultVal={currentProduct?.type} />
+                            <SelectElement data={productTypeOptions} label='Type' defaultVal={currentProduct ? currentProduct.type : ''} placeholder='Select Product Type' fieldRef={productTypeRef} />
+                            {/* <TextInput name='type' label='Type' control={control} type='text' defaultVal={currentProduct?.type} /> */}
                         </Flex>
 
                         <Flex gap={{ base: '4', md: '6' }} direction={{ base: 'column', sm: 'row' }}>

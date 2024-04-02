@@ -16,13 +16,23 @@ import FetchError from '../../components/FetchError';
 
 const columns = [
     { id: 'S/N', header: 'S/N' },
+    { id: 'refId', header: 'Reference Id' },
     { id: 'staff', header: 'Staff' },
+    { id: 'customer', header: 'Customer' },
     { id: 'totalAmount', header: 'Amount(₦)' },
     { id: 'totalNoOfBags', header: 'No. of Bags' },
-    { id: 'totalWeight', header: 'Total Weight(kg)' },
+    // { id: 'totalWeight', header: 'Total Weight(kg)' },
     { id: 'date', header: 'Date' },
     { id: 'actions', header: '' },
 ];
+
+const columnFilters = [
+    {
+        id: 'refId',
+        value: 'John', // filter the name column by 'John' by default
+    },
+];
+
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
     { name: 'Orders', ref: '/orders' },
@@ -40,7 +50,7 @@ export async function loader({ request }) {
         }
     }
 
-    // console.log(orders)
+    console.log(orders)
 
     const data = orders.map(order => {
         return {
@@ -49,8 +59,11 @@ export async function loader({ request }) {
             totalAmount: order.totalAmount,
             totalNoOfBags: order.totalNoOfBags,
             totalWeight: order.totalWeight,
-            staff: (order.staff.firstName && order.staff.lastName) ? `${order.staff.firstName} ${order.staff.lastName}` : '-',
-            // customer: (order.customer.firstName && order.customer.lastName) ? `${order.customer.firstName} ${order.customer.lastName}` : 'N/A',
+            staff: order.staffId ? `${order.staff.firstName} ${order.staff.lastName}` : '-',
+            customer: (order.customerId) ?
+                (order.customer.firstName && order.customer.lastName) ?
+                    `${order.customer.firstName} ${order.customer.lastName}` :
+                    order.phoneNumber : '-',
             phoneNumber: order.phoneNumber,
             ShippingAddress: order.ShippingAddress,
             paymentStatus: order.paymentStatus,

@@ -22,6 +22,7 @@ const SelectElement = ({ data, setManufacturerId, label, defaultVal, placeholder
                 placeholder={placeholder}
                 onChange={handleChange}
                 ref={fieldRef}
+                textTransform='capitalize'
             >
                 {
                     data.map((option, index) => (
