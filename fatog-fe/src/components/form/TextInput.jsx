@@ -2,7 +2,7 @@ import { FormControl, FormLabel, FormHelperText, Input } from "@chakra-ui/react"
 import { useController } from 'react-hook-form';
 import { useState } from "react";
 
-const TextInput = ({ name, label, control, type, fieldRef, defaultVal, helperText, ...rest }) => {
+const TextInput = ({ name, label, control, type, fieldRef, defaultVal, helperText, showHelperText, ...rest }) => {
     const { field } = useController({
         name,
         control,
@@ -27,7 +27,7 @@ const TextInput = ({ name, label, control, type, fieldRef, defaultVal, helperTex
                 required
             />
             {
-                helperText &&
+                helperText && showHelperText &&
                 <FormHelperText>{helperText}</FormHelperText>
             }
         </FormControl>
