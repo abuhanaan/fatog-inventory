@@ -22,8 +22,8 @@ import Back from '../../components/Back';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
-    const inventory = await getInventory(request, params.id);
-    const manufacturers = await getManufacturers(request);
+    const inventory = await getInventory(params.id);
+    const manufacturers = await getManufacturers();
 
     if (inventory.error || inventory.message) {
         return {
@@ -32,6 +32,8 @@ export async function loader({ params, request }) {
             statusCode: inventory.statusCode
         }
     }
+
+    // console.log(inventory)
 
     if (manufacturers.error || manufacturers.message) {
         return {

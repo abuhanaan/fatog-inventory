@@ -30,7 +30,7 @@ export async function loader({ params, request }) {
         };
     }
 
-    // console.log(response);
+    console.log(response);
 
     const data = {
         id: response.id,
@@ -49,9 +49,9 @@ export async function loader({ params, request }) {
         orderList: response.orderLists,
         staffId: response.staffId,
         customerId: response.customerId,
-        staff: response.staff,
+        staff: response.staffId ? response.staff : null,
+        customer: response.customerId ? response.customer : null,
         payments: response.payments,
-        // customer: response.customer,
     };
 
     return data;
@@ -75,21 +75,25 @@ const OrderList = () => {
     ];
 
     const basicOrderInfo = {
-        staff: (staff.firstName && staff.lastName) ? `${staff.firstName} ${staff.lastName}` : 'N/A',
-        // customer: (customer.firstName && customer.lastName) ? `${customer.firstName} ${customer.lastName}` : 'N/A',
-        totalAmount: order.totalAmount,
         totalNoOfBags: order.totalNoOfBags,
         totalWeight: order.totalWeight,
+        totalAmount: order.totalAmount,
+        outstandingPayment: order.outstandingPayment,
+        staff: staff ?
+            (staff.firstName && staff.lastName) ?
+                `${staff.firstName} ${staff.lastName}` :
+                '-'
+            : '-',
+        customerName: order.customer ? `${order.customer.firstName} ${order.customer.lastName}` : '-',
         customerPhoneNumber: order.customerPhoneNumber,
         shippingAddress: order.shippingAddress,
-        outstandingPayment: order.outstandingPayment,
         date: order.date,
         note: order.note,
     }
 
     const orderListColumns = [
         { id: 'S/N', header: 'S/N' },
-        // { id: 'productName', header: 'Product' },
+        { id: 'productName', header: 'Product' },
         { id: 'pricePerBag', header: 'Price per Bag' },
         { id: 'noOfBags', header: 'No. of Bags' },
         { id: 'totalAmount', header: 'Total Amount' },
@@ -100,10 +104,8 @@ const OrderList = () => {
     const orderListData = orderList.map(orderItem => ({
         ...orderItem,
         orderId: order.id,
-        // productName: orderItem.product.name
+        productName: orderItem.product.name
     }));
-
-    // console.log(orderListData);
 
     const paymentsData = payments.map(payment => ({
         amountPaid: payment.amountPaid,
@@ -146,7 +148,7 @@ const OrderList = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
+                <Stack direction={{ base: 'column', sm: 'row' }} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
                     <Back />
                 </Stack>

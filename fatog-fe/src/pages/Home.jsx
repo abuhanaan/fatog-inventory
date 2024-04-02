@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Box, Heading, Text, Button, Flex, Stack, Link, Icon } from "@chakra-ui/react";
 import { useNavigate, useLoaderData, useLocation } from 'react-router-dom';
 import { useForm } from "react-hook-form";
@@ -27,7 +28,8 @@ const Home = () => {
     const navigate = useNavigate();
     const { errorMessage, request } = useLoaderData();
     const { state } = useLocation();
-    const message = (state && state.message) || errorMessage;
+    const [loginError, setLoginError] = useState('')
+    const message = (state && state.message) || errorMessage || loginError;
     const redirectTo = state && state.redirectTo;
 
     const submit = async (userData) => {
@@ -49,6 +51,19 @@ const Home = () => {
             return;
         }
 
+        if (response.user.category === 'customer') {
+            setToastState({
+                title: 'Unauthorized!',
+                description: 'You are not authorized to login here.',
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
+
+            setLoginError('You are not authorized to login here.');
+
+            return;
+        }
+
         login(response);
         const to = redirectTo || new URL(request.url).searchParams.get('redirectTo') || '/dashboard';
         // const to = '/dashboard';
@@ -65,9 +80,8 @@ const Home = () => {
             bgImage={`linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${bgImage})`}
             backgroundRepeat='no-repeat'
             backgroundSize='cover'
-            boxShadow='lg'
         >
-            <Flex w={['90%', '90%', '80%', '80%', '60%']} borderRadius='md' overflow='hidden'>
+            <Flex w={['90%', '90%', '80%', '80%', '60%']} borderRadius='md' overflow='hidden' boxShadow='lg'>
                 <Box
                     display={['none', 'none', 'block']} w='55%'
                     bgImage={bgImage2}
@@ -85,7 +99,7 @@ const Home = () => {
                     <Logo />
 
                     {
-                        message &&
+                        (message) &&
                         <Text fontSize='md' fontWeight='medium' px='3' py='2' bg='red.100' color='red.600'>{message}</Text>
                     }
 

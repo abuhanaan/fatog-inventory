@@ -50,7 +50,7 @@ const SideNavLinks = () => {
             <Spacer />
 
             {/* Logout */}
-            <LogoutBtn display={{ base: 'none', md: 'block' }} />
+            {/* <LogoutBtn display={{ base: 'none', md: 'block' }} /> */}
         </Stack>
     )
 }

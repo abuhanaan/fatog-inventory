@@ -29,6 +29,8 @@ export const loader = async ({ params, request }) => {
         };
     }
 
+    console.log(history)
+
     const data = {
         id: history.id,
         operationStatus: history.decrement ? 'Decrement' : 'Increment',

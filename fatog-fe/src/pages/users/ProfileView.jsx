@@ -20,7 +20,7 @@ import Back from '../../components/Back';
 
 export async function loader({ request }) {
     await requireAuth(request);
-    const staff = await getStaffData(request);
+    const staff = await getStaffData();
 
     // console.log(staff);
 
@@ -87,7 +87,8 @@ const ProfileView = () => {
 
             if (find) {
                 if (key === 'status') {
-                    userInfoArray.push({ key, value: value ? 'Active' : 'Inactive' })
+                    userInfoArray.push({ key, value: value ? 'Active' : 'Inactive' });
+                    continue;
                 }
                 userInfoArray.push({ key, value });
             }
@@ -100,7 +101,7 @@ const ProfileView = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
+                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems={{base: 'start', sm: 'center'}}>
                     <Breadcrumb linkList={breadcrumbData} />
                     <Back />
                 </Stack>
