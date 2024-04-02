@@ -21,12 +21,16 @@ const breadcrumbData = [
     { name: 'Password Update', ref: '/profile/change-password' },
 ];
 
+const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[a-zA-Z\d\W_]{8,16}$/;
+
 const ChangePassword = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
-    const passwordRef = useRef(null);
     const { user } = useAuth();
+    const passwordRef = useRef(null);
     const confirmPasswordRef = useRef(null);
+    const [showPasswordHelper, setShowPasswordHelper] = useState(false);
+    const [showConfirmHelper, setShowConfirmHelper] = useState(false);
     const [toastState, setToastState] = useToastHook();
     const {
         handleSubmit,
@@ -35,7 +39,24 @@ const ChangePassword = () => {
     } = useForm();
 
     const passwordChange = async (data) => {
-        if (passwordRef.current.value !== confirmPasswordRef.current.value) {
+        const passwordValidation = PWD_REGEX.test(data.password);
+        setShowConfirmHelper(false);
+        setShowPasswordHelper(false);
+
+        if (!passwordValidation) {
+            setShowPasswordHelper(true);
+            setToastState({
+                title: 'Invalid Password!',
+                description: 'Password must include lowercase and uppercase letters, number, and special character.',
+                status: 'error',
+                icon: <Icon as={BiError} />
+            });
+
+            return;
+        }
+
+        if (data.password !== data.confirmPassword) {
+            setShowConfirmHelper(true);
             setToastState({
                 title: 'Password Mismatch',
                 description: 'New password and Confirm password must match.',
@@ -96,9 +117,29 @@ const ChangePassword = () => {
 
             <form onSubmit={handleSubmit(passwordChange)}>
                 <Stack spacing='4' p='6' borderWidth='1px' borderColor='gray.200' borderRadius='md'>
-                    <TextInput name='password' label='New Password' control={control} type='password' fieldRef={passwordRef} />
+                    <TextInput
+                        name='password'
+                        label='New Password'
+                        control={control}
+                        type='password'
+                        fieldRef={passwordRef}
+                        defaultVal=''
+                        helperText={`
+                        8 to 16 characters.
+                        Must include lowercase and uppercase letters, number, and special character.`}
+                        showHelperText={showPasswordHelper}
+                    />
 
-                    <TextInput name='confirm-password' label='Confirm New Password' control={control} type='password' fieldRef={confirmPasswordRef} />
+                    <TextInput
+                        name='confirmPassword'
+                        label='Confirm New Password'
+                        control={control}
+                        type='password'
+                        fieldRef={confirmPasswordRef}
+                        defaultVal=''
+                        helperText={`Must match the password field above.`}
+                        showHelperText={showConfirmHelper}
+                    />
 
                     <Button
                         type='submit'
