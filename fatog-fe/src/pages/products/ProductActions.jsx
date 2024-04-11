@@ -1,15 +1,14 @@
-import { useRef, useState, useEffect } from 'react';
-import { useNavigate, useNavigation, Link, useLoaderData, useLocation } from 'react-router-dom';
+import { useRef, useState } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 // import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
+import { HStack, Box, useDisclosure, IconButton, Icon, Button, Text, Spinner, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaEllipsisVertical } from "react-icons/fa6";
 import Modal from '../../components/Modal';
-import { getProducts, deleteProduct } from '../../api/products';
+import { deleteProduct } from '../../api/products';
 import { useToastHook } from '../../hooks/useToast';
-import { requireAuth } from '../../hooks/useAuth';
 import { isUnauthorized } from '../../utils';
 
 const ProductActions = ({ row }) => {
