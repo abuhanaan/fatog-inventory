@@ -48,6 +48,8 @@ export const getMonetaryValue = (value) => {
 }
 
 export const formatDate = (dateParam) => {
+    if (!dateParam) return '-'
+    
     const date = new Date(dateParam);
     return date.toLocaleString();
 };

@@ -18,17 +18,6 @@ import { getMonetaryValue, isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
 import ProductActions from './ProductActions';
 
-// const columns = [
-//     { id: 'S/N', header: 'S/N' },
-//     { id: 'name', header: 'Name' },
-//     { id: 'type', header: 'Type' },
-//     { id: 'weight', header: 'Weight' },
-//     { id: 'size', header: 'Size' },
-//     { id: 'pricePerBag', header: 'Price(₦)' },
-//     { id: 'manufacturer', header: 'Manufacturer' },
-//     { id: 'actions', header: '' },
-// ];
-
 const columns = [
     {
         id: 'S/N',

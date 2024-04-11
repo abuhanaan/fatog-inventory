@@ -14,6 +14,17 @@ export const formatDate = (dateParam) => {
     return date.toLocaleString();
 };
 
+// const columns = [
+//     { id: 'S/N', header: 'S/N' },
+//     { id: 'name', header: 'Name' },
+//     { id: 'type', header: 'Type' },
+//     { id: 'weight', header: 'Weight' },
+//     { id: 'remainingQty', header: 'Current Qty' },
+//     { id: 'pricePerBag', header: 'Unit Price(₦)' },
+//     { id: 'manufacturer', header: 'Manufacturer' },
+//     { id: 'actions', header: '' },
+// ];
+
 const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState, fileName, render }) => {
     const { pathname } = useLocation();
     const columnHelper = createColumnHelper();
