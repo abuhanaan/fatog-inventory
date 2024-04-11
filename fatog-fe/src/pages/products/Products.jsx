@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useNavigation, Link, useLoaderData, useLocation } from 'react-router-dom';
-import ListingsTable from '../../components/Table';
+// import ListingsTable from '../../components/Table';
+import ListingsTable from '../../components/Tabl';
 import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
@@ -13,18 +14,81 @@ import AddButton from '../../components/AddButton';
 import { getProducts, deleteProduct } from '../../api/products';
 import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
-import { isUnauthorized } from '../../utils';
+import { getMonetaryValue, isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import ProductActions from '../../components/ProductActions';
+
+// const columns = [
+//     { id: 'S/N', header: 'S/N' },
+//     { id: 'name', header: 'Name' },
+//     { id: 'type', header: 'Type' },
+//     { id: 'weight', header: 'Weight' },
+//     { id: 'size', header: 'Size' },
+//     { id: 'pricePerBag', header: 'Price(₦)' },
+//     { id: 'manufacturer', header: 'Manufacturer' },
+//     { id: 'actions', header: '' },
+// ];
 
 const columns = [
-    { id: 'S/N', header: 'S/N' },
-    { id: 'name', header: 'Name' },
-    { id: 'type', header: 'Type' },
-    { id: 'weight', header: 'Weight' },
-    { id: 'size', header: 'Size' },
-    { id: 'pricePerBag', header: 'Price(₦)' },
-    { id: 'manufacturer', header: 'Manufacturer' },
-    { id: 'actions', header: '' },
+    {
+        id: 'S/N',
+        header: 'S/N',
+        // size: 225,
+        cell: props => <Text>{props.row.index + 1}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'name',
+        header: 'Name',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'type',
+        header: 'Type',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'weight',
+        header: 'Weight',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'size',
+        header: 'Size',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'pricePerBag',
+        header: 'Price',
+        // size: 225,
+        cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'manufacturer',
+        header: 'Manufacturer',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString'
+    },
+    {
+        id: 'actions',
+        header: '',
+        // size: 225,
+        cell: ProductActions,
+        enableGlobalFilter: false,
+    },
 ];
 
 export async function loader({ request }) {
@@ -100,137 +164,10 @@ const Products = () => {
                     {
                         products?.length === 0 ?
                             <EmptySearch headers={['S/N', 'NAME', 'TYPE', 'WEIGHT', 'SIZE', 'MANUFACTURER']} type='product' /> :
-                            <ListingsTable data={products} columns={columns} fileName='products-data.csv' render={(product) => (
-                                <ActionButtons product={product} />
-                            )} />
+                            <ListingsTable data={products} columns={columns} fileName='products-data.csv' />
                     }
                 </Box>
             </Stack>
-    )
-}
-
-const ActionButtons = ({ product }) => {
-    const navigate = useNavigate();
-    const { pathname } = useLocation();
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const closeModalRef = useRef(null);
-    const [toastState, setToastState] = useToastHook();
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    function viewProduct(e) {
-        e.preventDefault();
-
-        const dataProductId = e.currentTarget.getAttribute('data-product-id');
-        navigate(`./${dataProductId}`);
-    }
-
-    async function productDelete(e) {
-        e.preventDefault();
-
-        setIsDeleting(true);
-
-        // TODO: Consume DELETE product endpoint
-        const response = await deleteProduct(product.id);
-
-        if (response.error || response.message) {
-            setToastState({
-                title: response.error,
-                description: response.message,
-                status: 'error',
-                icon: <Icon as={BiError} />
-            });
-
-            setIsDeleting(false);
-            closeModalRef.current.click();
-
-            setTimeout(() => {
-                isUnauthorized(response, navigate, pathname);
-            }, 6000);
-
-            return response.error;
-        }
-
-        setToastState({
-            title: 'Success!',
-            description: 'Product deleted successfully.',
-            status: 'success',
-            icon: <Icon as={FaRegThumbsUp} />
-        });
-
-        setIsDeleting(false);
-        closeModalRef.current.click();
-
-        setTimeout(() => {
-            navigate(`/products`);
-        }, 6000);
-
-    }
-
-    const modalButtons =
-        <HStack spacing='3'>
-            <Button colorScheme='red' ref={closeModalRef} onClick={onClose}>Cancel</Button>
-            <Button
-                onClick={productDelete}
-                colorScheme='blue'
-                isLoading={isDeleting ? true : false}
-                loadingText='Deleting...'
-                spinnerPlacement='end'
-                spinner={<Spinner
-                    thickness='4px'
-                    speed='0.5s'
-                    emptyColor='gray.200'
-                    color='blue.300'
-                    size='md'
-                />}
-            >
-                Delete
-            </Button>
-        </HStack>
-
-    return (
-        <>
-            {/* <HStack spacing='1'>
-                <Tooltip hasArrow label='Preview product' placement='bottom' borderRadius='md'>
-                    <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-product-id={product.id} onClick={viewProduct} />
-                </Tooltip>
-
-                <Tooltip hasArrow label='Edit product' placement='bottom' borderRadius='md'>
-                    <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentProduct: product }} />
-                </Tooltip>
-
-                <Tooltip hasArrow label='Delete product' placement='left' borderRadius='md'>
-                    <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-product-id={product.id} onClick={onOpen} />
-                </Tooltip>
-            </HStack> */}
-
-            <Menu>
-                <MenuButton
-                    as={IconButton}
-                    aria-label='Options'
-                    icon={<FaEllipsisVertical />}
-                    variant='unstyled'
-                />
-                <MenuList py='0'>
-                    <MenuItem icon={<IoEyeOutline />} data-product-id={product.id} onClick={viewProduct}>
-                        Preview
-                    </MenuItem>
-
-                    <MenuItem as={Link} to='create' icon={<MdOutlineEdit />} state={{ currentProduct: product }}>
-                        Edit Product
-                    </MenuItem>
-
-                    <MenuItem icon={<MdDeleteOutline />} data-product-id={product.id} onClick={onOpen}>
-                        Delete Product
-                    </MenuItem>
-                </MenuList>
-            </Menu>
-
-            <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Product'>
-                <Box>
-                    <Text>Proceed to delete product?</Text>
-                </Box>
-            </Modal>
-        </>
     )
 }
 
