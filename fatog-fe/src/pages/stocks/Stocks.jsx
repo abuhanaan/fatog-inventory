@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useLoaderData, Link as RouterLink } from 'react-router-dom';
-import ListingsTable from '../../components/Table';
-import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Tooltip } from '@chakra-ui/react';
+import ListingsTable from '../../components/Tabl';
+import { Stack, HStack, Text, Box, IconButton, Button, Icon, Heading, Tooltip } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import { MdOutlineCreateNewFolder } from "react-icons/md";
-
+import { getMonetaryValue, formatDate } from '../../utils';
 import Breadcrumb from '../../components/Breadcrumb';
 import { EmptySearch } from '../../components/EmptySearch';
 import AddButton from '../../components/AddButton';
@@ -15,15 +15,6 @@ import { requireAuth } from '../../hooks/useAuth';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
 
-const columns = [
-    { id: 'S/N', header: 'S/N' },
-    { id: 'staff', header: 'Staff' },
-    { id: 'totalAmount', header: 'Amount(₦)' },
-    { id: 'totalNoOfBags', header: 'No. of Bags' },
-    { id: 'totalWeight', header: 'Total Weight(kg)' },
-    { id: 'date', header: 'Date' },
-    { id: 'actions', header: '' },
-];
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
     { name: 'Stocks', ref: '/stocks' },
@@ -54,6 +45,81 @@ export async function loader({ request }) {
 
     return data;
 }
+
+const ActionButtons = ({ row }) => {
+    const stock = row.original;
+    const navigate = useNavigate();
+
+    function viewStock(e) {
+        e.preventDefault();
+
+        const dataStockId = e.currentTarget.getAttribute('data-stock-id');
+        navigate(`./${dataStockId}`);
+    }
+
+    return (
+        <HStack spacing='1'>
+            <Tooltip hasArrow label='Preview stock' placement='bottom' borderRadius='md'>
+                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-stock-id={stock.id} onClick={viewStock} />
+            </Tooltip>
+        </HStack>
+    )
+}
+
+const columns = [
+    {
+        id: 'S/N',
+        header: 'S/N',
+        // size: 225,
+        cell: props => <Text>{props.row.index + 1}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'staff',
+        header: 'Staff',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'totalAmount',
+        header: 'Amount',
+        // size: 225,
+        cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'totalNoOfBags',
+        header: 'No. of Bags',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+    },
+    {
+        accessorKey: 'totalWeight',
+        header: 'Total Weight (kg)',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'date',
+        header: 'Date',
+        // size: 225,
+        cell: (props) => <Text>{formatDate(props.getValue())}</Text>,
+        enableGlobalFilter: false,
+        filterFn: 'includesString'
+    },
+    {
+        id: 'actions',
+        header: '',
+        // size: 225,
+        cell: ActionButtons,
+        enableGlobalFilter: false,
+    },
+];
 
 const Stocks = () => {
     const navigate = useNavigate();
@@ -96,31 +162,10 @@ const Stocks = () => {
                     {
                         stocks?.length === 0 ?
                             <EmptySearch headers={['S/N', 'AMOUNT', 'NO. OF BAGS', 'WEIGHT', 'STAFF', 'DATE']} type='stock' /> :
-                            <ListingsTable data={stocks} columns={columns} fileName='stocks-data.csv' render={(stock) => (
-                                <ActionButtons stock={stock} />
-                            )} />
+                            <ListingsTable data={stocks} columns={columns} fileName='stocks-data.csv' />
                     }
                 </Box>
             </Stack>
-    )
-}
-
-const ActionButtons = ({ stock }) => {
-    const navigate = useNavigate();
-
-    function viewStock(e) {
-        e.preventDefault();
-
-        const dataStockId = e.currentTarget.getAttribute('data-stock-id');
-        navigate(`./${dataStockId}`);
-    }
-
-    return (
-        <HStack spacing='1'>
-            <Tooltip hasArrow label='Preview stock' placement='bottom' borderRadius='md'>
-                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-stock-id={stock.id} onClick={viewStock} />
-            </Tooltip>
-        </HStack>
     )
 }
 
