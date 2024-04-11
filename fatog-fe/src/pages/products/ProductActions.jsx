@@ -6,11 +6,11 @@ import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
 import { FaRegThumbsUp, FaEllipsisVertical } from "react-icons/fa6";
-import Modal from './Modal';
-import { getProducts, deleteProduct } from '../api/products';
-import { useToastHook } from '../hooks/useToast';
-import { requireAuth } from '../hooks/useAuth';
-import { isUnauthorized } from '../utils';
+import Modal from '../../components/Modal';
+import { getProducts, deleteProduct } from '../../api/products';
+import { useToastHook } from '../../hooks/useToast';
+import { requireAuth } from '../../hooks/useAuth';
+import { isUnauthorized } from '../../utils';
 
 const ProductActions = ({ row }) => {
     const product = row.original;

@@ -16,7 +16,7 @@ import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
 import { getMonetaryValue, isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
-import ProductActions from '../../components/ProductActions';
+import ProductActions from './ProductActions';
 
 // const columns = [
 //     { id: 'S/N', header: 'S/N' },
