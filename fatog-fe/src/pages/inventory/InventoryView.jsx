@@ -176,7 +176,7 @@ const RecentHistory = ({ history }) => {
             header: 'Remainder Before',
             // size: 225,
             cell: (props) => <Text>{props.getValue()}</Text>,
-            enableGlobalFilter: true,
+            enableGlobalFilter: false,
             filterFn: 'includesString',
         },
         {
