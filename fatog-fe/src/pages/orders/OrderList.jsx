@@ -131,16 +131,6 @@ const OrderList = () => {
         note: order.note,
     }
 
-    // const orderListColumns = [
-    //     { id: 'S/N', header: 'S/N' },
-    //     { id: 'productName', header: 'Product' },
-    //     { id: 'pricePerBag', header: 'Price per Bag' },
-    //     { id: 'noOfBags', header: 'No. of Bags' },
-    //     { id: 'totalAmount', header: 'Total Amount' },
-    //     { id: 'totalWeight', header: 'Total Weight' },
-    //     { id: 'actions', header: '' },
-    // ];
-
     const orderListColumns = [
         {
             id: 'S/N',
