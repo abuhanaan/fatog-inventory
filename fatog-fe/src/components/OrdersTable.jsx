@@ -1,4 +1,4 @@
-import ListingsTable from "./Tabl";
+import ListingsTable from "./Table";
 import { EmptySearch } from "./EmptySearch";
 import { Box } from '@chakra-ui/react';
 

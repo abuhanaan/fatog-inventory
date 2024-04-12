@@ -1,4 +1,4 @@
-import ListingsTable from "./Tabl";
+import ListingsTable from "./Table";
 import { EmptySearch } from "./EmptySearch";
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Box, IconButton, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';

@@ -15,7 +15,7 @@ import { requireAuth } from '../../hooks/useAuth';
 import { getInventory } from '../../api/inventories';
 import { getManufacturers } from '../../api/manufacturers';
 import { useToastHook } from '../../hooks/useToast';
-import ListingsTable from '../../components/Tabl';
+import ListingsTable from '../../components/Table';
 import { formatDate, isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
 import Back from '../../components/Back';

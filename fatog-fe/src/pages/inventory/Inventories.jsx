@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useLoaderData, Link as RouterLink } from 'react-router-dom';
-import ListingsTable from '../../components/Tabl';
+import ListingsTable from '../../components/Table';
 import { Stack, HStack, VStack, Box, IconButton, Button, Icon, Heading, Text, Tooltip } from '@chakra-ui/react';
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";

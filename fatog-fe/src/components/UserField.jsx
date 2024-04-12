@@ -1,6 +1,6 @@
 import { Box, Heading, Text } from '@chakra-ui/react';
 import { getMonetaryValue } from '../utils';
-import { formatDate } from './Table';
+import { formatDate } from './TablePrev';
 
 export const splitFieldName = (str) => {
     return str.split(/(?=[A-Z])/).join(' ');

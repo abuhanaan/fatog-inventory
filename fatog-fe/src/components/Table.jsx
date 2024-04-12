@@ -7,133 +7,14 @@ import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
 import UsersFilter from './UsersFilter';
-import { getMonetaryValue } from '../utils';
 
 export const formatDate = (dateParam) => {
     const date = new Date(dateParam);
     return date.toLocaleString();
 };
 
-// const columns = [
-//     { id: 'S/N', header: 'S/N' },
-//     { id: 'name', header: 'Name' },
-//     { id: 'type', header: 'Type' },
-//     { id: 'weight', header: 'Weight' },
-//     { id: 'remainingQty', header: 'Current Qty' },
-//     { id: 'pricePerBag', header: 'Unit Price(₦)' },
-//     { id: 'manufacturer', header: 'Manufacturer' },
-//     { id: 'actions', header: '' },
-// ];
-
-const ListingsTable = ({ data: tableData, columns: cols, filterData, buttonState, fileName, render }) => {
+const ListingsTable = ({ data: tableData, columns, filterData, buttonState, fileName }) => {
     const { pathname } = useLocation();
-    const columnHelper = createColumnHelper();
-
-    const columns = cols.map(col => {
-        if (col.id === 'S/N') {
-            return (
-                columnHelper.accessor('', {
-                    id: col.id,
-                    cell: info => <span>{info.row.index + 1}</span>,
-                    header: col.header,
-                })
-            )
-        }
-
-        if (col.id === 'active') {
-            return (
-                columnHelper.accessor(col.id, {
-                    id: col.id,
-                    cell: info => (
-                        <Badge colorScheme={info.getValue() === true ? 'green' : 'red'} variant='subtle'>
-                            {info.getValue() === true ? 'Active' : 'Inactive'}
-                        </Badge>
-                    ),
-                    header: col.header,
-                })
-            )
-        }
-
-        if (col.id === 'totalAmount' || col.id === 'pricePerBag' || col.id === 'totalPrice' || col.id === 'amountPaid' || col.id === 'outstandingPayment' || col.id === 'amountPayable' || col.id === 'previousPaymentTotal') {
-            return (
-                columnHelper.accessor(col.id, {
-                    id: col.id,
-                    cell: info => (
-                        <span>
-                            {
-                                getMonetaryValue(info.getValue())
-                            }
-                        </span>
-                    ),
-                    header: col.header,
-                })
-            )
-        }
-
-        if (col.id === 'date') {
-            return (
-                columnHelper.accessor(col.id, {
-                    id: col.id,
-                    cell: info => (
-                        <span>
-                            {
-                                formatDate(info.getValue())
-                            }
-                        </span>
-                    ),
-                    header: col.header,
-                })
-            )
-        }
-
-        if (col.id === 'refId') {
-            return (
-                columnHelper.accessor(col.id, {
-                    id: col.id,
-                    cell: info => (
-                        <Text
-                            overflow='hidden'
-                            textOverflow='ellipsis'
-                            whiteSpace='nowrap'
-                        >
-                            {
-                                info.getValue()
-                                // `${info.getValue().slice(0, 20)}...`
-                            }
-                        </Text>
-                    ),
-                    header: col.header,
-                    size: col.size
-                })
-            )
-        }
-
-        if (col.id === 'actions') {
-            return (
-                columnHelper.accessor('', {
-                    id: col.id,
-                    cell: props => (
-                        render(props.row.original)
-                    ),
-                    header: col.header
-                })
-            )
-        }
-
-        return (
-            columnHelper.accessor(col.id, {
-                id: col.id,
-                cell: info => <span>
-                    {
-                        typeof info.getValue() === 'number' ? info.getValue() :
-                            info.getValue() ? info.getValue() : '-'
-                    }
-                </span>,
-                header: col.header,
-            })
-        )
-    });
-
     const [data, setData] = useState(tableData);
 
     useEffect(() => {
