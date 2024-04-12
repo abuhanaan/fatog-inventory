@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
+import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
 import { HiOutlinePlus } from "react-icons/hi";
 import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
@@ -17,6 +17,9 @@ import { getOrderList } from '../../api/orders';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
 import Back from '../../components/Back';
+import { IoEyeOutline } from "react-icons/io5";
+import { FaEllipsisVertical } from "react-icons/fa6";
+import { getMonetaryValue, formatDate } from '../../utils';
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -57,6 +60,43 @@ export async function loader({ params, request }) {
     return data;
 }
 
+const ActionButtons = ({ order, path }) => {
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+
+    function viewOrder(e) {
+        e.preventDefault();
+
+        const dataOrderId = e.currentTarget.getAttribute('data-order-id');
+        navigate(`${path}/${dataOrderId}`, { state: { from: pathname } });
+    }
+
+    return (
+        <>
+            <Menu>
+                <MenuButton
+                    as={IconButton}
+                    aria-label='Options'
+                    icon={<FaEllipsisVertical />}
+                    variant='unstyled'
+                />
+                <MenuList py='0'>
+                    <MenuItem icon={<IoEyeOutline />} data-order-id={order.id} onClick={viewOrder}>
+                        Preview
+                    </MenuItem>
+
+                    {
+                        pathname.includes('orders') &&
+                        <MenuItem as={RouterLink} to={`/orders/${order.orderId}/orderlist/${order.id}/edit`} icon={<MdOutlineEdit />} state={{ orderItem: order }}>
+                            Edit
+                        </MenuItem>
+                    }
+                </MenuList>
+            </Menu>
+        </>
+    )
+}
+
 const OrderList = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
@@ -91,14 +131,68 @@ const OrderList = () => {
         note: order.note,
     }
 
+    // const orderListColumns = [
+    //     { id: 'S/N', header: 'S/N' },
+    //     { id: 'productName', header: 'Product' },
+    //     { id: 'pricePerBag', header: 'Price per Bag' },
+    //     { id: 'noOfBags', header: 'No. of Bags' },
+    //     { id: 'totalAmount', header: 'Total Amount' },
+    //     { id: 'totalWeight', header: 'Total Weight' },
+    //     { id: 'actions', header: '' },
+    // ];
+
     const orderListColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'productName', header: 'Product' },
-        { id: 'pricePerBag', header: 'Price per Bag' },
-        { id: 'noOfBags', header: 'No. of Bags' },
-        { id: 'totalAmount', header: 'Total Amount' },
-        { id: 'totalWeight', header: 'Total Weight' },
-        { id: 'actions', header: '' },
+        {
+            id: 'S/N',
+            header: 'S/N',
+            // size: 225,
+            cell: props => <Text>{props.row.index + 1}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'productName',
+            header: 'Product',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'pricePerBag',
+            header: 'Price per Bag',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: false,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'noOfBags',
+            header: 'No. of Bags',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalAmount',
+            header: 'Amount',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalWeight',
+            header: 'Weight',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            id: 'actions',
+            header: '',
+            // size: 225,
+            cell: props => <ActionButtons order={props.row.original} path={`/orders/${order.id}/orderlist`} />,
+            enableGlobalFilter: false,
+        },
     ];
 
     const orderListData = orderList.map(orderItem => ({
@@ -114,18 +208,59 @@ const OrderList = () => {
         date: payment.date
     }));
 
+    // const paymentColumns = [
+    //     { id: 'S/N', header: 'S/N' },
+    //     { id: 'amountPaid', header: 'Amount Paid' },
+    //     { id: 'outstandingPayment', header: 'Outstanding Payment' },
+    //     { id: 'previousPaymentTotal', header: 'Prev. Payment Total' },
+    //     { id: 'date', header: 'Date' },
+    // ];
+
     const paymentColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'amountPaid', header: 'Amount Paid' },
-        { id: 'outstandingPayment', header: 'Outstanding Payment' },
-        { id: 'previousPaymentTotal', header: 'Prev. Payment Total' },
-        { id: 'date', header: 'Date' },
+        {
+            id: 'S/N',
+            header: 'S/N',
+            // size: 225,
+            cell: props => <Text>{props.row.index + 1}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'amountPaid',
+            header: 'Amount Paid',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'outstandingPayment',
+            header: 'Outstanding Payment',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'previousPaymentTotal',
+            header: 'Prev. Payment Total',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'date',
+            header: 'Date',
+            // size: 225,
+            cell: (props) => <Text>{formatDate(props.getValue())}</Text>,
+            enableGlobalFilter: false,
+            filterFn: 'includesString'
+        },
     ];
 
     const tabTitles = ['Overview', 'Order List', 'Payments'];
     const tabPanels = [
         <GeneralInfo info={basicOrderInfo} />,
-        <OrdersTable orders={orderListData} columns={orderListColumns} path={`/orders/${order.id}/orderlist`} />,
+        <OrdersTable orders={orderListData} columns={orderListColumns} />,
         <PaymentsTable payments={paymentsData} columns={paymentColumns} />,
     ];
 

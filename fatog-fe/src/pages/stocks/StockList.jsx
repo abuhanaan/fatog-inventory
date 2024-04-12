@@ -110,16 +110,6 @@ const StockList = () => {
         date: stock.date
     }
 
-    // const stockListColumns = [
-    //     { id: 'S/N', header: 'S/N' },
-    //     { id: 'productName', header: 'Product' },
-    //     { id: 'pricePerBag', header: 'Price per Bag' },
-    //     { id: 'noOfBags', header: 'No. of Bags' },
-    //     { id: 'totalAmount', header: 'Total Amount' },
-    //     { id: 'totalWeight', header: 'Total Weight' },
-    //     { id: 'actions', header: '' },
-    // ];
-
     const columns = [
         {
             id: 'S/N',
@@ -180,7 +170,7 @@ const StockList = () => {
         productName: stockItem.product.name
     }));
 
-    console.log(stockListData);
+    // console.log(stockListData);
 
     const tabTitles = ['Overview', 'Stock List'];
     const tabPanels = [
