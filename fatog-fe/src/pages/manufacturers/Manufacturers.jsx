@@ -15,13 +15,46 @@ import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import ManufacturerActions from './ManufacturerActions';
 
 const columns = [
-    { id: 'S/N', header: 'S/N' },
-    { id: 'brandName', header: 'Brand Name' },
-    { id: 'repName', header: 'Representative Name' },
-    { id: 'repPhoneNumber', header: 'Representative Phone' },
-    { id: 'actions', header: '' },
+    {
+        id: 'S/N',
+        header: 'S/N',
+        // size: 225,
+        cell: props => <Text>{props.row.index + 1}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'brandName',
+        header: 'Brand Name',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'repName',
+        header: 'Representative Name',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'repPhoneNumber',
+        header: 'Representative Phone',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        id: 'actions',
+        header: '',
+        // size: 225,
+        cell: ManufacturerActions,
+        enableGlobalFilter: false,
+    },
 ];
 
 export async function loader({ request }) {
@@ -84,138 +117,10 @@ const Manufacturers = () => {
                     {
                         manufacturers?.length === 0 ?
                             <EmptySearch headers={['S/N', 'BRAND NAME', 'REPRESENTATIVE NAME', 'REPRESENTATIVE PHONE']} type='manufacturer' /> :
-                            <ListingsTable data={manufacturers} columns={columns} fileName='manufacturers-data.csv' render={(manufacturer) => (
-                                <ActionButtons manufacturer={manufacturer} />
-                            )} />
+                            <ListingsTable data={manufacturers} columns={columns} fileName='manufacturers-data.csv' />
                     }
                 </Box>
             </Stack>
-    )
-}
-
-const ActionButtons = ({ manufacturer }) => {
-    const navigate = useNavigate();
-    const { state } = useNavigation();
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const { pathname } = useLocation();
-    const closeModalRef = useRef(null);
-    const [toastState, setToastState] = useToastHook();
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    function viewManufacturer(e) {
-        e.preventDefault();
-
-        const dataManufacturerId = e.currentTarget.getAttribute('data-manufacturer-id');
-        navigate(`./${dataManufacturerId}`);
-    }
-
-    async function manufacturerDelete(e) {
-        e.preventDefault();
-
-        setIsDeleting(true);
-
-        // TODO: Consume DELETE manufacturer endpoint
-        const response = await deleteManufacturer(manufacturer.id);
-
-        if (response.error || response.message) {
-            setToastState({
-                title: response.error,
-                description: response.message,
-                status: 'error',
-                icon: <Icon as={BiError} />
-            });
-
-            setIsDeleting(false);
-            closeModalRef.current.click();
-
-            setTimeout(() => {
-                isUnauthorized(response, navigate, pathname);
-            }, 6000);
-
-            return response.error;
-        }
-
-        setToastState({
-            title: 'Success!',
-            description: 'Manufacturer deleted successfully.',
-            status: 'success',
-            icon: <Icon as={FaRegThumbsUp} />
-        });
-
-        setIsDeleting(false);
-        closeModalRef.current.click();
-
-        setTimeout(() => {
-            navigate(`/manufacturers`);
-        }, 6000);
-
-    }
-
-    const modalButtons =
-        <HStack spacing='3'>
-            <Button colorScheme='red' ref={closeModalRef} onClick={onClose}>Cancel</Button>
-            <Button
-                onClick={manufacturerDelete}
-                colorScheme='blue'
-                isLoading={isDeleting ? true : false}
-                loadingText='Deleting...'
-                spinnerPlacement='end'
-                spinner={<Spinner
-                    thickness='4px'
-                    speed='0.5s'
-                    emptyColor='gray.200'
-                    color='blue.300'
-                    size='md'
-                />}
-            >
-                Delete
-            </Button>
-        </HStack>
-
-    return (
-        <>
-            {/* <HStack spacing='1'>
-                <Tooltip hasArrow label='Preview manufacturer' placement='bottom' borderRadius='md'>
-                    <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-manufacturer-id={manufacturer.id} onClick={viewManufacturer} />
-                </Tooltip>
-
-                <Tooltip hasArrow label='Edit manufacturer' placement='bottom' borderRadius='md'>
-                    <IconButton as={Link} to='create' icon={<MdOutlineEdit />} colorScheme='blue' size='sm' state={{ currentManufacturer: manufacturer }} />
-                </Tooltip>
-
-                <Tooltip hasArrow label='Delete manufacturer' placement='left' borderRadius='md'>
-                    <IconButton icon={<MdDeleteOutline />} colorScheme='red' size='sm' data-manufacturer-id={manufacturer.id} onClick={onOpen} />
-                </Tooltip>
-            </HStack> */}
-
-            <Menu>
-                <MenuButton
-                    as={IconButton}
-                    aria-label='Options'
-                    icon={<FaEllipsisVertical />}
-                    variant='unstyled'
-                />
-                <MenuList py='0'>
-                    <MenuItem icon={<IoEyeOutline />} data-manufacturer-id={manufacturer.id} onClick={viewManufacturer}>
-                        Preview
-                    </MenuItem>
-
-                    <MenuItem as={Link} to='create' icon={<MdOutlineEdit />} state={{ currentManufacturer: manufacturer }}>
-                        Edit Manufacturer
-                    </MenuItem>
-
-                    <MenuItem icon={<MdDeleteOutline />} data-manufacturer-id={manufacturer.id} onClick={onOpen}>
-                        Delete Manufacturer
-                    </MenuItem>
-                </MenuList>
-            </Menu>
-
-            <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Manufacturer'>
-                <Box>
-                    <Text>Proceed to delete manufacturer?</Text>
-                </Box>
-            </Modal>
-        </>
     )
 }
 

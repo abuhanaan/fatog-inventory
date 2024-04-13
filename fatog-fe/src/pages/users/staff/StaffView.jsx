@@ -19,6 +19,8 @@ import { useToastHook } from '../../../hooks/useToast';
 import { isUnauthorized } from '../../../utils';
 import FetchError from '../../../components/FetchError';
 import Back from '../../../components/Back';
+import { StaffOrderActions, StaffStockActions, StaffSaleActions } from './StaffActions';
+import { getMonetaryValue, formatDate } from '../../../utils';
 
 export async function loader({ request }) {
     await requireAuth(request);
@@ -72,30 +74,172 @@ const StaffView = () => {
     ];
 
     const stocksColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'totalAmount', header: 'Total Amount' },
-        { id: 'totalNoOfBags', header: 'No. of Bags' },
-        { id: 'totalWeight', header: 'Total Weight' },
-        { id: 'date', header: 'Date' },
-        { id: 'actions', header: '' },
+        {
+            id: 'S/N',
+            header: 'S/N',
+            // size: 225,
+            cell: props => <Text>{props.row.index + 1}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'productName',
+            header: 'Product',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'totalNoOfBags',
+            header: 'No. of Bags',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalAmount',
+            header: 'Amount',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalWeight',
+            header: 'Weight',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            id: 'actions',
+            header: '',
+            // size: 225,
+            cell: props => <StaffStockActions stock={props.row.original} path={`/stocks`} />,
+            enableGlobalFilter: false,
+        },
     ];
 
     const ordersColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'totalAmount', header: 'Amount' },
-        { id: 'totalNoOfBags', header: 'No. of Bags' },
-        { id: 'totalWeight', header: 'Total Weight' },
-        { id: 'phoneNumber', header: 'Customer Phone' },
-        { id: 'date', header: 'Date' },
-        { id: 'actions', header: '' },
-    ]
+        {
+            id: 'S/N',
+            header: 'S/N',
+            // size: 225,
+            cell: props => <Text>{props.row.index + 1}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'productName',
+            header: 'Product',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'pricePerBag',
+            header: 'Price per Bag',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: false,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'noOfBags',
+            header: 'No. of Bags',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalAmount',
+            header: 'Amount',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalWeight',
+            header: 'Weight',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            id: 'actions',
+            header: '',
+            // size: 225,
+            cell: props => <StaffOrderActions order={props.row.original} path={`/orders`} />,
+            enableGlobalFilter: false,
+        },
+    ];
+
+    const salesColumns = [
+        {
+            id: 'S/N',
+            header: 'S/N',
+            // size: 225,
+            cell: props => <Text>{props.row.index + 1}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'amountPaid',
+            header: 'Amount Paid',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'amountPayable',
+            header: 'Amount Payable',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'outstandingPayment',
+            header: 'Outstanding Payment',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'paymentStatus',
+            header: 'Payment Status',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalNoOfBags',
+            header: 'No. of Bags',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'date',
+            header: 'Date',
+            // size: 225,
+            cell: (props) => <Text>{formatDate(props.getValue())}</Text>,
+            enableGlobalFilter: false,
+            filterFn: 'includesString'
+        },
+        {
+            id: 'actions',
+            header: '',
+            // size: 225,
+            cell: StaffSaleActions,
+            enableGlobalFilter: false,
+        },
+    ];
 
     const tabTitles = ['Bio Data', 'Sales', 'Stocks', 'Orders'];
     const tabPanels = [
         <GeneralInfo staff={staff} />,
-        <SalesTable sales={sales} />,
-        <StocksTable stocks={stocks} columns={stocksColumns} path='/stocks' />,
-        <OrdersTable orders={orders} columns={ordersColumns} path='/orders' />
+        <SalesTable sales={sales} columns={salesColumns} />,
+        <StocksTable stocks={stocks} columns={stocksColumns} />,
+        <OrdersTable orders={orders} columns={ordersColumns} />
     ];
 
     useEffect(() => {
@@ -259,7 +403,7 @@ const StaffView = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
+                <Stack direction={{ base: 'column', sm: 'row' }} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
                     <Back />
                 </Stack>

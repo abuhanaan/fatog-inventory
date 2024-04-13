@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, useDisclosure } from '@chakra-ui/react';
+import { Stack, Box, HStack, VStack, SimpleGrid, Heading, Text, Button, IconButton, Icon, Spinner, Tooltip, Card, CardBody, Menu, MenuButton, MenuList, MenuItem, useDisclosure } from '@chakra-ui/react';
 import { HiOutlinePlus } from "react-icons/hi";
 import { Link as RouterLink, useLoaderData, useNavigate, useLocation } from 'react-router-dom';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
@@ -16,6 +16,9 @@ import { getStockList } from '../../api/stocks';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
 import Back from '../../components/Back';
+import { getMonetaryValue, formatDate } from '../../utils';
+import { IoEyeOutline } from "react-icons/io5";
+import { FaEllipsisVertical } from "react-icons/fa6";
 
 export async function loader({ params, request }) {
     await requireAuth(request);
@@ -45,6 +48,43 @@ export async function loader({ params, request }) {
     return data;
 }
 
+const ActionButtons = ({ stock, path }) => {
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+
+    function viewStock(e) {
+        e.preventDefault();
+
+        const dataStockId = e.currentTarget.getAttribute('data-stock-id');
+        navigate(`${path}/${dataStockId}`, { state: { from: pathname } });
+    }
+
+    return (
+        <>
+            <Menu>
+                <MenuButton
+                    as={IconButton}
+                    aria-label='Options'
+                    icon={<FaEllipsisVertical />}
+                    variant='unstyled'
+                />
+                <MenuList py='0'>
+                    <MenuItem icon={<IoEyeOutline />} data-stock-id={stock.id} onClick={viewStock}>
+                        Preview
+                    </MenuItem>
+
+                    {
+                        pathname.includes('stocks') &&
+                        <MenuItem as={RouterLink} to={`/stocks/${stock.stockId}/stocklist/${stock.id}/edit`} icon={<MdOutlineEdit />} state={{ stockItem: stock }}>
+                            Edit
+                        </MenuItem>
+                    }
+                </MenuList>
+            </Menu>
+        </>
+    )
+}
+
 const StockList = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
@@ -70,14 +110,58 @@ const StockList = () => {
         date: stock.date
     }
 
-    const stockListColumns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'productName', header: 'Product' },
-        { id: 'pricePerBag', header: 'Price per Bag' },
-        { id: 'noOfBags', header: 'No. of Bags' },
-        { id: 'totalAmount', header: 'Total Amount' },
-        { id: 'totalWeight', header: 'Total Weight' },
-        { id: 'actions', header: '' },
+    const columns = [
+        {
+            id: 'S/N',
+            header: 'S/N',
+            // size: 225,
+            cell: props => <Text>{props.row.index + 1}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'productName',
+            header: 'Product',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'pricePerBag',
+            header: 'Price per Bag',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'noOfBags',
+            header: 'No. of Bags',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalAmount',
+            header: 'Amount',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalWeight',
+            header: 'Weight',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            id: 'actions',
+            header: '',
+            // size: 225,
+            cell: props => <ActionButtons stock={props.row.original} path={`/stocks/${stock.id}/stocklist`} />,
+            enableGlobalFilter: false,
+        },
     ];
 
     const stockListData = stockList.map(stockItem => ({
@@ -86,12 +170,12 @@ const StockList = () => {
         productName: stockItem.product.name
     }));
 
-    console.log(stockListData);
+    // console.log(stockListData);
 
     const tabTitles = ['Overview', 'Stock List'];
     const tabPanels = [
         <GeneralInfo info={basicStockInfo} />,
-        <StocksTable stocks={stockListData} columns={stockListColumns} path={`/stocks/${stock.id}/stocklist`} />,
+        <StocksTable stocks={stockListData} columns={columns} />,
     ];
 
     useEffect(() => {
@@ -113,7 +197,7 @@ const StockList = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
+                <Stack direction={{ base: 'column', sm: 'row' }} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
                     <Back />
                 </Stack>
