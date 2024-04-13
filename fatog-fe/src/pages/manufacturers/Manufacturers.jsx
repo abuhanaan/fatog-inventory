@@ -47,6 +47,7 @@ const columns = [
         // size: 225,
         cell: (props) => <Text>{props.getValue()}</Text>,
         enableGlobalFilter: false,
+        enableSorting: false,
     },
     {
         id: 'actions',
