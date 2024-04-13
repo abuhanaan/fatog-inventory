@@ -17,6 +17,7 @@ import { useToastHook } from '../../../hooks/useToast';
 import { isUnauthorized } from '../../../utils';
 import FetchError from '../../../components/FetchError';
 import Back from '../../../components/Back';
+import { CustomerOrderActions } from './CustomerActions';
 
 export async function loader({ request }) {
     await requireAuth(request);
@@ -67,10 +68,64 @@ const Customer = () => {
         { name: 'Customer', ref: `/customers/${customer.id}` },
     ];
 
+    const ordersColumns = [
+        {
+            id: 'S/N',
+            header: 'S/N',
+            // size: 225,
+            cell: props => <Text>{props.row.index + 1}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'productName',
+            header: 'Product',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'pricePerBag',
+            header: 'Price per Bag',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: false,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'noOfBags',
+            header: 'No. of Bags',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalAmount',
+            header: 'Amount',
+            // size: 225,
+            cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'totalWeight',
+            header: 'Weight',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            id: 'actions',
+            header: '',
+            // size: 225,
+            cell: props => <CustomerOrderActions order={props.row.original} path={`/orders`} />,
+            enableGlobalFilter: false,
+        },
+    ];
+
     const tabTitles = ['Bio Data', 'Orders'];
     const tabPanels = [
         <GeneralInfo customer={customer} />,
-        <OrdersTable orders={orders} />
+        <OrdersTable orders={orders} columns={ordersColumns} />
     ];
 
     useEffect(() => {

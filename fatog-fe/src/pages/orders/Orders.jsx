@@ -13,23 +13,115 @@ import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import { formatDate, getMonetaryValue } from '../../utils';
+
+const ActionButtons = ({ row }) => {
+    const order = row.original;
+    const navigate = useNavigate();
+
+    function viewOrder(e) {
+        e.preventDefault();
+
+        const dataOrderId = e.currentTarget.getAttribute('data-order-id');
+        navigate(`./${dataOrderId}`);
+    }
+
+    return (
+        <Menu>
+            <MenuButton
+                as={IconButton}
+                aria-label='Options'
+                icon={<FaEllipsisVertical />}
+                variant='unstyled'
+            />
+            <MenuList py='0'>
+                <MenuItem icon={<IoEyeOutline />} data-order-id={order.id} onClick={viewOrder}>
+                    Preview
+                </MenuItem>
+
+                {
+                    !order.invoice ?
+                        <MenuItem as={RouterLink} to={`/sales/create/${order.id}`} icon={<FaMoneyBill />}>
+                            Create Sales
+                        </MenuItem> :
+                        null
+                }
+            </MenuList>
+        </Menu>
+    )
+}
 
 const columns = [
-    { id: 'S/N', header: 'S/N' },
-    { id: 'refId', header: 'Reference Id' },
-    { id: 'staff', header: 'Staff' },
-    { id: 'customer', header: 'Customer' },
-    { id: 'totalAmount', header: 'Amount(₦)' },
-    { id: 'totalNoOfBags', header: 'No. of Bags' },
-    // { id: 'totalWeight', header: 'Total Weight(kg)' },
-    { id: 'date', header: 'Date' },
-    { id: 'actions', header: '' },
-];
-
-const columnFilters = [
     {
-        id: 'refId',
-        value: 'John', // filter the name column by 'John' by default
+        id: 'S/N',
+        header: 'S/N',
+        // size: 225,
+        cell: props => <Text>{props.row.index + 1}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'refId',
+        header: 'Reference',
+        size: 50,
+        cell: (props) => (
+            <Text
+                overflow='hidden'
+                textOverflow='ellipsis'
+                whiteSpace='nowrap'
+                w='200px'
+                minW='50px'
+                maxW='300px'
+            >
+                {props.getValue()}
+            </Text>
+        ),
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'staff',
+        header: 'Staff',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'customer',
+        header: 'Customer',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'totalAmount',
+        header: 'Amount',
+        // size: 225,
+        cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+        enableGlobalFilter: true,
+    },
+    {
+        accessorKey: 'totalNoOfBags',
+        header: 'No. of Bags',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'date',
+        header: 'Date',
+        // size: 225,
+        cell: (props) => <Text>{formatDate(props.getValue())}</Text>,
+        enableGlobalFilter: false,
+        filterFn: 'includesString'
+    },
+    {
+        id: 'actions',
+        header: '',
+        // size: 225,
+        cell: ActionButtons,
+        enableGlobalFilter: false,
     },
 ];
 
@@ -50,7 +142,7 @@ export async function loader({ request }) {
         }
     }
 
-    console.log(orders)
+    // console.log(orders);
 
     const data = orders.map(order => {
         return {
@@ -122,47 +214,10 @@ const Orders = () => {
                     {
                         orders?.length === 0 ?
                             <EmptySearch headers={['S/N', 'AMOUNT', 'NO. OF BAGS', 'CUSTOMER', 'STAFF', 'AMOUNT PAID', 'DELIVERY STATUS', 'PAYMENT STATUS', 'DATE']} type='order' /> :
-                            <ListingsTable data={orders} columns={columns} fileName='orders-data.csv' render={(order) => (
-                                <ActionButtons order={order} />
-                            )} />
+                            <ListingsTable data={orders} columns={columns} fileName='orders-data.csv' />
                     }
                 </Box>
             </Stack>
-    )
-}
-
-const ActionButtons = ({ order }) => {
-    const navigate = useNavigate();
-
-    function viewOrder(e) {
-        e.preventDefault();
-
-        const dataOrderId = e.currentTarget.getAttribute('data-order-id');
-        navigate(`./${dataOrderId}`);
-    }
-
-    return (
-        <Menu>
-            <MenuButton
-                as={IconButton}
-                aria-label='Options'
-                icon={<FaEllipsisVertical />}
-                variant='unstyled'
-            />
-            <MenuList py='0'>
-                <MenuItem icon={<IoEyeOutline />} data-order-id={order.id} onClick={viewOrder}>
-                    Preview
-                </MenuItem>
-
-                {
-                    !order.invoice ?
-                        <MenuItem as={RouterLink} to={`/sales/create/${order.id}`} icon={<FaMoneyBill />}>
-                            Create Sales
-                        </MenuItem> :
-                        null
-                }
-            </MenuList>
-        </Menu>
     )
 }
 

@@ -47,6 +47,13 @@ export const getMonetaryValue = (value) => {
     }).format(value);
 }
 
+export const formatDate = (dateParam) => {
+    if (!dateParam) return '-'
+    
+    const date = new Date(dateParam);
+    return date.toLocaleString();
+};
+
 
 // const isUnauthorized = (res, request) => {
 //     if (res.status === 401) {

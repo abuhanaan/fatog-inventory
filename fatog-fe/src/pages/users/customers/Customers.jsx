@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useNavigation, Link, useLoaderData, useLocation } from 'react-router-dom';
 import ListingsTable from '../../../components/Table';
-import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Menu, MenuButton, MenuList, MenuItem, Tooltip } from '@chakra-ui/react';
+import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Menu, MenuButton, MenuList, MenuItem, Badge, Tooltip } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";
 import { BiError } from "react-icons/bi";
@@ -16,16 +16,77 @@ import { useToastHook } from '../../../hooks/useToast';
 import { requireAuth } from '../../../hooks/useAuth';
 import { isUnauthorized } from '../../../utils';
 import FetchError from '../../../components/FetchError';
+import CustomerActions from './CustomerActions';
+
+// const columns = [
+//     { id: 'S/N', header: 'S/N' },
+//     { id: 'firstName', header: 'First Name' },
+//     { id: 'lastName', header: 'Last Name' },
+//     { id: 'email', header: 'Email' },
+//     { id: 'phoneNumber', header: 'Phone' },
+//     { id: 'role', header: 'Role' },
+//     { id: 'active', header: 'Status' },
+//     { id: 'actions', header: '' },
+// ];
 
 const columns = [
-    { id: 'S/N', header: 'S/N' },
-    { id: 'firstName', header: 'First Name' },
-    { id: 'lastName', header: 'Last Name' },
-    { id: 'email', header: 'Email' },
-    { id: 'phoneNumber', header: 'Phone' },
-    { id: 'role', header: 'Role' },
-    { id: 'active', header: 'Status' },
-    { id: 'actions', header: '' },
+    {
+        id: 'S/N',
+        header: 'S/N',
+        // size: 225,
+        cell: props => <Text>{props.row.index + 1}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'firstName',
+        header: 'First Name',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'lastName',
+        header: 'Last Name',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'email',
+        header: 'Email',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'phone',
+        header: 'Phone Number',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+    },
+    {
+        accessorKey: 'active',
+        header: 'Status',
+        // size: 225,
+        cell: (props) => (
+            <Badge colorScheme={props.getValue() === true ? 'green' : 'red'} variant='subtle'>
+                {props.getValue() === true ? 'Active' : 'Inactive'}
+            </Badge>
+        ),
+        enableGlobalFilter: true,
+        filterFn: 'includesString'
+    },
+    {
+        id: 'actions',
+        header: '',
+        // size: 225,
+        cell: CustomerActions,
+        enableGlobalFilter: false,
+    },
 ];
 
 export async function loader({ request }) {
@@ -114,270 +175,10 @@ const Customers = () => {
                     {
                         customers.length === 0 ?
                             <EmptySearch headers={['S/N', 'FIRST NAME', 'LAST NAME', 'EMAIL', 'PHONE', 'ROLE', 'STATUS']} type='staff' /> :
-                            <ListingsTable data={customersFilter} columns={columns} fileName='customers-data.csv' filterData={filterData} buttonState={buttonState} render={(customer) => (
-                                <ActionButtons customer={customer} />
-                            )} />
+                            <ListingsTable data={customersFilter} columns={columns} fileName='customers-data.csv' filterData={filterData} buttonState={buttonState} />
                     }
                 </Box>
             </Stack>
-    )
-}
-
-const ActionButtons = ({ customer }) => {
-    const navigate = useNavigate();
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const closeModalRef = useRef(null);
-    const { pathname } = useLocation();
-    const [toastState, setToastState] = useToastHook();
-    const [isDeleting, setIsDeleting] = useState(false);
-    const [isActivating, setIsActivating] = useState(false);
-
-    function viewCustomer(e) {
-        e.preventDefault();
-
-        const dataCustomerId = e.currentTarget.getAttribute('data-customer-id');
-        navigate(`./${dataCustomerId}`);
-    }
-
-    async function customerDelete(e) {
-        e.preventDefault();
-
-        setIsDeleting(true);
-
-        // TODO: Consume DELETE customer endpoint
-        const response = await deleteCustomer(customer.id);
-
-        // if (response.unAuthorize) {
-        //     sessionStorage.removeItem('customer');
-        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        // }
-
-        if (response.error || response.message) {
-            setToastState({
-                title: response.error,
-                description: response.message,
-                status: 'error',
-                icon: <Icon as={BiError} />
-            });
-
-            setIsDeleting(false);
-            closeModalRef.current.click();
-
-            setTimeout(() => {
-                isUnauthorized(response, navigate, pathname);
-            }, 6000);
-
-            return response.error;
-        }
-
-        setToastState({
-            title: 'Success!',
-            description: 'Customer deleted successfully.',
-            status: 'success',
-            icon: <Icon as={FaRegThumbsUp} />
-        });
-
-        setIsDeleting(false);
-        closeModalRef.current.click();
-
-        setTimeout(() => {
-            navigate(`/customers`);
-        }, 6000);
-
-    }
-
-    const customerActivate = async (e) => {
-        e.preventDefault();
-
-        setIsActivating(true);
-
-        const customerId = e.currentTarget.getAttribute('data-customer-id');
-
-        const response = await activateUser(customerId);
-
-        // if (response.unAuthorize) {
-        //     sessionStorage.removeItem('user');
-        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        // }
-
-        if (response.error || response.message) {
-            setToastState({
-                title: response.error,
-                description: response.message,
-                status: 'error',
-                icon: <Icon as={BiError} />
-            });
-
-            setIsActivating(false);
-
-            setTimeout(() => {
-                isUnauthorized(response, navigate, pathname);
-            }, 6000);
-
-            return response.error;
-        }
-
-        setToastState({
-            title: 'Success!',
-            description: 'Customer activated successfully.',
-            status: 'success',
-            icon: <Icon as={FaRegThumbsUp} />
-        });
-
-        setIsActivating(false);
-
-        setTimeout(() => {
-            navigate(`/customers`);
-        }, 6000);
-    }
-
-    const customerDeactivate = async (e) => {
-        e.preventDefault();
-
-        setIsActivating(true);
-
-        const customerId = e.currentTarget.getAttribute('data-customer-id');
-
-        const response = await deactivateUser(customerId);
-
-        // if (response.unAuthorize) {
-        //     sessionStorage.removeItem('user');
-        //     navigate(`/?message=${response.message}. Please log in to continue&redirectTo=${pathname}`);
-        // }
-
-        if (response.error || response.message) {
-            setToastState({
-                title: response.error,
-                description: response.message,
-                status: 'error',
-                icon: <Icon as={BiError} />
-            });
-
-            setIsActivating(false);
-
-            setTimeout(() => {
-                isUnauthorized(response, navigate, pathname);
-            }, 6000);
-
-            return response.error;
-        }
-
-        setToastState({
-            title: 'Success!',
-            description: 'Customer deactivated successfully.',
-            status: 'success',
-            icon: <Icon as={FaRegThumbsUp} />
-        });
-
-        setIsActivating(false);
-
-        setTimeout(() => {
-            navigate(`/customers`);
-        }, 6000);
-    }
-
-    const modalButtons =
-        <HStack spacing='3'>
-            <Button colorScheme='red' ref={closeModalRef} onClick={onClose}>Cancel</Button>
-            <Button
-                onClick={customerDelete}
-                colorScheme='blue'
-                isLoading={isDeleting ? true : false}
-                loadingText='Deleting...'
-                spinnerPlacement='end'
-                spinner={<Spinner
-                    thickness='4px'
-                    speed='0.5s'
-                    emptyColor='gray.200'
-                    color='blue.300'
-                    size='md'
-                />}
-            >
-                Delete
-            </Button>
-        </HStack>
-
-    return (
-        <>
-            <Menu>
-                <MenuButton
-                    as={IconButton}
-                    aria-label='Options'
-                    icon={<FaEllipsisVertical />}
-                    variant='unstyled'
-                />
-                <MenuList py='0'>
-                    <MenuItem icon={<IoEyeOutline />} data-customer-id={customer.id} onClick={viewCustomer}>
-                        Preview
-                    </MenuItem>
-
-                    <MenuItem as={Link} to='/users/create' icon={<MdOutlineEdit />} state={{ currentUser: customer, entity: 'customers' }}>
-                        Edit Customer
-                    </MenuItem>
-
-                    {
-                        customer.active ?
-                            <MenuItem
-                                as={Button}
-                                icon={<FaUserXmark />}
-                                data-customer-id={customer.id}
-                                onClick={customerDeactivate}
-                                size='sm'
-                                _hover={{ bg: 'gray.100' }}
-                                borderRadius='0'
-                                fontWeight='normal'
-                                closeOnSelect={false}
-                                aria-label='Deactivate customer'
-                                isLoading={isActivating}
-                                loadingText='Deactivating...'
-                                spinnerPlacement='end'
-                                spinner={< Spinner
-                                    thickness='4px'
-                                    speed='0.5s'
-                                    emptyColor='gray.200'
-                                    color='blue.300'
-                                    size='md'
-                                />}
-                            >
-                                Deactivate Customer
-                            </MenuItem> :
-                            <MenuItem
-                                as={Button}
-                                icon={<FaUserCheck />}
-                                size='sm'
-                                data-customer-id={customer.id}
-                                onClick={customerActivate}
-                                _hover={{ bg: 'gray.100' }}
-                                borderRadius='0'
-                                fontWeight='normal'
-                                closeOnSelect={false}
-                                aria-label='Activate customer'
-                                isLoading={isActivating ? true : false}
-                                loadingText='Activating...'
-                                spinnerPlacement='end'
-                                spinner={<Spinner
-                                    thickness='4px'
-                                    speed='0.5s'
-                                    emptyColor='gray.200'
-                                    color='blue.300'
-                                    size='md'
-                                />}
-                            >
-                                Activate Customer
-                            </MenuItem>
-                    }
-                    {/* <MenuItem icon={<MdDeleteOutline />} data-customer-id={customer.id} onClick={onOpen}>
-                        Delete Customer
-                    </MenuItem> */}
-                </MenuList>
-            </Menu>
-
-            <Modal isOpen={isOpen} onClose={onClose} footer={modalButtons} title='Delete Customer'>
-                <Box>
-                    <Text>Proceed to delete customer?</Text>
-                </Box>
-            </Modal>
-        </>
     )
 }
 

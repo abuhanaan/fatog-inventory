@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, createContext } from 'react';
 import { useNavigate, useNavigation, useSearchParams, Link, useLoaderData, useLocation } from 'react-router-dom';
-import ListingsTable from '../../components/Table';
+import ListingsTable from '../../components/TablePrev';
 import { Stack, HStack, VStack, Box, useDisclosure, IconButton, Icon, Button, Heading, Text, Spinner, Tooltip } from '@chakra-ui/react';
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { IoEyeOutline } from "react-icons/io5";

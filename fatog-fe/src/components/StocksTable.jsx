@@ -6,7 +6,7 @@ import { IoEyeOutline } from "react-icons/io5";
 import { MdOutlineEdit, MdDeleteOutline } from "react-icons/md";
 import { FaEllipsisVertical } from "react-icons/fa6";
 
-const StocksTable = ({ stocks, columns, path }) => {
+const StocksTable = ({ stocks, columns }) => {
     const stocksData = stocks.map(stock => ({
         ...stock,
         date: stock.createdAt
@@ -19,9 +19,7 @@ const StocksTable = ({ stocks, columns, path }) => {
             {
                 stocks.length === 0 ?
                     <EmptySearch headers={['S/N', 'Amount', 'No. of Bags', 'Total Weight', ' ']} type='stock' /> :
-                    <ListingsTable data={stocksData} columns={columns} fileName='stocks-data.csv' render={(stock) => (
-                        <ActionButtons stock={stock} path={path} />
-                    )} />
+                    <ListingsTable data={stocksData} columns={columns} fileName='stocks-data.csv' />
             }
         </Box>
     )

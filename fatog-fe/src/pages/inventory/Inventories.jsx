@@ -13,17 +13,71 @@ import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import InventoryActions from './InventoryActions';
+import { getMonetaryValue } from '../../utils';
 
 const columns = [
-    { id: 'S/N', header: 'S/N' },
-    { id: 'name', header: 'Name' },
-    { id: 'type', header: 'Type' },
-    { id: 'weight', header: 'Weight' },
-    { id: 'remainingQty', header: 'Current Qty' },
-    { id: 'pricePerBag', header: 'Unit Price(₦)' },
-    { id: 'manufacturer', header: 'Manufacturer' },
-    { id: 'actions', header: '' },
+    {
+        id: 'S/N',
+        header: 'S/N',
+        // size: 225,
+        cell: props => <Text>{props.row.index + 1}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'name',
+        header: 'Name',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'type',
+        header: 'Type',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'weight',
+        header: 'Weight',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'remainingQty',
+        header: 'Remaining Quantity',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'pricePerBag',
+        header: 'Price',
+        // size: 225,
+        cell: (props) => <Text>{getMonetaryValue(props.getValue())}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'manufacturer',
+        header: 'Manufacturer',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString'
+    },
+    {
+        id: 'actions',
+        header: '',
+        // size: 225,
+        cell: InventoryActions,
+        enableGlobalFilter: false,
+    },
 ];
+
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
     { name: 'Inventories', ref: '/inventories' },
@@ -108,31 +162,10 @@ const Inventories = () => {
                     {
                         inventories?.length === 0 ?
                             <EmptySearch headers={['S/N', 'NAME', 'TYPE', 'WEIGHT', 'QUANTITY', 'PRICE(₦)', 'MANUFACTURER']} type='inventory' /> :
-                            <ListingsTable data={inventories} columns={columns} fileName='inventories-data.csv' render={(inventory) => (
-                                <ActionButtons inventory={inventory} />
-                            )} />
+                            <ListingsTable data={inventories} columns={columns} fileName='inventories-data.csv' />
                     }
                 </Box>
             </Stack>
-    )
-}
-
-const ActionButtons = ({ inventory }) => {
-    const navigate = useNavigate();
-
-    function viewInventory(e) {
-        e.preventDefault();
-
-        const dataInventoryId = e.currentTarget.getAttribute('data-inventory-id');
-        navigate(`./${dataInventoryId}`);
-    }
-
-    return (
-        <HStack spacing='1'>
-            <Tooltip hasArrow label='Preview inventory' placement='bottom' borderRadius='md'>
-                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-inventory-id={inventory.id} onClick={viewInventory} />
-            </Tooltip>
-        </HStack>
     )
 }
 

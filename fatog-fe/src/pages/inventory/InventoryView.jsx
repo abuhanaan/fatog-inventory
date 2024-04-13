@@ -16,7 +16,7 @@ import { getInventory } from '../../api/inventories';
 import { getManufacturers } from '../../api/manufacturers';
 import { useToastHook } from '../../hooks/useToast';
 import ListingsTable from '../../components/Table';
-import { isUnauthorized } from '../../utils';
+import { formatDate, isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
 import Back from '../../components/Back';
 
@@ -99,7 +99,7 @@ const InventoryView = () => {
         error.error || error.message ?
             <FetchError error={error} /> :
             <Stack spacing='6'>
-                <Stack direction={{base: 'column', sm: 'row'}} justifyContent='space-between' alignItems='center'>
+                <Stack direction={{ base: 'column', sm: 'row' }} justifyContent='space-between' alignItems='center'>
                     <Breadcrumb linkList={breadcrumbData} />
                     <Back />
                 </Stack>
@@ -142,39 +142,8 @@ const GeneralInfo = ({ inventory }) => {
     )
 };
 
-const RecentHistory = ({ history }) => {
-    const columns = [
-        { id: 'S/N', header: 'S/N' },
-        { id: 'remainderBefore', header: 'Remainder Before' },
-        { id: 'effectQuantity', header: 'Effect Qty' },
-        { id: 'remainderAfter', header: 'Remainder After' },
-        { id: 'operationStatus', header: 'Status' },
-        { id: 'operationType', header: 'Type' },
-        { id: 'date', header: 'Date' },
-        { id: 'actions', header: '' },
-    ];
-
-    const historyData = history.map(hist => ({
-        ...hist,
-        operationStatus: hist.decrement ? 'Decrement' : 'Increment',
-        operationType: hist.orderItemId ? 'Order' : 'Stock',
-        date: hist.createdAt
-    }));
-
-    return (
-        <Box marginTop='8'>
-            {
-                history?.length === 0 ?
-                    <EmptySearch headers={['S/N', 'REM. BEFORE', 'REM. AFTER', 'EFFECT QTY', 'STATUS']} type='history' /> :
-                    <ListingsTable data={historyData} columns={columns} fileName='inventories-data.csv' render={(history) => (
-                        <ActionButtons history={history} />
-                    )} />
-            }
-        </Box>
-    )
-}
-
-const ActionButtons = ({ history }) => {
+const ActionButtons = ({ row }) => {
+    const history = row.original;
     const navigate = useNavigate();
 
     function viewHistory(e) {
@@ -190,6 +159,87 @@ const ActionButtons = ({ history }) => {
                 <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-history-id={history.id} onClick={viewHistory} />
             </Tooltip>
         </HStack>
+    )
+}
+
+const RecentHistory = ({ history }) => {
+    const columns = [
+        {
+            id: 'S/N',
+            header: 'S/N',
+            // size: 225,
+            cell: props => <Text>{props.row.index + 1}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'remainderBefore',
+            header: 'Remainder Before',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: false,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'effectQuantity',
+            header: 'Effect Qty',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+            filterFn: 'includesString',
+        },
+        {
+            accessorKey: 'remainderAfter',
+            header: 'Remainder After',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: false,
+        },
+        {
+            accessorKey: 'operationStatus',
+            header: 'Status',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'operationType',
+            header: 'Type',
+            // size: 225,
+            cell: (props) => <Text>{props.getValue()}</Text>,
+            enableGlobalFilter: true,
+        },
+        {
+            accessorKey: 'date',
+            header: 'Date',
+            // size: 225,
+            cell: (props) => <Text>{formatDate(props.getValue())}</Text>,
+            enableGlobalFilter: false,
+            filterFn: 'includesString'
+        },
+        {
+            id: 'actions',
+            header: '',
+            // size: 225,
+            cell: ActionButtons,
+            enableGlobalFilter: false,
+        },
+    ];
+
+    const historyData = history.map(hist => ({
+        ...hist,
+        operationStatus: hist.decrement ? 'Decrement' : 'Increment',
+        operationType: hist.orderItemId ? 'Order' : 'Stock',
+        date: hist.createdAt
+    }));
+
+    return (
+        <Box marginTop='8'>
+            {
+                history?.length === 0 ?
+                    <EmptySearch headers={['S/N', 'REM. BEFORE', 'REM. AFTER', 'EFFECT QTY', 'STATUS']} type='history' /> :
+                    <ListingsTable data={historyData} columns={columns} fileName='inventories-data.csv' />
+            }
+        </Box>
     )
 }
 

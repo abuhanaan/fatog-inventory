@@ -11,17 +11,8 @@ import { useToastHook } from '../../hooks/useToast';
 import { requireAuth } from '../../hooks/useAuth';
 import { isUnauthorized } from '../../utils';
 import FetchError from '../../components/FetchError';
+import { formatDate } from '../../utils';
 
-const columns = [
-    { id: 'S/N', header: 'S/N' },
-    { id: 'remainderBefore', header: 'Remainder Before' },
-    { id: 'effectQuantity', header: 'Effect Qty' },
-    { id: 'remainderAfter', header: 'Remainder After' },
-    { id: 'operationStatus', header: 'Status' },
-    { id: 'operationType', header: 'Type' },
-    { id: 'date', header: 'Date' },
-    { id: 'actions', header: '' },
-];
 const breadcrumbData = [
     { name: 'Home', ref: '/dashboard' },
     { name: 'History', ref: '/history' },
@@ -54,6 +45,88 @@ export async function loader({ request }) {
 
     return data;
 }
+
+const ActionButtons = ({ row }) => {
+    const history = row.original;
+    const navigate = useNavigate();
+
+    function viewHistory(e) {
+        e.preventDefault();
+
+        const dataHistoryId = e.currentTarget.getAttribute('data-history-id');
+        navigate(`./${dataHistoryId}`);
+    }
+
+    return (
+        <HStack spacing='1'>
+            <Tooltip hasArrow label='Preview history' placement='bottom' borderRadius='md'>
+                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-history-id={history.id} onClick={viewHistory} />
+            </Tooltip>
+        </HStack>
+    )
+}
+
+const columns = [
+    {
+        id: 'S/N',
+        header: 'S/N',
+        // size: 225,
+        cell: props => <Text>{props.row.index + 1}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'remainderBefore',
+        header: 'Remainder Before',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'effectQuantity',
+        header: 'Effect Qty',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+        filterFn: 'includesString',
+    },
+    {
+        accessorKey: 'remainderAfter',
+        header: 'Remainder After',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: false,
+    },
+    {
+        accessorKey: 'operationStatus',
+        header: 'Status',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+    },
+    {
+        accessorKey: 'operationType',
+        header: 'Type',
+        // size: 225,
+        cell: (props) => <Text>{props.getValue()}</Text>,
+        enableGlobalFilter: true,
+    },
+    {
+        accessorKey: 'date',
+        header: 'Date',
+        // size: 225,
+        cell: (props) => <Text>{formatDate(props.getValue())}</Text>,
+        enableGlobalFilter: false,
+        filterFn: 'includesString'
+    },
+    {
+        id: 'actions',
+        header: '',
+        // size: 225,
+        cell: ActionButtons,
+        enableGlobalFilter: false,
+    },
+];
 
 const Histories = () => {
     const navigate = useNavigate();
@@ -95,31 +168,10 @@ const Histories = () => {
                     {
                         histories?.length === 0 ?
                             <EmptySearch headers={['S/N', 'PRODUCT', 'MANUFACTURER', 'STAFF', 'CUSTOMER', 'AMOUNT', 'QTY', 'PAYMENT STATUS', 'DELIVERY STATUS', 'DATE']} type='history' /> :
-                            <ListingsTable data={histories} columns={columns} fileName='histories-data.csv' render={(history) => (
-                                <ActionButtons history={history} />
-                            )} />
+                            <ListingsTable data={histories} columns={columns} fileName='histories-data.csv' />
                     }
                 </Box>
             </Stack>
-    )
-}
-
-const ActionButtons = ({ history }) => {
-    const navigate = useNavigate();
-
-    function viewHistory(e) {
-        e.preventDefault();
-
-        const dataHistoryId = e.currentTarget.getAttribute('data-history-id');
-        navigate(`./${dataHistoryId}`);
-    }
-
-    return (
-        <HStack spacing='1'>
-            <Tooltip hasArrow label='Preview history' placement='bottom' borderRadius='md'>
-                <IconButton icon={<IoEyeOutline />} colorScheme='purple' size='sm' data-history-id={history.id} onClick={viewHistory} />
-            </Tooltip>
-        </HStack>
     )
 }
 
