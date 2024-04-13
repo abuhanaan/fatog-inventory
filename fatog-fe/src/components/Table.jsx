@@ -1,12 +1,14 @@
 // ProductsListing.js
 import React, { useMemo, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { createColumnHelper, getCoreRowModel, useReactTable, flexRender, getPaginationRowModel, getFilteredRowModel } from '@tanstack/react-table';
+import { createColumnHelper, getCoreRowModel, useReactTable, flexRender, getPaginationRowModel, getFilteredRowModel, getSortedRowModel } from '@tanstack/react-table';
 import { TableContainer, Table, Tbody, Td, Th, Thead, Tr, Button, IconButton, Flex, HStack, Input, Box, Select, Icon, Spacer, Badge, Text } from '@chakra-ui/react';
 import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
 import SearchInput from './form/SearchInput';
 import DownloadBtn from './DownloadBtn';
 import UsersFilter from './UsersFilter';
+import SortIcon from '../icons/SortIcon';
+import { TbSortAscending, TbSortDescending } from "react-icons/tb";
 
 export const formatDate = (dateParam) => {
     const date = new Date(dateParam);
@@ -29,6 +31,7 @@ const ListingsTable = ({ data: tableData, columns, filterData, buttonState, file
             globalFilter,
         },
         getFilteredRowModel: getFilteredRowModel(),
+        getSortedRowModel: getSortedRowModel(),
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel()
     });
@@ -72,6 +75,25 @@ const ListingsTable = ({ data: tableData, columns, filterData, buttonState, file
                                             <Th key={header.id}>
                                                 {
                                                     flexRender(header.column.columnDef.header, header.getContext())
+                                                }
+
+                                                {
+                                                    header.column.getCanSort() && (
+                                                        <Icon
+                                                            as={SortIcon}
+                                                            fontSize={14}
+                                                            mx={3}
+                                                            cursor='pointer'
+                                                            onClick={header.column.getToggleSortingHandler()}
+                                                        />
+                                                    )
+                                                }
+
+                                                {
+                                                    {
+                                                        'asc': <Icon as={TbSortAscending} fontSize={14}/>,
+                                                        'desc': <Icon as={TbSortDescending} fontSize={14} />
+                                                    }[header.column.getIsSorted()]
                                                 }
                                             </Th>
                                         ))
