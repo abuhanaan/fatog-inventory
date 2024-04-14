@@ -33,7 +33,8 @@ const ListingsTable = ({ data: tableData, columns, filterData, buttonState, file
         getFilteredRowModel: getFilteredRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel()
+        getPaginationRowModel: getPaginationRowModel(),
+        columnResizeMode: 'onChange',
     });
 
     const generateMultiplesOf10 = (totalNumber) => {
@@ -65,14 +66,14 @@ const ListingsTable = ({ data: tableData, columns, filterData, buttonState, file
                 <DownloadBtn data={tableData} fileName={fileName}>Download</DownloadBtn>
             </Flex>
             <TableContainer overflowX='auto'>
-                <Table variant="simple" size='sm' colorScheme='blue'>
+                <Table variant="simple" size='sm' colorScheme='blue' w={table.getTotalSize()}>
                     <Thead>
                         {
                             table.getHeaderGroups().map(headerGroup => (
                                 <Tr key={headerGroup.id}>
                                     {
                                         headerGroup.headers.map(header => (
-                                            <Th key={header.id}>
+                                            <Th key={header.id} pos={header.column.columnDef.accessorKey === 'refId' ? 'relative' : ''} w={header.getSize()}>
                                                 {
                                                     flexRender(header.column.columnDef.header, header.getContext())
                                                 }
@@ -91,9 +92,19 @@ const ListingsTable = ({ data: tableData, columns, filterData, buttonState, file
 
                                                 {
                                                     {
-                                                        'asc': <Icon as={TbSortAscending} fontSize={14}/>,
+                                                        'asc': <Icon as={TbSortAscending} fontSize={14} />,
                                                         'desc': <Icon as={TbSortDescending} fontSize={14} />
                                                     }[header.column.getIsSorted()]
+                                                }
+
+                                                {
+                                                    header.column.columnDef.accessorKey === 'refId' && (
+                                                        <Box
+                                                            onMouseDown={header.getResizeHandler()}
+                                                            onTouchStart={header.getResizeHandler()}
+                                                            className={`resizer ${header.column.getIsResizing() ? 'isResizing' : ''}`}
+                                                        />
+                                                    )
                                                 }
                                             </Th>
                                         ))
