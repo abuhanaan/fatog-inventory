@@ -66,7 +66,7 @@ const ListingsTable = ({ data: tableData, columns, filterData, buttonState, file
                 <DownloadBtn data={tableData} fileName={fileName}>Download</DownloadBtn>
             </Flex>
             <TableContainer overflowX='auto'>
-                <Table variant="simple" size='sm' colorScheme='blue' w={table.getTotalSize()}>
+                <Table variant="simple" size='sm' colorScheme='blue'>
                     <Thead>
                         {
                             table.getHeaderGroups().map(headerGroup => (
